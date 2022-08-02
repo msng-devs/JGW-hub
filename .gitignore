@@ -1,4 +1,4 @@
-secrets.py
+secret_key.py
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,pycharm,django,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,pycharm,django,python

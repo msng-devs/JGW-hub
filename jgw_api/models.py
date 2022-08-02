@@ -47,6 +47,43 @@ class AttendanceType(models.Model):
         db_table = 'ATTENDANCE_TYPE'
 
 
+class Board(models.Model):
+    board_id_pk = models.AutoField(db_column='BOARD_ID_PK', primary_key=True)  # Field name made lowercase.
+    board_name = models.CharField(db_column='BOARD_NAME', unique=True, max_length=45)  # Field name made lowercase.
+    role_role_pk_write_level = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK_WRITE_LEVEL', related_name='write_board_role')  # Field name made lowercase.
+    role_role_pk_read_level = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK_READ_LEVEL', related_name='read_board_role')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'BOARD'
+
+
+class Category(models.Model):
+    category_id_pk = models.AutoField(db_column='CATEGORY_ID_PK', primary_key=True)  # Field name made lowercase.
+    category_name = models.CharField(db_column='CATEGORY_NAME', unique=True, max_length=20)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'CATEGORY'
+
+
+class Comment(models.Model):
+    comment_id = models.AutoField(db_column='COMMENT_ID', primary_key=True)  # Field name made lowercase.
+    comment_ref_id = models.IntegerField(db_column='COMMENT_REF_ID')  # Field name made lowercase.
+    comment_depth = models.IntegerField(db_column='COMMENT_DEPTH')  # Field name made lowercase.
+    comment_content = models.TextField(db_column='COMMENT_CONTENT')  # Field name made lowercase.
+    comment_write_time = models.DateTimeField(db_column='COMMENT_WRITE_TIME')  # Field name made lowercase.
+    comment_update_time = models.DateTimeField(db_column='COMMENT_UPDATE_TIME')  # Field name made lowercase.
+    comment_delete = models.CharField(db_column='COMMENT_DELETE', max_length=1)  # Field name made lowercase.
+    post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK')  # Field name made lowercase.
+    member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True, related_name='comment_member')  # Field name made lowercase.
+    comment_comment_id_ref = models.ForeignKey('self', models.DO_NOTHING, db_column='COMMENT_COMMENT_ID_REF', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'COMMENT'
+
+
 class Config(models.Model):
     config_pk = models.AutoField(db_column='CONFIG_PK', primary_key=True)  # Field name made lowercase.
     config_nm = models.CharField(db_column='CONFIG_NM', unique=True, max_length=50)  # Field name made lowercase.
@@ -79,6 +116,15 @@ class Event(models.Model):
     class Meta:
         managed = False
         db_table = 'EVENT'
+
+
+class Image(models.Model):
+    image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
+    image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'IMAGE'
 
 
 class Major(models.Model):
@@ -120,7 +166,7 @@ class Method(models.Model):
 
 class Penalty(models.Model):
     penalty_pk = models.AutoField(db_column='PENALTY_PK', primary_key=True)  # Field name made lowercase.
-    member_member_pk_giver = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK_GIVER')  # Field name made lowercase.
+    member_member_pk_giver = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK_GIVER', related_name='penalty_member')  # Field name made lowercase.
     member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK')  # Field name made lowercase.
     penalty_modified_dttm = models.DateTimeField(db_column='PENALTY_MODIFIED_DTTM')  # Field name made lowercase.
     penalty_created_dttm = models.DateTimeField(db_column='PENALTY_CREATED_DTTM')  # Field name made lowercase.
@@ -131,6 +177,32 @@ class Penalty(models.Model):
         managed = False
         db_table = 'PENALTY'
         unique_together = (('penalty_pk', 'member_member_pk_giver', 'member_member_pk'),)
+
+
+class Post(models.Model):
+    post_id_pk = models.AutoField(db_column='POST_ID_PK', primary_key=True)  # Field name made lowercase.
+    post_title = models.CharField(db_column='POST_TITLE', max_length=100)  # Field name made lowercase.
+    post_content = models.TextField(db_column='POST_CONTENT')  # Field name made lowercase.
+    post_write_time = models.DateTimeField(db_column='POST_WRITE_TIME')  # Field name made lowercase.
+    post_update_time = models.DateTimeField(db_column='POST_UPDATE_TIME')  # Field name made lowercase.
+    category_category_id_pk = models.ForeignKey(Category, models.DO_NOTHING, db_column='CATEGORY_CATEGORY_ID_PK', blank=True, null=True)  # Field name made lowercase.
+    image_image_id_pk = models.ForeignKey(Image, models.DO_NOTHING, db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True)  # Field name made lowercase.
+    board_boadr_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOADR_ID_PK')  # Field name made lowercase.
+    member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'POST'
+
+
+class PostHasTag(models.Model):
+    post_post_id_pk = models.OneToOneField(Post, models.DO_NOTHING, db_column='POST_POST_ID_PK', primary_key=True)  # Field name made lowercase.
+    tag_tag_id_pk = models.ForeignKey('Tag', models.DO_NOTHING, db_column='TAG_TAG_ID_PK')  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'POST_has_TAG'
+        unique_together = (('post_post_id_pk', 'tag_tag_id_pk'),)
 
 
 class Rank(models.Model):
@@ -162,6 +234,15 @@ class Service(models.Model):
         db_table = 'SERVICE'
 
 
+class Tag(models.Model):
+    tag_id_pk = models.AutoField(db_column='TAG_ID_PK', primary_key=True)  # Field name made lowercase.
+    tag_name = models.CharField(db_column='TAG_NAME', unique=True, max_length=20)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'TAG'
+
+
 class Timetable(models.Model):
     timetable_pk = models.AutoField(db_column='TIMETABLE_PK', primary_key=True)  # Field name made lowercase.
     event_event_pk = models.ForeignKey(Event, models.DO_NOTHING, db_column='EVENT_EVENT_PK')  # Field name made lowercase.
@@ -173,84 +254,3 @@ class Timetable(models.Model):
         managed = False
         db_table = 'TIMETABLE'
         unique_together = (('timetable_pk', 'event_event_pk'),)
-
-
-class Board(models.Model):
-    board_id_pk = models.AutoField(db_column='BOARD_ID_PK', primary_key=True)  # Field name made lowercase.
-    board_name = models.CharField(db_column='BOARD_NAME', unique=True, max_length=45)  # Field name made lowercase.
-    role_role_pk_write_level = models.ForeignKey(Role, models.DO_NOTHING, db_column='ROLE_ROLE_PK_WRITE_LEVEL')  # Field name made lowercase.
-    role_role_pk_read_level = models.ForeignKey(Role, models.DO_NOTHING, db_column='ROLE_ROLE_PK_READ_LEVEL')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'BOARD'
-
-
-class Category(models.Model):
-    category_id_pk = models.AutoField(db_column='CATEGORY_ID_PK', primary_key=True)  # Field name made lowercase.
-    category_name = models.CharField(db_column='CATEGORY_NAME', unique=True, max_length=20)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'CATEGORY'
-
-
-class Image(models.Model):
-    image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
-    image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'IMAGE'
-
-
-class Comment(models.Model):
-    comment_id = models.AutoField(db_column='COMMENT_ID', primary_key=True)  # Field name made lowercase.
-    comment_ref_id = models.IntegerField(db_column='COMMENT_REF_ID')  # Field name made lowercase.
-    comment_depth = models.IntegerField(db_column='COMMENT_DEPTH')  # Field name made lowercase.
-    comment_content = models.TextField(db_column='COMMENT_CONTENT')  # Field name made lowercase.
-    comment_write_time = models.DateTimeField(db_column='COMMENT_WRITE_TIME')  # Field name made lowercase.
-    comment_update_time = models.DateTimeField(db_column='COMMENT_UPDATE_TIME')  # Field name made lowercase.
-    comment_delete = models.CharField(db_column='COMMENT_DELETE', max_length=1)  # Field name made lowercase.
-    post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK')  # Field name made lowercase.
-    member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
-    comment_comment_id_ref = models.ForeignKey('self', models.DO_NOTHING, db_column='COMMENT_COMMENT_ID_REF', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'COMMENT'
-
-
-class Post(models.Model):
-    post_id_pk = models.AutoField(db_column='POST_ID_PK', primary_key=True)  # Field name made lowercase.
-    post_title = models.CharField(db_column='POST_TITLE', max_length=100)  # Field name made lowercase.
-    post_content = models.TextField(db_column='POST_CONTENT')  # Field name made lowercase.
-    post_write_time = models.DateTimeField(db_column='POST_WRITE_TIME')  # Field name made lowercase.
-    post_update_time = models.DateTimeField(db_column='POST_UPDATE_TIME')  # Field name made lowercase.
-    category_category_id_pk = models.ForeignKey(Category, models.DO_NOTHING, db_column='CATEGORY_CATEGORY_ID_PK', blank=True, null=True)  # Field name made lowercase.
-    image_image_id_pk = models.ForeignKey(Image, models.DO_NOTHING, db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True)  # Field name made lowercase.
-    board_boadr_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOADR_ID_PK')  # Field name made lowercase.
-    member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'POST'
-
-
-class PostHasTag(models.Model):
-    post_post_id_pk = models.OneToOneField(Post, models.DO_NOTHING, db_column='POST_POST_ID_PK', primary_key=True)  # Field name made lowercase.
-    tag_tag_id_pk = models.ForeignKey('Tag', models.DO_NOTHING, db_column='TAG_TAG_ID_PK')  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'POST_has_TAG'
-        unique_together = (('post_post_id_pk', 'tag_tag_id_pk'),)
-
-
-class Tag(models.Model):
-    tag_id_pk = models.AutoField(db_column='TAG_ID_PK', primary_key=True)  # Field name made lowercase.
-    tag_name = models.CharField(db_column='TAG_NAME', unique=True, max_length=20)  # Field name made lowercase.
-
-    class Meta:
-        managed = False
-        db_table = 'TAG'
