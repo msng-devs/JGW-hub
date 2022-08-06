@@ -3,7 +3,7 @@ from rest_framework import viewsets, status, views
 from rest_framework.response import Response
 
 from .models import Category
-from .serializers import CategorySerializer
+from .serializers import CategoryGetSerializer, CategoryEditSerializer
 
 @api_view(['GET'])
 def test_header(request):
@@ -11,16 +11,25 @@ def test_header(request):
     return Response(data={'test': 'test'}, status=status.HTTP_200_OK)
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = CategorySerializer
+    serializer_class = CategoryGetSerializer
     queryset = Category.objects.all()
 
     def list(self, request, *args, **kwargs):
         categories = Category.objects.all()
-        serializer = CategorySerializer(categories, many=True)
+        serializer = CategoryGetSerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        pass
+        print(request.data)
+        serializer = CategoryEditSerializer(data=request.data)
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(status=status.HTTP_201_CREATED)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_create(self, serializer):
+        serializer.save()
 
 class TestHeader(views.APIView):
     def get(self, request):
