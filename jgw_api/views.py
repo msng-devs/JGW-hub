@@ -20,16 +20,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        print(request.data)
         serializer = CategoryEditSerializer(data=request.data)
         if serializer.is_valid():
             self.perform_create(serializer)
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-    def perform_create(self, serializer):
-        serializer.save()
 
 class TestHeader(views.APIView):
     def get(self, request):
