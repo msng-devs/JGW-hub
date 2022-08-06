@@ -8,8 +8,9 @@ __user_tocken = 'user_uid'
 
 @api_view(['GET'])
 def test_header(request):
-    data = json.loads(request.body)
-    print(data['member']['id'])
+    print(request.body)
+    # data = json.loads(request.body)
+    # print(data['member']['id'])
     return Response(data={'test': 'test'}, status=status.HTTP_200_OK)
 
 class TestHeader(views.APIView):
