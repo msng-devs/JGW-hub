@@ -10,7 +10,7 @@ class CategoryApiTest(APITestCase):
     def setUp(self):
         self.url = '/hubapi/category/'
 
-    def category_get_api(self):
+    def category_get_all_api(self):
         print("Category GET ALL")
         response: Response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -18,7 +18,7 @@ class CategoryApiTest(APITestCase):
         return response.data
 
     def category_post_api(self, content):
-        print("Category POST")
+        print("Category POST:", content)
         data = {
             "category_name": content
         }
@@ -26,26 +26,38 @@ class CategoryApiTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def category_get_by_id(self, key):
-        print("Category GET BY ID")
+        print("Category GET BY ID:", key)
         url = self.url + str(key) + '/'
         response: Response = self.client.get(url)
         print("GET Rust:", response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def category_delete_by_id(self, key):
-        print("Category DELETE BY ID")
+        print("Category DELETE BY ID:", key)
         url = self.url + str(key) + '/'
         response: Response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def category_patch_by_id(self, key, content):
+        print("Category PATCH BY ID:", key, content)
+        data = {
+            "category_name": content
+        }
+        url = self.url + str(key) + '/'
+        response: Response = self.client.patch(url, data=data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_api_ok(self):
         self.category_post_api('Rust')
         self.category_post_api('Java')
         self.category_post_api('Python')
-        data = self.category_get_api()
+        data = self.category_get_all_api()
         for i in data:
             key = i['category_id_pk']
             if i['category_name'] == 'Rust':
                 break
         self.category_get_by_id(key)
+        self.category_patch_by_id(key, "HTML")
+        self.category_get_all_api()
         self.category_delete_by_id(key)
+

@@ -11,7 +11,7 @@ def test_header(request):
     return Response(data={'test': 'test'}, status=status.HTTP_200_OK)
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = CategoryGetSerializer
+    serializer_class = CategoryEditSerializer
     queryset = Category.objects.all()
 
     def list(self, request, *args, **kwargs):
