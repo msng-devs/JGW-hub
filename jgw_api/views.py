@@ -5,11 +5,6 @@ from rest_framework.response import Response
 from .models import Category
 from .serializers import CategoryGetSerializer, CategoryEditSerializer
 
-@api_view(['GET'])
-def test_header(request):
-    print(request.body)
-    return Response(data={'test': 'test'}, status=status.HTTP_200_OK)
-
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategoryEditSerializer
     queryset = Category.objects.all()
@@ -26,10 +21,3 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-class TestHeader(views.APIView):
-    def get(self, request):
-        print('get')
-        data = request.query_params['member']
-        print(data)
-        return Response(data={'test': 'test'}, status=status.HTTP_200_OK)

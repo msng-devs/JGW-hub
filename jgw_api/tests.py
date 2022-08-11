@@ -10,58 +10,31 @@ from jgw_api.models import Category
 class CategoryApiTest(APITestCase):
     def setUp(self):
         self.url = '/hubapi/category/'
+
+    def test_category_get_all(self):
+        # given
         Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
 
-    def category_get_all_api(self):
-        print("Category GET ALL")
-        response: Response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print('GET data:', response.data)
-        return response.data
+        # when
+        respons: Response = self.client.get(self.url)
 
-    def category_post_api(self, content):
-        print("Category POST:", content)
-        data = {
-            "category_name": content
-        }
-        response: Response = self.client.post(self.url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        # then
+        return_data = [
+            {
+                "category_id_pk": 1,
+                "category_name": "Java"
+            },
+            {
+                "category_id_pk": 2,
+                "category_name": "Python"
+            },
+            {
+                "category_id_pk": 3,
+                "category_name": "Rust"
+            }
+        ]
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
 
-    def category_get_by_id(self, key):
-        print("Category GET BY ID:", key)
-        url = self.url + str(key) + '/'
-        response: Response = self.client.get(url)
-        print("GET Rust:", response.data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def category_delete_by_id(self, key):
-        print("Category DELETE BY ID:", key)
-        url = self.url + str(key) + '/'
-        response: Response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    def category_patch_by_id(self, key, content):
-        print("Category PATCH BY ID:", key, content)
-        data = {
-            "category_name": content
-        }
-        url = self.url + str(key) + '/'
-        response: Response = self.client.patch(url, data=data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_api_ok(self):
-        self.category_post_api('Rust')
-        self.category_post_api('Java')
-        self.category_post_api('Python')
-        data = self.category_get_all_api()
-        for i in data:
-            key = i['category_id_pk']
-            if i['category_name'] == 'Rust':
-                break
-        self.category_get_by_id(key)
-        self.category_patch_by_id(key, "HTML")
-        self.category_get_all_api()
-        self.category_delete_by_id(key)
-
-    def test_api_error(self):
-        pass
