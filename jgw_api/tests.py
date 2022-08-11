@@ -12,6 +12,8 @@ class CategoryApiTest(APITestCase):
         self.url = '/hubapi/category/'
 
     def test_category_get_all(self):
+        print("Category Api GET ALL Running...")
+
         # given
         Category.objects.create(category_name="Java")
         Category.objects.create(category_name="Python")
@@ -38,3 +40,16 @@ class CategoryApiTest(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
+    def test_category_post(self):
+        print("Category Api POST Running...")
+
+        # given
+        data = {
+            "category_name": "Java"
+        }
+
+        # when
+        respons: Response = self.client.post(self.url, data=data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
