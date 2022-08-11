@@ -5,10 +5,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpRequest
 from secret_key import TEST_JSON
+from jgw_api.models import Category
 
 class CategoryApiTest(APITestCase):
     def setUp(self):
         self.url = '/hubapi/category/'
+        Category.objects.create(category_name="Java")
 
     def category_get_all_api(self):
         print("Category GET ALL")
@@ -61,3 +63,5 @@ class CategoryApiTest(APITestCase):
         self.category_get_all_api()
         self.category_delete_by_id(key)
 
+    def test_api_error(self):
+        pass
