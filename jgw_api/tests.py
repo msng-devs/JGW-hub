@@ -23,20 +23,8 @@ class CategoryApiTest(APITestCase):
         respons: Response = self.client.get(self.url)
 
         # then
-        return_data = [
-            {
-                "category_id_pk": 1,
-                "category_name": "Java"
-            },
-            {
-                "category_id_pk": 2,
-                "category_name": "Python"
-            },
-            {
-                "category_id_pk": 3,
-                "category_name": "Rust"
-            }
-        ]
+        return_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+                       for i in Category.objects.all()]
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
@@ -53,3 +41,25 @@ class CategoryApiTest(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+
+    def test_category_get_by_id(self):
+        print("Category Api GET BY ID Running...")
+
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
+
+        # when
+        url = f"{self.url}2/"
+        respons: Response = self.client.get(url)
+
+        # then
+        return_data = [
+            {
+                "category_id_pk": 2,
+                "category_name": "Python"
+            }
+        ]
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)

@@ -21,3 +21,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = CategoryGetSerializer(instance)
+        return Response(serializer.data)
