@@ -4,7 +4,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpRequest
-from secret_key import TEST_JSON
 from jgw_api.models import Category
 
 class CategoryApiTest(APITestCase):
