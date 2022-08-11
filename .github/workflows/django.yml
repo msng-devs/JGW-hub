@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  MY_SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+  ENGINE: ${{ secrets.ENGINE }}
+  NAME: ${{ secrets.NAME }}
+  USER: ${{ secrets.USER }}
+  PASSWORD: ${{ secrets.PASSWORD }}
+  HOST: ${{ secrets.HOST }}
+  PORT: ${{ secrets.PORT }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
