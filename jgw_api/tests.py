@@ -50,16 +50,15 @@ class CategoryApiTest(APITestCase):
         Category.objects.create(category_name="Python")
         Category.objects.create(category_name="Rust")
 
+
         # when
-        url = f"{self.url}2/"
-        respons: Response = self.client.get(url)
+        key = Category.objects.filter(category_name='Python')[0].category_id_pk
+        respons: Response = self.client.get(f"{self.url}{key}/")
 
         # then
-        return_data = [
-            {
-                "category_id_pk": 2,
+        return_data = {
+                "category_id_pk": key,
                 "category_name": "Python"
             }
-        ]
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
