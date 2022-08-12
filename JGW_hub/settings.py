@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ['MY_SECRET_KEY']
+SECRET_KEY = os.environ.get('MY_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,12 +81,12 @@ WSGI_APPLICATION = 'JGW_hub.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.environ['ENGINE'],
-        'NAME': os.environ['NAME'],
+        'ENGINE': os.environ.get('ENGINE'),
+        'NAME': os.environ.get('NAME'),
         'USER': os.environ['USER'],
-        'PASSWORD': os.environ['PASSWORD'],
-        'HOST': os.environ['HOST'],
-        'PORT': os.environ['PORT']
+        'PASSWORD': os.environ.get('PASSWORD'),
+        'HOST': os.environ.get('HOST'),
+        'PORT': os.environ.get('PORT')
     }
 }
 
