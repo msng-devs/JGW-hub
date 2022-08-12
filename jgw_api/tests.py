@@ -137,9 +137,6 @@ class CategoryApiTestError(APITestCase):
         print("Category Api GET BY ID not exist Running...")
 
         # given
-        Category.objects.create(category_name="Java")
-        Category.objects.create(category_name="Python")
-        Category.objects.create(category_name="Rust")
 
         # when
         respons: Response = self.client.get(f'{self.url}0/')
@@ -155,10 +152,6 @@ class CategoryApiTestError(APITestCase):
         print("Category Api GET ALL Pagination out of idx Running...")
 
         # given
-        datas = ['Java', 'Python', 'ML', 'Back-end', 'Rust', 'Ruby', 'HTML', 'CSS',
-                 'JS', 'C', 'C#', 'Brainfuck', 'tensorflow']
-        for d in datas:
-            Category.objects.create(category_name=d)
 
         # when
         respons: Response = self.client.get(self.url, data={'page': 3})
@@ -170,21 +163,21 @@ class CategoryApiTestError(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, return_data)
 
-    # def test_category_put(self):
-    #     print("Category Api PUT BY ID Running...")
-    #     # given
-    #     Category.objects.create(category_name="Java")
-    #     Category.objects.create(category_name="Python")
-    #     Category.objects.create(category_name="Rust")
-    #     patch_data = {
-    #         "category_name": "JS"
-    #     }
-    #
-    #     # when
-    #     target = 'Python'
-    #     instance = Category.objects.filter(category_name=target)[0]
-    #     key = instance.category_id_pk
-    #     respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
-    #
-    #     # then
-    #     self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
+    def test_category_put_403(self):
+        print("Category Api PUT BY ID Running...")
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
+        patch_data = {
+            "category_name": "JS"
+        }
+
+        # when
+        target = 'Python'
+        instance = Category.objects.filter(category_name=target)[0]
+        key = instance.category_id_pk
+        respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
