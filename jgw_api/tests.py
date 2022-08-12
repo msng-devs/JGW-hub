@@ -58,7 +58,7 @@ class CategoryApiTestOK(APITestCase):
 
         # given
         data = {
-            "category_name": "Java"
+            "category_name": ["Java", "Python"]
         }
 
         # when
