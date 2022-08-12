@@ -31,7 +31,7 @@ class CategoryApiTestOK(APITestCase):
         self.assertJSONEqual(respons.content, return_data)
 
     def test_category_get_pagination(self):
-        print("Category Api GET ALL Running...")
+        print("Category Api GET ALL Pagination Running...")
 
         # given
         datas = ['Java', 'Python', 'ML', 'Back-end', 'Rust', 'Ruby', 'HTML', 'CSS',
@@ -142,12 +142,13 @@ class CategoryApiTestError(APITestCase):
         Category.objects.create(category_name="Rust")
 
         # when
-        respons: Response = self.client.get(self.url)
+        respons: Response = self.client.get(f'{self.url}0/')
 
         # then
-        return_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
-                       for i in Category.objects.all()]
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        return_data = {
+            "detail": "Not found."
+        }
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, return_data)
 
     # def test_category_put(self):
