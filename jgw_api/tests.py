@@ -30,6 +30,29 @@ class CategoryApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
+    def test_category_get_pagination(self):
+        print("Category Api GET ALL Running...")
+
+        # given
+        datas = ['Java', 'Python', 'ML', 'Back-end', 'Rust', 'Ruby', 'HTML', 'CSS',
+                 'JS', 'C', 'C#', 'Brainfuck', 'tensorflow']
+        for d in datas:
+            Category.objects.create(category_name=d)
+
+        # when
+        respons: Response = self.client.get(self.url, data={'page': 1})
+
+        # then
+        return_data = {
+            'count': 10,
+            'next': 'http://testserver/hubapi/category/?page=2',
+            'previous': None,
+            'results': [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+                        for i in Category.objects.all().order_by('category_id_pk')[:10]]
+        }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
     def test_category_post(self):
         print("Category Api POST Running...")
 
