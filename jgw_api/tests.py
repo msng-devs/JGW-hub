@@ -151,6 +151,25 @@ class CategoryApiTestError(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, return_data)
 
+    def test_category_get_pagination_out_of_idx(self):
+        print("Category Api GET ALL Pagination out of idx Running...")
+
+        # given
+        datas = ['Java', 'Python', 'ML', 'Back-end', 'Rust', 'Ruby', 'HTML', 'CSS',
+                 'JS', 'C', 'C#', 'Brainfuck', 'tensorflow']
+        for d in datas:
+            Category.objects.create(category_name=d)
+
+        # when
+        respons: Response = self.client.get(self.url, data={'page': 3})
+
+        # then
+        return_data = {
+            "detail": "Invalid page."
+        }
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertJSONEqual(respons.content, return_data)
+
     # def test_category_put(self):
     #     print("Category Api PUT BY ID Running...")
     #     # given
