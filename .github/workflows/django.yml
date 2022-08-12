@@ -13,7 +13,6 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.9]
-
     steps:
     - uses: actions/checkout@v3
     - name: get secret_key
@@ -22,7 +21,7 @@ jobs:
         repository: msng-devs/JGW-Secret
         ref: mms
         path: "./"
-        tocken: ${{ secrets.TOCKEN }}
+        token: ${{ secrets.TOCKEN }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
