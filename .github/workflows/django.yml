@@ -20,7 +20,7 @@ jobs:
       with:
         repository: msng-devs/JGW-Secret
         ref: mms
-        path: "./secrets/files/"
+        path: "./secrets_content/files/"
         token: ${{ secrets.TOCKEN }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
