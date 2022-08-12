@@ -22,8 +22,11 @@ class CategoryApiTestOK(APITestCase):
         respons: Response = self.client.get(self.url)
 
         # then
-        return_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
-                       for i in Category.objects.all()]
+        return_data = {
+                'count': Category.objects.count(),
+                'results': [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+                            for i in Category.objects.all().order_by('category_id_pk')]
+            }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
@@ -102,6 +105,27 @@ class CategoryApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+class CategoryApiTestError(APITestCase):
+    def setUp(self):
+        self.url = '/hubapi/category/'
+
+    def test_category_get_by_id_not_exist(self):
+        print("Category Api GET BY ID not exist Running...")
+
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
+
+        # when
+        respons: Response = self.client.get(self.url)
+
+        # then
+        return_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+                       for i in Category.objects.all()]
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
 
     # def test_category_put(self):
     #     print("Category Api PUT BY ID Running...")
