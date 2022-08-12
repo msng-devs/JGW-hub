@@ -4,16 +4,27 @@ from rest_framework.response import Response
 
 from .models import Category
 from .serializers import CategoryGetSerializer, CategoryEditSerializer
+from .custom_pagination import CategoryPageNumberPagination
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategoryEditSerializer
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by('category_id_pk')
+    pagination_class = CategoryPageNumberPagination
 
     # get
     def list(self, request, *args, **kwargs):
-        categories = Category.objects.all()
-        serializer = CategoryGetSerializer(categories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        queryset = self.filter_queryset(self.get_queryset())
+        if 'page' in request.query_params:
+            page = self.paginate_queryset(queryset)
+            serializer = CategoryGetSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        else:
+            serializer = CategoryGetSerializer(queryset, many=True)
+            response_data = {
+                'count': Category.objects.count(),
+                'results': serializer.data
+            }
+            return Response(response_data)
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
