@@ -43,7 +43,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     # put
     def update(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        response_data = {
+            "detail": "Use patch."
+        }
+        return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
     # patch
     def partial_update(self, request, *args, **kwargs):

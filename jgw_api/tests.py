@@ -169,7 +169,7 @@ class CategoryApiTestError(APITestCase):
         Category.objects.create(category_name="Java")
         Category.objects.create(category_name="Python")
         Category.objects.create(category_name="Rust")
-        patch_data = {
+        put_data = {
             "category_name": "JS"
         }
 
@@ -177,7 +177,26 @@ class CategoryApiTestError(APITestCase):
         target = 'Python'
         instance = Category.objects.filter(category_name=target)[0]
         key = instance.category_id_pk
-        respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
+        respons: Response = self.client.put(f"{self.url}{key}/", data=put_data)
 
         # then
+        response_data = {
+            "detail": "Use patch."
+        }
         self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertJSONEqual(respons.content, response_data)
+
+    def test_category_post_already_exist(self):
+        print("Category Api POST Running...")
+
+        # given
+        Category.objects.create(category_name="Java")
+        data = {
+            "category_name": "Java"
+        }
+
+        # when
+        respons: Response = self.client.post(self.url, data=data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
