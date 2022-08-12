@@ -15,13 +15,13 @@ jobs:
         python-version: [3.9]
     steps:
     - uses: actions/checkout@v3
-#    - name: get secret_key
-#      uses: actions/checkout@v3
-#      with:
-#        repository: msng-devs/JGW-Secret
-#        ref: mms
-#        path: "./"
-#        token: ${{ secrets.TOCKEN }}
+    - name: get secret_key
+      uses: actions/checkout@v3
+      with:
+        repository: msng-devs/JGW-Secret
+        ref: mms
+        path: "./secrets/"
+        token: ${{ secrets.TOCKEN }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
