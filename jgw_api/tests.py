@@ -51,13 +51,38 @@ class CategoryApiTest(APITestCase):
 
 
         # when
-        key = Category.objects.filter(category_name='Python')[0].category_id_pk
+        target = 'Python'
+        key = Category.objects.filter(category_name=target)[0].category_id_pk
         respons: Response = self.client.get(f"{self.url}{key}/")
 
         # then
         return_data = {
                 "category_id_pk": key,
-                "category_name": "Python"
+                "category_name": target
             }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_category_patch_by_id(self):
+        print("Category Api PATCH BY ID Running...")
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
+        patch_data = {
+            "category_name": "JS"
+        }
+
+        # when
+        target = 'Python'
+        instance = Category.objects.filter(category_name=target)[0]
+        key = instance.category_id_pk
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
+
+        # then
+        return_data = {
+            "category_id_pk": key,
+            "category_name": "JS"
+        }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
