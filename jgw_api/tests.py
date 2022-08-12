@@ -86,3 +86,22 @@ class CategoryApiTest(APITestCase):
         }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
+
+    def test_category_put(self):
+        print("Category Api PUT BY ID Running...")
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        Category.objects.create(category_name="Rust")
+        patch_data = {
+            "category_name": "JS"
+        }
+
+        # when
+        target = 'Python'
+        instance = Category.objects.filter(category_name=target)[0]
+        key = instance.category_id_pk
+        respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
