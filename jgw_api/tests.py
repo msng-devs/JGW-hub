@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from django.http import HttpRequest
 from jgw_api.models import Category
 
-class CategoryApiTest(APITestCase):
+class CategoryApiTestOK(APITestCase):
     def setUp(self):
         self.url = '/hubapi/category/'
 
@@ -87,21 +87,37 @@ class CategoryApiTest(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
-    def test_category_put(self):
-        print("Category Api PUT BY ID Running...")
+    def test_category_delete_by_id(self):
+        print("Category Api DELETE BY ID Running...")
         # given
         Category.objects.create(category_name="Java")
         Category.objects.create(category_name="Python")
         Category.objects.create(category_name="Rust")
-        patch_data = {
-            "category_name": "JS"
-        }
 
         # when
         target = 'Python'
         instance = Category.objects.filter(category_name=target)[0]
         key = instance.category_id_pk
-        respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
+        respons: Response = self.client.delete(f"{self.url}{key}/")
 
         # then
-        self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+    # def test_category_put(self):
+    #     print("Category Api PUT BY ID Running...")
+    #     # given
+    #     Category.objects.create(category_name="Java")
+    #     Category.objects.create(category_name="Python")
+    #     Category.objects.create(category_name="Rust")
+    #     patch_data = {
+    #         "category_name": "JS"
+    #     }
+    #
+    #     # when
+    #     target = 'Python'
+    #     instance = Category.objects.filter(category_name=target)[0]
+    #     key = instance.category_id_pk
+    #     respons: Response = self.client.put(f"{self.url}{key}/", data=patch_data)
+    #
+    #     # then
+    #     self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
