@@ -1,4 +1,4 @@
-name: Django CI
+name: JGW-hub Test
 
 on:
   push:
