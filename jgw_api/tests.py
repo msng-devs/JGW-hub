@@ -181,11 +181,7 @@ class CategoryApiTestError(APITestCase):
         respons: Response = self.client.put(f"{self.url}{key}/", data=put_data)
 
         # then
-        response_data = {
-            "detail": "Use patch."
-        }
-        self.assertEqual(respons.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertJSONEqual(respons.content, response_data)
+        self.assertEqual(respons.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_category_post_already_exist(self):
         print("Category Api POST already exist Running...")

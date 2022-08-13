@@ -1,15 +1,21 @@
-from rest_framework.decorators import api_view
-from rest_framework import viewsets, status, views
+from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from .models import Category
-from .serializers import CategoryGetSerializer, CategoryEditSerializer
+from .serializers import CategoryGetSerializer
 from .custom_pagination import CategoryPageNumberPagination
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 class CategoryViewSet(viewsets.ModelViewSet):
+    '''
+    카테고리 Api
+    '''
     serializer_class = CategoryGetSerializer
     queryset = Category.objects.all().order_by('category_id_pk')
     pagination_class = CategoryPageNumberPagination
+    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
