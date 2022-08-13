@@ -58,7 +58,7 @@ class CategoryApiTestOK(APITestCase):
 
         # given
         data = {
-            "category_name": ["Java", "Python"]
+            "category_name": "Rust"
         }
 
         # when
@@ -66,6 +66,9 @@ class CategoryApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+
+        respons: Response = self.client.get(self.url)
+        print(respons.content)
 
     def test_category_get_by_id(self):
         print("Category Api GET BY ID Running...")
@@ -187,7 +190,7 @@ class CategoryApiTestError(APITestCase):
         self.assertJSONEqual(respons.content, response_data)
 
     def test_category_post_already_exist(self):
-        print("Category Api POST Running...")
+        print("Category Api POST already exist Running...")
 
         # given
         Category.objects.create(category_name="Java")
