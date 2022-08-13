@@ -21,7 +21,7 @@ schema_view = get_schema_view(
 )
 
 router = routers.DefaultRouter()
-router.register(r'category', views.CategoryViewSet, basename='categoty')
+router.register(r'category', views.CategoryViewSet, basename='category')
 
 urlpatterns = [
     path('', include(router.urls))

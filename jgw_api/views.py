@@ -9,9 +9,6 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    '''
-    카테고리 Api
-    '''
     serializer_class = CategoryGetSerializer
     queryset = Category.objects.all().order_by('category_id_pk')
     pagination_class = CategoryPageNumberPagination
@@ -22,10 +19,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         if 'page' in request.query_params:
             page = self.paginate_queryset(queryset)
-            serializer = CategoryGetSerializer(page, many=True)
+            serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         else:
-            serializer = CategoryGetSerializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, many=True)
             response_data = {
                 'count': Category.objects.count(),
                 'results': serializer.data
@@ -35,7 +32,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = CategoryGetSerializer(instance)
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     # post
@@ -62,5 +59,4 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
-        serializer = CategoryGetSerializer(instance)
         return Response(serializer.data)
