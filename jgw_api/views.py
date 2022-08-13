@@ -7,7 +7,7 @@ from .serializers import CategoryGetSerializer, CategoryEditSerializer
 from .custom_pagination import CategoryPageNumberPagination
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = CategoryEditSerializer
+    serializer_class = CategoryGetSerializer
     queryset = Category.objects.all().order_by('category_id_pk')
     pagination_class = CategoryPageNumberPagination
 
@@ -55,8 +55,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
         serializer = CategoryGetSerializer(instance)
         return Response(serializer.data)

@@ -57,18 +57,16 @@ class CategoryApiTestOK(APITestCase):
         print("Category Api POST Running...")
 
         # given
-        data = {
-            "category_name": "Rust"
-        }
+        data = '[{"category_name": "Python"},{"category_name": "Rust"}]'
 
         # when
-        respons: Response = self.client.post(self.url, data=data)
+        respons: Response = self.client.post(self.url, data=data, content_type='application/json')
 
         # then
+        respons_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+                        for i in Category.objects.all().order_by('category_id_pk')]
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-
-        respons: Response = self.client.get(self.url)
-        print(respons.content)
+        self.assertJSONEqual(respons.content, respons_data)
 
     def test_category_get_by_id(self):
         print("Category Api GET BY ID Running...")
