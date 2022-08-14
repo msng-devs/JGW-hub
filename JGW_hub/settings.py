@@ -132,6 +132,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [],
+    # 'DEFAULT_PERMISSION_CLASSES': [],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Jaram Hub Api 문서',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_SETTINGS': {
+
+    },
+    'SERVE_AUTHENTICATION': None
 }
 
 # SWAGGER_SETTINGS = {
