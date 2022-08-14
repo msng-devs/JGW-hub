@@ -2,20 +2,9 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from . import views
 from rest_framework import routers, permissions
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView, SpectacularJSONAPIView
 
 # app_name = 'jgw_api'
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="자람 Hub Api",
-        default_version='v1',
-        description="자람 hub api 문서",
-    ),
-    public=True,
-    permission_classes=[permissions.AllowAny],
-)
 
 router = routers.DefaultRouter()
 router.register(r'category', views.CategoryViewSet, basename='category')
@@ -26,7 +15,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += [
-        re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-        re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-        re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc')
+        path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+        path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     ]
