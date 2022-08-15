@@ -65,12 +65,10 @@ class CategoryApiTestOK(APITestCase):
         respons: Response = self.client.post(self.url, data=data, content_type='application/json')
 
         # then
-        respons_data = {
-            'results': [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
+        responses_data = [{"category_id_pk": i.category_id_pk, "category_name": i.category_name}
                         for i in Category.objects.all().order_by('category_id_pk')]
-        }
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(respons.content, respons_data)
+        self.assertJSONEqual(respons.content, responses_data)
 
     def test_category_get_by_id(self):
         print("Category Api GET BY ID Running...")

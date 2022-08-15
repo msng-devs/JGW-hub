@@ -41,12 +41,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        response_data = serializer.data
-        if isinstance(request.data, list):
-            response_data = {
-                'results': serializer.data
-            }
-        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     # put
     def update(self, request, *args, **kwargs):
