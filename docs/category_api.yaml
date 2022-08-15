@@ -1,0 +1,100 @@
+\hubapi\category\:
+  get:
+    operationId: category_list
+    description: 카테고리 데이터를 가져옵니다.
+    parameters:
+    - in: query
+      name: page
+      schema:
+        type: integer
+      description: 카테고리 데이터를 10개씩 끊어서 가져올 때 페이지 번호입니다.
+    tags:
+    - category
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/PaginatedCategoryList'
+        description: ''
+  post:
+    operationId: category_create
+    description: 카테고리 데이터를 생성합니다. 요청한 데이터가 이미 존재할 경우 오류를 리턴합니다.
+    tags:
+    - category
+    requestBody:
+      content:
+        application/json:
+          schema:
+            anyOf:
+              - $ref: './schemas/category_schemas.yaml#/schemas/Category'
+              - $ref: './schemas/category_schemas.yaml#/schemas/CategoryList'
+      required: true
+    responses:
+      '201':
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: './schemas/category_schemas.yaml#/schemas/Category'
+                - $ref: './schemas/category_schemas.yaml#/schemas/CategoryList'
+        description: ''
+\hubapi\category\{category_id_pk}\:
+  get:
+    description: 특정 카테고리 데이터를 가져옵니다.
+    operationId: category_retrieve
+    parameters:
+    - in: path
+      name: category_id_pk
+      description: 가져올 카테고리 데이터의 pk
+      schema:
+        type: string
+      required: true
+    tags:
+    - category
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/Category'
+        description: ''
+  patch:
+    operationId: category_partial_update
+    description: 특정 카테고리 데이터의 이름을 변경합니다.
+    parameters:
+    - in: path
+      name: category_id_pk
+      description: 수정할 카테고리 데이터의 pk
+      schema:
+        type: string
+      required: true
+    tags:
+    - category
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: './schemas/category_schemas.yaml#/schemas/PatchedCategory'
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/Category'
+        description: ''
+  delete:
+    operationId: category_destroy
+    description: 특정 카테고리 데이터를 삭제합니다.
+    parameters:
+    - in: path
+      name: category_id_pk
+      description: 삭제할 카테고리 데이터의 pk
+      schema:
+        type: string
+      required: true
+    tags:
+    - category
+    responses:
+      '204':
+        description: No response body
