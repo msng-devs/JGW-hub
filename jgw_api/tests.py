@@ -4,7 +4,11 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import HttpRequest
-from jgw_api.models import Category
+from jgw_api.models import (
+    Category,
+    Board,
+    Role
+)
 
 class CategoryApiTestOK(APITestCase):
     def setUp(self):
@@ -249,4 +253,42 @@ class CategoryApiTestError(APITestCase):
         # then
         return_data = {'detail': 'Not found.'}
         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertJSONEqual(respons.content, return_data)
+
+class BoardApiTestOK(APITestCase):
+    def setUp(self):
+        self.url = '/hubapi/board/'
+
+    @classmethod
+    def setUpTestData(cls):
+        Role.objects.create(role_nm='ROLE_GUEST')
+        Role.objects.create(role_nm='ROLE_USER0')
+        Role.objects.create(role_nm='ROLE_USER1')
+        Role.objects.create(role_nm='ROLE_ADMIN')
+        Role.objects.create(role_nm='ROLE_DEV')
+
+    def test_board_get_all(self):
+        print("Board Api GET ALL Running...")
+
+        # given
+        Board.objects.create(
+            board_name="공지사항",
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=1)
+        )
+
+        # when
+        respons: Response = self.client.get(self.url)
+
+        # then
+        return_data = {
+                'count': Board.objects.count(),
+                'next': None,
+                'previous': None,
+                'results': [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
+                             "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
+                             "role_role_pk_read_level": i.role_role_pk_read_level.role_pk}
+                            for i in Board.objects.all().order_by('board_id_pk')]
+            }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)

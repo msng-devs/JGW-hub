@@ -97,7 +97,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             serializer = self.get_serializer(queryset, many=True)
             response_data = {
-                'count': Category.objects.count(),
+                'count': Board.objects.count(),
                 'next': None,
                 'previous': None,
                 'results': serializer.data
