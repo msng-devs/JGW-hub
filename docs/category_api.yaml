@@ -16,7 +16,13 @@
           application/json:
             schema:
               $ref: './schemas/category_schemas.yaml#/schemas/PaginatedCategoryList'
-        description: ''
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: Invalid page.
   post:
     operationId: category_create
     description: 카테고리 데이터를 생성합니다. 요청한 데이터가 이미 존재할 경우 오류를 리턴합니다.
@@ -38,7 +44,13 @@
               anyOf:
                 - $ref: './schemas/category_schemas.yaml#/schemas/Category'
                 - $ref: './schemas/category_schemas.yaml#/schemas/CategoryList'
-        description: ''
+      '400':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: category with this category name already exists.
 \hubapi\category\{category_id_pk}\:
   get:
     description: 특정 카테고리 데이터를 가져옵니다.
@@ -58,7 +70,13 @@
           application/json:
             schema:
               $ref: './schemas/category_schemas.yaml#/schemas/Category'
-        description: ''
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: Not found.
   patch:
     operationId: category_partial_update
     description: 특정 카테고리 데이터의 이름을 변경합니다.
@@ -82,7 +100,20 @@
           application/json:
             schema:
               $ref: './schemas/category_schemas.yaml#/schemas/Category'
-        description: ''
+      '400':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: category with this category name already exists.
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: Not found.
   delete:
     operationId: category_destroy
     description: 특정 카테고리 데이터를 삭제합니다.
@@ -98,3 +129,10 @@
     responses:
       '204':
         description: No response body
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: './schemas/category_schemas.yaml#/schemas/CategoryError'
+            example:
+              detail: Not found.

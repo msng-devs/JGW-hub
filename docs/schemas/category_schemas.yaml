@@ -53,11 +53,9 @@ schemas:
       category_name:
         type: string
         maxLength: 20
-securitySchemes:
-  basicAuth:
-    type: http
-    scheme: basic
-  cookieAuth:
-    type: apiKey
-    in: cookie
-    name: sessionid
+  CategoryError:
+    type: object
+    properties:
+      detail:
+        type: string
+        description: 에러 메세지
