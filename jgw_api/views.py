@@ -1,10 +1,15 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
-from .models import Category
-from .serializers import CategorySerializer
+from .models import (
+    Category,
+    Board
+)
+from .serializers import (
+    CategorySerializer,
+    BoardSerializer
+)
 from .custom_pagination import CategoryPageNumberPagination
-from .api_docs import CategoryApiDoc
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -72,3 +77,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 'detail': 'category with this category name already exists.'
             }
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
+class BoardViewSet(viewsets.ModelViewSet):
+    serializer_class = BoardSerializer
+    queryset = Board.objects.all().order_by('board_id_pk')
+    # http_method_names = ['get', 'post', 'head', 'patch', 'delete']

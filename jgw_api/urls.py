@@ -8,6 +8,7 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, 
 
 router = routers.DefaultRouter()
 router.register(r'category', views.CategoryViewSet, basename='category')
+router.register(r'board', views.BoardViewSet, basename='board')
 
 urlpatterns = [
     path('', include(router.urls))
