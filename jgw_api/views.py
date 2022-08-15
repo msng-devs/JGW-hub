@@ -2,14 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 
 from .models import Category
-from .serializers import CategoryGetSerializer
+from .serializers import CategorySerializer
 from .custom_pagination import CategoryPageNumberPagination
-
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
+from .api_docs import CategoryApiDoc
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    serializer_class = CategoryGetSerializer
+    serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('category_id_pk')
     pagination_class = CategoryPageNumberPagination
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
@@ -25,6 +23,8 @@ class CategoryViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(queryset, many=True)
             response_data = {
                 'count': Category.objects.count(),
+                'next': None,
+                'previous': None,
                 'results': serializer.data
             }
             return Response(response_data)
@@ -41,7 +41,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        response_data = serializer.data
+        if isinstance(request.data, list):
+            response_data = {
+                'results': serializer.data
+            }
+        return Response(response_data, status=status.HTTP_201_CREATED, headers=headers)
 
     # put
     def update(self, request, *args, **kwargs):
