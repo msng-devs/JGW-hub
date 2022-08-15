@@ -166,7 +166,7 @@ class CategoryApiTestError(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, return_data)
 
-    def test_category_put_403(self):
+    def test_category_put_405(self):
         print("Category Api PUT BY ID Running...")
         # given
         Category.objects.create(category_name="Java")
@@ -190,12 +190,63 @@ class CategoryApiTestError(APITestCase):
 
         # given
         Category.objects.create(category_name="Java")
-        data = {
-            "category_name": "Java"
+        Category.objects.create(category_name="Python")
+        data = '[{"category_name": "Java"},{"category_name": "Test"}]'
+
+        # when
+        respons: Response = self.client.post(self.url, data=data, content_type='application/json')
+
+        # then
+        responses_data = {"detail":"category with this category name already exists."}
+        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertJSONEqual(respons.content, responses_data)
+
+    def test_category_patch_already_exist(self):
+        print("Category Api PATCH BY ID already exist Running...")
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        patch_data = {
+            "category_name": "Python"
         }
 
         # when
-        respons: Response = self.client.post(self.url, data=data)
+        target = 'Java'
+        instance = Category.objects.filter(category_name=target)[0]
+        key = instance.category_id_pk
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
 
         # then
+        return_data = {"detail":"category with this category name already exists."}
         self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_category_patch_id_not_exist(self):
+        print("Category Api PATCH BY ID not exist Running...")
+        # given
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+        patch_data = {
+            "category_name": "Python"
+        }
+
+        # when
+        respons: Response = self.client.patch(f"{self.url}0/", data=patch_data)
+
+        # then
+        return_data = {'detail': 'Not found.'}
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_category_delete_by_id_not_exist(self):
+        print("Category Api DELETE BY ID not exist Running...")
+        # given
+        Category.objects.create(category_name="Java")
+
+        # when
+        respons: Response = self.client.delete(f"{self.url}0/")
+
+        # then
+        return_data = {'detail': 'Not found.'}
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertJSONEqual(respons.content, return_data)
