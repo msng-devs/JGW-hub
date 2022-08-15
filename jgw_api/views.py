@@ -9,7 +9,10 @@ from .serializers import (
     CategorySerializer,
     BoardSerializer
 )
-from .custom_pagination import CategoryPageNumberPagination
+from .custom_pagination import (
+    CategoryPageNumberPagination,
+    BoardPageNumberPagination
+)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -81,4 +84,22 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     queryset = Board.objects.all().order_by('board_id_pk')
-    # http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    pagination_class = BoardPageNumberPagination
+    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+
+    # get
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if 'page' in request.query_params:
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            response_data = {
+                'count': Category.objects.count(),
+                'next': None,
+                'previous': None,
+                'results': serializer.data
+            }
+            return Response(response_data)
