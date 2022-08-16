@@ -1,7 +1,14 @@
 \hubapi\category\:
   get:
     operationId: category_list
-    description: 카테고리 데이터를 가져옵니다.
+    description: |
+      카테고리 데이터를 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | false |
+      | Role | x |
+      | add user info | false |
     parameters:
     - in: query
       name: page
@@ -25,7 +32,14 @@
               detail: Invalid page.
   post:
     operationId: category_create
-    description: 카테고리 데이터를 생성합니다. 요청한 데이터가 이미 존재할 경우 오류를 리턴합니다.
+    description: |
+      카테고리 데이터를 생성합니다. 요청한 데이터가 이미 존재할 경우 오류를 리턴합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | true |
+      | Role | user0 |
+      | add user info | false |
     tags:
     - category
     requestBody:
@@ -53,7 +67,14 @@
               detail: category with this category name already exists.
 \hubapi\category\{category_id_pk}\:
   get:
-    description: 특정 카테고리 데이터를 가져옵니다.
+    description: |
+      특정 카테고리 데이터를 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | false |
+      | Role | x |
+      | add user info | false |
     operationId: category_retrieve
     parameters:
     - in: path
@@ -79,7 +100,14 @@
               detail: Not found.
   patch:
     operationId: category_partial_update
-    description: 특정 카테고리 데이터의 이름을 변경합니다.
+    description: |
+      특정 카테고리 데이터의 이름을 변경합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | true |
+      | Role | user0 |
+      | add user info | false |
     parameters:
     - in: path
       name: category_id_pk
@@ -116,7 +144,14 @@
               detail: Not found.
   delete:
     operationId: category_destroy
-    description: 특정 카테고리 데이터를 삭제합니다.
+    description: |
+      특정 카테고리 데이터를 삭제합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | true |
+      | Role | user0 |
+      | add user info | false |
     parameters:
     - in: path
       name: category_id_pk
