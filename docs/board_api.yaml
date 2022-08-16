@@ -24,3 +24,30 @@
             schema:
               $ref: '#/components/schemas/PaginatedBoardList'
         description: ''
+\hubapi\board\{board_id_pk}\:
+  get:
+    operationId: board_retrieve
+    description: |
+      게시판 목록을 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | false |
+      | Role | x |
+      | add user info | false |
+    parameters:
+    - in: path
+      name: board_id_pk
+      schema:
+        type: string
+      required: true
+      description: 가져올 게시판 데이터의 pk
+    tags:
+    - board
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Board'
+        description: ''

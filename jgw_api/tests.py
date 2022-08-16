@@ -346,7 +346,6 @@ class BoardApiTestOK(APITestCase):
             role_role_pk_read_level=Role.objects.get(role_pk=2)
         )
 
-
         # when
         target = '공지사항1'
         key = Board.objects.filter(board_name=target)[0].board_id_pk

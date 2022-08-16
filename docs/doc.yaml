@@ -10,6 +10,8 @@ paths:
     $ref: './category_api.yaml#/\hubapi\category\{category_id_pk}\'
   /hubapi/board/:
     $ref: './board_api.yaml#/\hubapi\board\'
+  /hubapi/board/{board_id_pk}/:
+    $ref: './board_api.yaml#/\hubapi\board\{board_id_pk}\'
 x-tagGroups:
   - name: Apis
     tags:

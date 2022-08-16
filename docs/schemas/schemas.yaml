@@ -39,13 +39,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=4
+          example: http://api.example.org/hubapi/category/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=2
+          example: http://api.example.org/hubapi/category/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -105,13 +105,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=4
+          example: http://api.example.org/hubapi/board/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=2
+          example: http://api.example.org/hubapi/board/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
