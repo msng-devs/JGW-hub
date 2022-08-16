@@ -287,8 +287,14 @@ class BoardApiTestOK(APITestCase):
                 'next': None,
                 'previous': None,
                 'results': [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
-                             "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-                             "role_role_pk_read_level": i.role_role_pk_read_level.role_pk}
+                             "role_role_pk_write_level": {
+                                 'role_pk': i.role_role_pk_write_level.role_pk,
+                                 'role_nm': i.role_role_pk_write_level.role_nm
+                             },
+                             "role_role_pk_read_level": {
+                                 'role_pk': i.role_role_pk_read_level.role_pk,
+                                 'role_nm': i.role_role_pk_read_level.role_nm
+                             }}
                             for i in Board.objects.all().order_by('board_id_pk')]
             }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
@@ -314,8 +320,14 @@ class BoardApiTestOK(APITestCase):
                 'next': 'http://testserver/hubapi/board/?page=2',
                 'previous': None,
                 'results': [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
-                             "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-                             "role_role_pk_read_level": i.role_role_pk_read_level.role_pk}
+                             "role_role_pk_write_level": {
+                                 'role_pk': i.role_role_pk_write_level.role_pk,
+                                 'role_nm': i.role_role_pk_write_level.role_nm
+                             },
+                             "role_role_pk_read_level": {
+                                 'role_pk': i.role_role_pk_read_level.role_pk,
+                                 'role_nm': i.role_role_pk_read_level.role_nm
+                             }}
                             for i in Board.objects.all().order_by('board_id_pk')[:10]]
             }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
