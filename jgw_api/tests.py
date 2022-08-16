@@ -1,14 +1,12 @@
-from django.test import TestCase
 from rest_framework.test import APITestCase
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
-from django.http import HttpRequest
 from jgw_api.models import (
     Category,
     Board,
     Role
 )
+import random
 
 class CategoryApiTestOK(APITestCase):
     def setUp(self):
@@ -274,8 +272,8 @@ class BoardApiTestOK(APITestCase):
         for i in range(20):
             Board.objects.create(
                 board_name=f'공지사항{i}',
-                role_role_pk_write_level=Role.objects.get(role_pk=1),
-                role_role_pk_read_level=Role.objects.get(role_pk=1)
+                role_role_pk_write_level=Role.objects.get(role_pk=random.randint(1, 5)),
+                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5))
             )
 
         # when
@@ -307,8 +305,8 @@ class BoardApiTestOK(APITestCase):
         for i in range(20):
             Board.objects.create(
                 board_name=f'공지사항{i}',
-                role_role_pk_write_level=Role.objects.get(role_pk=1),
-                role_role_pk_read_level=Role.objects.get(role_pk=1)
+                role_role_pk_write_level=Role.objects.get(role_pk=random.randint(1, 5)),
+                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5))
             )
 
         # when
@@ -330,5 +328,42 @@ class BoardApiTestOK(APITestCase):
                              }}
                             for i in Board.objects.all().order_by('board_id_pk')[:10]]
             }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_board_get_by_id(self):
+        print("Board Api GET BY ID Running...")
+
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=1)
+        )
+        Board.objects.create(
+            board_name='공지사항2',
+            role_role_pk_write_level=Role.objects.get(role_pk=2),
+            role_role_pk_read_level=Role.objects.get(role_pk=2)
+        )
+
+
+        # when
+        target = '공지사항1'
+        key = Board.objects.filter(board_name=target)[0].board_id_pk
+        respons: Response = self.client.get(f"{self.url}{key}/")
+
+        # then
+        return_data = {
+            "board_id_pk": key,
+            "board_name": target,
+            "role_role_pk_write_level": {
+                'role_pk': 1,
+                'role_nm': 'ROLE_GUEST'
+            },
+            "role_role_pk_read_level": {
+                'role_pk': 1,
+                'role_nm': 'ROLE_GUEST'
+            }
+        }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
