@@ -132,3 +132,9 @@ components:
       required:
         - role_nm
         - role_pk
+    BoardError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: 에러 메세지

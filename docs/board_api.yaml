@@ -23,7 +23,13 @@
           application/json:
             schema:
               $ref: '#/components/schemas/PaginatedBoardList'
-        description: ''
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Invalid page.
 \hubapi\board\{board_id_pk}\:
   get:
     operationId: board_retrieve
@@ -51,3 +57,10 @@
             schema:
               $ref: '#/components/schemas/Board'
         description: ''
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Not found.
