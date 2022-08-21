@@ -7,7 +7,8 @@ from .models import (
 )
 from .serializers import (
     CategorySerializer,
-    BoardSerializer
+    BoardSerializer,
+    BoardSerializerWrite
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
@@ -103,3 +104,24 @@ class BoardViewSet(viewsets.ModelViewSet):
                 'results': serializer.data
             }
             return Response(response_data)
+
+    # get by id
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    # post
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = BoardSerializerWrite(data=request.data, many=isinstance(request.data, list))
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as err:
+            print(err)
+            error_responses_data = {
+                'detail': 'board with this board name already exists.'
+            }
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)

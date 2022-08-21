@@ -366,3 +366,21 @@ class BoardApiTestOK(APITestCase):
         }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
+
+    def test_board_post(self):
+        print("Board Api POST Running...")
+
+        # given
+        data = '[{"board_name": "test1", "role_role_pk_write_level": 1,"role_role_pk_read_level": 1},' \
+               '{"board_name": "test2", "role_role_pk_write_level": 2,"role_role_pk_read_level": 1}]'
+
+        # when
+        respons: Response = self.client.post(self.url, data=data, content_type='application/json')
+
+        # then
+        responses_data = [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
+                             "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
+                             "role_role_pk_read_level": i.role_role_pk_read_level.role_pk}
+                          for i in Board.objects.all().order_by('board_id_pk')]
+        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(respons.content, responses_data)

@@ -23,3 +23,8 @@ class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = ['board_id_pk', 'board_name', 'role_role_pk_write_level', 'role_role_pk_read_level']
+
+class BoardSerializerWrite(serializers.ModelSerializer):
+    class Meta:
+        model = Board
+        fields = '__all__'
