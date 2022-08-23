@@ -94,6 +94,37 @@ components:
         - board_name
         - role_role_pk_read_level
         - role_role_pk_write_level
+    BoardCreateList:
+      type: array
+      items:
+        $ref: '#/components/schemas/BoardCreate'
+      example:
+        - board_id_pk: 0
+          board_name: 'string'
+          role_role_pk_write_level: 1
+          role_role_pk_read_level: 1
+    BoardCreate:
+      type: object
+      properties:
+        board_id_pk:
+          type: integer
+          readOnly: true
+          description: 게시판 pk
+        board_name:
+          type: string
+          maxLength: 45
+          description: 게시판 이름
+        role_role_pk_write_level:
+          type: integer
+          description: 게시판 쓰기 권한 레벨 (Role pk)
+        role_role_pk_read_level:
+          type: integer
+          description: 게시판 읽기 권한 레벨 (Role pk)
+      required:
+        - board_id_pk
+        - board_name
+        - role_role_pk_read_level
+        - role_role_pk_write_level
     PaginatedBoardList:
       type: object
       properties:

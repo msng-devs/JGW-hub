@@ -30,6 +30,33 @@
               $ref: '#/components/schemas/BoardError'
             example:
               detail: Invalid page.
+  post:
+    operationId: board_create
+    tags:
+      - board
+    requestBody:
+      content:
+        application/json:
+          schema:
+            anyOf:
+              - $ref: '#/components/schemas/BoardCreate'
+              - $ref: '#/components/schemas/BoardCreateList'
+      required: true
+    responses:
+      '201':
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/BoardCreate'
+                - $ref: '#/components/schemas/BoardCreateList'
+      '400':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: board with this category name already exists.
 \hubapi\board\{board_id_pk}\:
   get:
     operationId: board_retrieve
