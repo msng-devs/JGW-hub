@@ -32,6 +32,14 @@
               detail: Invalid page.
   post:
     operationId: board_create
+    description: |
+      게시판 목록을 생성합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | authorization | true |
+      | Role | admin |
+      | add user info | false |
     tags:
       - board
     requestBody:
