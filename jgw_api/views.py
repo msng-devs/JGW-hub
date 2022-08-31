@@ -124,3 +124,5 @@ class BoardViewSet(viewsets.ModelViewSet):
                 'detail': 'board with this board name already exists.'
             }
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
+
