@@ -384,3 +384,37 @@ class BoardApiTestOK(APITestCase):
                           for i in Board.objects.all().order_by('board_id_pk')]
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(respons.content, responses_data)
+
+    def test_board_patch_by_id(self):
+        print("Board Api PATCH BY ID Running...")
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=3)
+        )
+        Board.objects.create(
+            board_name='공지사항2',
+            role_role_pk_write_level=Role.objects.get(role_pk=2),
+            role_role_pk_read_level=Role.objects.get(role_pk=2)
+        )
+        patch_data = {
+            "board_name": "자유게시판",
+            'role_role_pk_write_level': 1
+        }
+
+        # when
+        target = '공지사항1'
+        instance = Board.objects.filter(board_name=target)[0]
+        key = instance.board_id_pk
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
+
+        # then
+        return_data = {
+            "board_id_pk": key,
+            "board_name": '자유게시판',
+            "role_role_pk_write_level": 1,
+            "role_role_pk_read_level": 3
+        }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
