@@ -125,4 +125,19 @@ class BoardViewSet(viewsets.ModelViewSet):
             }
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
 
+    # patch
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        try:
+            serializer = BoardSerializerWrite(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
 
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+            return Response(serializer.data)
+        except:
+            error_responses_data = {
+                'detail': 'board with this board name already exists.'
+            }
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
