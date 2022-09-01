@@ -418,3 +418,26 @@ class BoardApiTestOK(APITestCase):
         }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
+
+    def test_board_delete_by_id(self):
+        print("Board Api DELETE BY ID Running...")
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=3)
+        )
+        Board.objects.create(
+            board_name='공지사항2',
+            role_role_pk_write_level=Role.objects.get(role_pk=2),
+            role_role_pk_read_level=Role.objects.get(role_pk=2)
+        )
+
+        # when
+        target = '공지사항1'
+        instance = Board.objects.filter(board_name=target)[0]
+        key = instance.board_id_pk
+        respons: Response = self.client.delete(f"{self.url}{key}/")
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
