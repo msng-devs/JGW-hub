@@ -125,6 +125,23 @@ components:
         - board_name
         - role_role_pk_read_level
         - role_role_pk_write_level
+    PatchedBoard:
+      type: object
+      properties:
+        board_id_pk:
+          type: integer
+          readOnly: true
+          description: 게시판 pk
+        board_name:
+          type: string
+          maxLength: 45
+          description: 게시판 이름
+        role_role_pk_write_level:
+          type: integer
+          description: 게시판 쓰기 권한 레벨 (Role pk)
+        role_role_pk_read_level:
+          type: integer
+          description: 게시판 읽기 권한 레벨 (Role pk)
     PaginatedBoardList:
       type: object
       properties:
@@ -149,6 +166,13 @@ components:
           description: 게시판 데이터 리스트
           items:
             $ref: '#/components/schemas/Board'
+    BoardError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: 에러 메세지
+
     Role:
       type: object
       properties:
@@ -163,9 +187,3 @@ components:
       required:
         - role_nm
         - role_pk
-    BoardError:
-      type: object
-      properties:
-        detail:
-          type: string
-          description: 에러 메세지
