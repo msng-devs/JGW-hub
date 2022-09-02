@@ -272,8 +272,10 @@ class BoardApiTestOK(APITestCase):
         for i in range(20):
             Board.objects.create(
                 board_name=f'공지사항{i}',
+                board_layout=0,
                 role_role_pk_write_level=Role.objects.get(role_pk=random.randint(1, 5)),
-                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5))
+                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5)),
+                role_role_pk_comment_write_level=Role.objects.get(role_pk=random.randint(1, 5))
             )
 
         # when
@@ -284,7 +286,9 @@ class BoardApiTestOK(APITestCase):
                 'count': Board.objects.count(),
                 'next': None,
                 'previous': None,
-                'results': [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
+                'results': [{"board_id_pk": i.board_id_pk,
+                             "board_name": i.board_name,
+                             'board_layout': i.board_layout,
                              "role_role_pk_write_level": {
                                  'role_pk': i.role_role_pk_write_level.role_pk,
                                  'role_nm': i.role_role_pk_write_level.role_nm
@@ -292,6 +296,10 @@ class BoardApiTestOK(APITestCase):
                              "role_role_pk_read_level": {
                                  'role_pk': i.role_role_pk_read_level.role_pk,
                                  'role_nm': i.role_role_pk_read_level.role_nm
+                             },
+                             "role_role_pk_comment_write_level": {
+                                 'role_pk': i.role_role_pk_comment_write_level.role_pk,
+                                 'role_nm': i.role_role_pk_comment_write_level.role_nm
                              }}
                             for i in Board.objects.all().order_by('board_id_pk')]
             }
@@ -305,8 +313,10 @@ class BoardApiTestOK(APITestCase):
         for i in range(20):
             Board.objects.create(
                 board_name=f'공지사항{i}',
+                board_layout=0,
                 role_role_pk_write_level=Role.objects.get(role_pk=random.randint(1, 5)),
-                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5))
+                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5)),
+                role_role_pk_comment_write_level=Role.objects.get(role_pk=random.randint(1, 5))
             )
 
         # when
@@ -317,7 +327,9 @@ class BoardApiTestOK(APITestCase):
                 'count': 10,
                 'next': 'http://testserver/hubapi/board/?page=2',
                 'previous': None,
-                'results': [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
+                'results': [{"board_id_pk": i.board_id_pk,
+                             "board_name": i.board_name,
+                             'board_layout': i.board_layout,
                              "role_role_pk_write_level": {
                                  'role_pk': i.role_role_pk_write_level.role_pk,
                                  'role_nm': i.role_role_pk_write_level.role_nm
@@ -325,6 +337,10 @@ class BoardApiTestOK(APITestCase):
                              "role_role_pk_read_level": {
                                  'role_pk': i.role_role_pk_read_level.role_pk,
                                  'role_nm': i.role_role_pk_read_level.role_nm
+                             },
+                             "role_role_pk_comment_write_level": {
+                                 'role_pk': i.role_role_pk_comment_write_level.role_pk,
+                                 'role_nm': i.role_role_pk_comment_write_level.role_nm
                              }}
                             for i in Board.objects.all().order_by('board_id_pk')[:10]]
             }
@@ -337,29 +353,38 @@ class BoardApiTestOK(APITestCase):
         # given
         Board.objects.create(
             board_name='공지사항1',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=1),
-            role_role_pk_read_level=Role.objects.get(role_pk=1)
+            role_role_pk_read_level=Role.objects.get(role_pk=1),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=1)
         )
         Board.objects.create(
             board_name='공지사항2',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=2),
-            role_role_pk_read_level=Role.objects.get(role_pk=2)
+            role_role_pk_read_level=Role.objects.get(role_pk=2),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=2)
         )
 
         # when
         target = '공지사항1'
-        key = Board.objects.filter(board_name=target)[0].board_id_pk
-        respons: Response = self.client.get(f"{self.url}{key}/")
+        ins = Board.objects.filter(board_name=target)[0]
+        respons: Response = self.client.get(f"{self.url}{ins.board_id_pk}/")
 
         # then
         return_data = {
-            "board_id_pk": key,
-            "board_name": target,
+            "board_id_pk": ins.board_id_pk,
+            "board_name": ins.board_name,
+            'board_layout': ins.board_layout,
             "role_role_pk_write_level": {
                 'role_pk': 1,
                 'role_nm': 'ROLE_GUEST'
             },
             "role_role_pk_read_level": {
+                'role_pk': 1,
+                'role_nm': 'ROLE_GUEST'
+            },
+            "role_role_pk_comment_write_level": {
                 'role_pk': 1,
                 'role_nm': 'ROLE_GUEST'
             }
@@ -371,16 +396,21 @@ class BoardApiTestOK(APITestCase):
         print("Board Api POST Running...")
 
         # given
-        data = '[{"board_name": "test1", "role_role_pk_write_level": 1,"role_role_pk_read_level": 1},' \
-               '{"board_name": "test2", "role_role_pk_write_level": 2,"role_role_pk_read_level": 1}]'
+        data = '[{"board_name": "test1", "board_layout": 0, "role_role_pk_write_level": 1,' \
+               '"role_role_pk_read_level": 1, "role_role_pk_comment_write_level": 1},' \
+               '{"board_name": "test2", "board_layout": 0, "role_role_pk_write_level": 2,' \
+               '"role_role_pk_read_level": 1, "role_role_pk_comment_write_level": 2}]'
 
         # when
         respons: Response = self.client.post(self.url, data=data, content_type='application/json')
 
         # then
-        responses_data = [{"board_id_pk": i.board_id_pk, "board_name": i.board_name,
-                             "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-                             "role_role_pk_read_level": i.role_role_pk_read_level.role_pk}
+        responses_data = [{"board_id_pk": i.board_id_pk,
+                           "board_name": i.board_name,
+                            'board_layout': i.board_layout,
+                            "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
+                            "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
+                           'role_role_pk_comment_write_level': i.role_role_pk_comment_write_level.role_pk}
                           for i in Board.objects.all().order_by('board_id_pk')]
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(respons.content, responses_data)
@@ -390,13 +420,17 @@ class BoardApiTestOK(APITestCase):
         # given
         Board.objects.create(
             board_name='공지사항1',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=1),
-            role_role_pk_read_level=Role.objects.get(role_pk=3)
+            role_role_pk_read_level=Role.objects.get(role_pk=3),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=3)
         )
         Board.objects.create(
             board_name='공지사항2',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=2),
-            role_role_pk_read_level=Role.objects.get(role_pk=2)
+            role_role_pk_read_level=Role.objects.get(role_pk=2),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=3)
         )
         patch_data = {
             "board_name": "자유게시판",
@@ -413,8 +447,10 @@ class BoardApiTestOK(APITestCase):
         return_data = {
             "board_id_pk": key,
             "board_name": '자유게시판',
+            'board_layout': 0,
             "role_role_pk_write_level": 1,
-            "role_role_pk_read_level": 3
+            "role_role_pk_read_level": 3,
+            'role_role_pk_comment_write_level': 3
         }
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -424,13 +460,17 @@ class BoardApiTestOK(APITestCase):
         # given
         Board.objects.create(
             board_name='공지사항1',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=1),
-            role_role_pk_read_level=Role.objects.get(role_pk=3)
+            role_role_pk_read_level=Role.objects.get(role_pk=3),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=3)
         )
         Board.objects.create(
             board_name='공지사항2',
+            board_layout=0,
             role_role_pk_write_level=Role.objects.get(role_pk=2),
-            role_role_pk_read_level=Role.objects.get(role_pk=2)
+            role_role_pk_read_level=Role.objects.get(role_pk=2),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=3)
         )
 
         # when

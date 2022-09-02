@@ -19,10 +19,12 @@ class RoleSerializer(serializers.ModelSerializer):
 class BoardSerializer(serializers.ModelSerializer):
     role_role_pk_write_level = RoleSerializer(read_only=True)
     role_role_pk_read_level = RoleSerializer(read_only=True)
+    role_role_pk_comment_write_level = RoleSerializer(read_only=True)
 
     class Meta:
         model = Board
-        fields = ['board_id_pk', 'board_name', 'role_role_pk_write_level', 'role_role_pk_read_level']
+        fields = ['board_id_pk', 'board_name', 'board_layout', 'role_role_pk_write_level',
+                  'role_role_pk_read_level', 'role_role_pk_comment_write_level']
 
 class BoardSerializerWrite(serializers.ModelSerializer):
     class Meta:
