@@ -79,6 +79,9 @@ components:
           type: string
           maxLength: 45
           description: 게시판 이름
+        board_layout:
+          type: integer
+          description: 게시판 레이아웃 타입
         role_role_pk_write_level:
           description: 게시판 쓰기 권한 레벨
           allOf:
@@ -89,11 +92,18 @@ components:
           allOf:
             - $ref: '#/components/schemas/Role'
           readOnly: true
+        role_role_pk_comment_write_level:
+          allOf:
+            - $ref: '#/components/schemas/Role'
+          description: 게시판 댓글 쓰기 권한 레벨
+          readOnly: true
       required:
         - board_id_pk
         - board_name
+        - board_layout
         - role_role_pk_read_level
         - role_role_pk_write_level
+        - role_role_pk_comment_write_level
     BoardCreateList:
       type: array
       items:
@@ -101,8 +111,10 @@ components:
       example:
         - board_id_pk: 0
           board_name: 'string'
+          board_layout: 0
           role_role_pk_write_level: 1
           role_role_pk_read_level: 1
+          role_role_pk_comment_write_level: 1
     BoardCreate:
       type: object
       properties:
@@ -114,17 +126,25 @@ components:
           type: string
           maxLength: 45
           description: 게시판 이름
+        board_layout:
+          type: integer
+          description: 게시판 레이아웃 타입
         role_role_pk_write_level:
           type: integer
           description: 게시판 쓰기 권한 레벨 (Role pk)
         role_role_pk_read_level:
           type: integer
           description: 게시판 읽기 권한 레벨 (Role pk)
+        role_role_pk_comment_write_level:
+          type: integer
+          description: 게시판 댓글 쓰기 권한 레벨 (Role pk)
       required:
         - board_id_pk
         - board_name
+        - board_layout
         - role_role_pk_read_level
         - role_role_pk_write_level
+        - role_role_pk_comment_write_level
     PatchedBoard:
       type: object
       properties:
@@ -136,12 +156,18 @@ components:
           type: string
           maxLength: 45
           description: 게시판 이름
+        board_layout:
+          type: integer
+          description: 게시판 레이아웃 타입
         role_role_pk_write_level:
           type: integer
           description: 게시판 쓰기 권한 레벨 (Role pk)
         role_role_pk_read_level:
           type: integer
           description: 게시판 읽기 권한 레벨 (Role pk)
+        role_role_pk_comment_write_level:
+          type: integer
+          description: 게시판 댓글 쓰기 권한 레벨 (Role pk)
     PaginatedBoardList:
       type: object
       properties:
