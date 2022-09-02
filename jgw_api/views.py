@@ -3,12 +3,14 @@ from rest_framework.response import Response
 
 from .models import (
     Category,
-    Board
+    Board,
+    Post
 )
 from .serializers import (
     CategorySerializer,
     BoardSerializer,
-    BoardSerializerWrite
+    BoardSerializerWrite,
+    PostSerializer
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
@@ -148,3 +150,9 @@ class BoardViewSet(viewsets.ModelViewSet):
             "detail": "Use patch."
         }
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+
+class PostViewSet(viewsets.ModelViewSet):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all().order_by('board_id_pk')
+    pagination_class = BoardPageNumberPagination
+    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
