@@ -1,0 +1,709 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>자료구조론 Term Project 레포트</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	text-indent: -1.7em;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="27653721-df7f-4c8d-868f-02afbf8b1668" class="page sans"><header><h1 class="page-title">자료구조론 Term Project 레포트</h1></header><div class="page-body"><h1 id="7f6d1a78-e7d3-43e6-b85d-4bfa9a68183c" class="">B-tree 란?</h1><p id="4dccb871-b159-4d6c-94f0-f4448b35d4d1" class="">항상 균형을 유지하는 balanced tree의 한 종류이다. 일반적인 이진트리와 다르게 한 노드에 여러개의 키를 가질 수 있다는 점이 특징이다.</p><h2 id="45263886-0534-4677-8545-bb2c468f0952" class="">조건</h2><p id="d2cac188-5488-4e5e-a1d5-30e07a208dba" class="">M차 트리라고 할때, B-tree의 조건</p><ol type="1" id="e05e2ec9-10d9-4d46-9122-1d12f5675c19" class="numbered-list" start="1"><li>루트 노드를 제외한 모든 노드는 최대 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi></mrow><annotation encoding="application/x-tex">M</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span></span></span></span></span><span>﻿</span></span>개 부터 최소 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">⌈</mo><mi>M</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">⌉</mo></mrow><annotation encoding="application/x-tex">⌈M/2⌉</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord">/2</span><span class="mclose">⌉</span></span></span></span></span><span>﻿</span></span>개의 자식 노드를 가질 수 있다.<ol type="a" id="b7e79b46-a2e3-46aa-9e8a-a766b8674ef7" class="numbered-list" start="1"><li>루트 노드는 최소 2개의 자식 노드를 가질 수 있다.</li></ol></li></ol><ol type="1" id="5c5b6e74-baa9-4477-a378-e091966f57e3" class="numbered-list" start="2"><li>루트 노드를 제외한 모든 노드는 최대 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">M-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.76666em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span>개 부터 최소 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">⌈</mo><mi>M</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">⌉</mo><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">⌈M/2⌉-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord">/2</span><span class="mclose">⌉</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span>개의 키를 가질 수 있다.<ol type="a" id="d930c418-6acf-477b-af35-bf2456113e5c" class="numbered-list" start="1"><li>루트 노드는 최소 1개의 키를 가질 수 있다.</li></ol></li></ol><ol type="1" id="0c76e72b-ff77-4a82-a302-7a0f715ec6a8" class="numbered-list" start="3"><li>노드의 키가 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">x</span></span></span></span></span><span>﻿</span></span>개라면, 자식 노드의 수는 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">x+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.66666em;vertical-align:-0.08333em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span>개 이다.</li></ol><ol type="1" id="52afb38f-0261-4e92-8da6-91ecd802d285" class="numbered-list" start="4"><li>모든 리프 노드는 동일한 레벨에 존재해야 한다.</li></ol><h1 id="74300cea-585a-4ca8-b485-17878944909f" class="">구현</h1><h2 id="4db00598-81ee-4571-bd3e-f53fb5940f45" class="">노드 구현하기</h2><h3 id="8ffb99e6-a7c3-40c9-b160-183c6f27e21b" class="">구조체에 필요한 정보</h3><ol type="1" id="00f54203-17fb-4744-aa1d-61328e923007" class="numbered-list" start="1"><li>B-tree의 차수: 키를 추가할 때 2번 조건을 만족 하는지 검사하기 위해 필요하다.</li></ol><ol type="1" id="3a32482b-4b76-4a5e-b313-89c249342f34" class="numbered-list" start="2"><li>키를 저장할 공간: 키를 여러개 저장 가능한 특성 상 배열로 저장해야 한다.</li></ol><ol type="1" id="53bc2374-2010-4f53-aa8b-08b3241cc481" class="numbered-list" start="3"><li>자식 노드를 저장할 공간: 자식도 여러 자식을 가질 수 있으므로 배열로 저장 해야 한다.</li></ol><ol type="1" id="737e97ce-ec71-425c-8747-448afe66a840" class="numbered-list" start="4"><li>부모 노드: 부모 노드를 저장해서 아래→위 방향으로 탐색이 가능하도록 해야한다.</li></ol><h3 id="71469520-6d3f-4e09-a508-4aae838faf6a" class="">선언 된 변수</h3><figure id="717be18c-b7d7-4626-bb0e-7fab4871b5e1" class="image"><a href="img/Untitled.png"><img style="width:302px" src="img/Untitled.png"/></a></figure><ol type="1" id="5a87ed57-ff73-4415-bfd3-225e4ead7858" class="numbered-list" start="1"><li>order: 소속 된 B-tree의 차수</li></ol><ol type="1" id="a609f5ba-fb8a-4fd6-aca0-e05e52506610" class="numbered-list" start="2"><li>keys[]: 키를 저장할 배열</li></ol><ol type="1" id="8d466831-5b4a-4e70-9454-a4c4239cd097" class="numbered-list" start="3"><li>numKeys: 저장된 키의 개수<ul id="11b571e2-2831-4332-89eb-12d9b2db794b" class="bulleted-list"><li style="list-style-type:disc">keys가 고정된 크기로 선언해야 하는 배열이라서, 임의의 값으로 채워서 배열 선언 후, 실제 값은 몇개가 추가되었는지 알기 위해 선언함.</li></ul></li></ol><ol type="1" id="4fa859b7-186a-49c3-8cda-a90c8b2f2310" class="numbered-list" start="4"><li>childrenNodes[]: 자식 노드를 저장할 배열</li></ol><ol type="1" id="fbc965aa-8480-4463-8fef-1409f20dd5a3" class="numbered-list" start="5"><li>numChildren: 저장된 자식 노드의 개수<ul id="937b05ee-43d1-4f9e-a63f-e7b1bb7061d6" class="bulleted-list"><li style="list-style-type:disc">3번과 같은 이유로 선언</li></ul></li></ol><ol type="1" id="7c82ee0f-a4c6-4336-ab9c-9cab269afd9e" class="numbered-list" start="6"><li>parentNode: 현재 노드의 부모 노드</li></ol><ol type="1" id="d26e271d-5541-4b86-bacb-17e7c68f411c" class="numbered-list" start="7"><li>nodeSorter: childrenNodes[]를 저장된 키의 오름차순으로 정렬하는 Comparator</li></ol><h3 id="ab33f751-55e1-4674-a7dd-3f76e0ae96c0" class="">생성자</h3><figure id="72c3a4b3-2e75-46ab-8a81-3fe98c71f9a8" class="image"><a href="img/Untitled%201.png"><img style="width:435px" src="img/Untitled%201.png"/></a></figure><ul id="34d9a709-bf5d-4433-b157-97e5f0f6c9e5" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="c6ef5605-3411-4c5a-83a0-e67a58b36d6f" class="bulleted-list"><li style="list-style-type:circle">order: 소속된 B-tree의 차수</li></ul></li></ul><ul id="64aaa4d4-4af3-4efe-a7d4-01d80f206dcc" class="bulleted-list"><li style="list-style-type:disc">least: 조건 2번의 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">⌈</mo><mi>M</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">⌉</mo><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">⌈M/2⌉-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mord">/2</span><span class="mclose">⌉</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span> 계산</li></ul><ul id="e01d7f14-3ee1-41f6-bd3a-2a685db8583e" class="bulleted-list"><li style="list-style-type:disc">childrenNodes를 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>r</mi><mi>d</mi><mi>e</mi><mi>r</mi><mo>+</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>s</mi><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">order+least+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span>개로 초기화.<ul id="9df4731a-934f-4134-b4d9-b7bcaf3c9757" class="bulleted-list"><li style="list-style-type:circle">삭제 연산을 수행할 때 최소 개수 + 최대 개수의 노드 두 개가 병합될 경우를 생각하고 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>r</mi><mi>d</mi><mi>e</mi><mi>r</mi><mo>+</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>s</mi><mi>t</mi><mo>+</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">order+least+1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span></span><span>﻿</span></span>개로 초기화 한다. 1개는 여유로 추가</li></ul></li></ul><ul id="36f1fb07-9caf-4a0b-8b5b-68f1e67c6a89" class="bulleted-list"><li style="list-style-type:disc">parentNode: 처음에는 null로 초기화.<ul id="5611bfab-0f38-49d9-9c7f-29b59d60b085" class="bulleted-list"><li style="list-style-type:circle">root노드는 parentNode가 null.</li></ul></li></ul><ul id="0c84295d-a2fe-43be-bb0e-9dacfbb7bc71" class="bulleted-list"><li style="list-style-type:disc">keys: childrenNodes와 같은 이유로 <style>@import url('https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.2/katex.min.css')</style><span data-token-index="0" contenteditable="false" class="notion-text-equation-token" style="user-select:all;-webkit-user-select:all;-moz-user-select:all"><span></span><span><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mi>r</mi><mi>d</mi><mi>e</mi><mi>r</mi><mo>+</mo><mi>l</mi><mi>e</mi><mi>a</mi><mi>s</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">order+least</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">or</span><span class="mord mathnormal">d</span><span class="mord mathnormal" style="margin-right:0.02778em;">er</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathnormal" style="margin-right:0.01968em;">l</span><span class="mord mathnormal">e</span><span class="mord mathnormal">a</span><span class="mord mathnormal">s</span><span class="mord mathnormal">t</span></span></span></span></span><span>﻿</span></span>개로 초기화.</li></ul><ul id="7f3fe2d9-99e4-483d-8a98-d3c59e7bdb68" class="bulleted-list"><li style="list-style-type:disc">Arrays.fill: keys를 Integer의 최대 수로 초기화.</li></ul><h3 id="255cff4e-c091-485f-9900-4fdff19e47de" class="">함수</h3><p id="931b0350-077f-4e76-ad28-41972a6f4218" class="">getter와 setter는 생략</p><ol type="1" id="9f4fef34-6784-419c-af06-f7f23aba89dc" class="numbered-list" start="1"><li><mark class="highlight-orange_background">divideNode</mark><p id="95fe4f5e-c349-4e6c-b525-633fc2817ad5" class="">노드를 절반으로 나누는 함수. 노드 자신은 왼쪽 노드, 새로 생성하는 노드는 오른쪽 노드로 나누어진다.</p><ul id="68e149b9-15f7-4730-817e-98fd706d58c2" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="24d1e824-d027-4b5b-bbf6-e0d41b10970b" class="bulleted-list"><li style="list-style-type:circle">int total: 키의 전체 개수</li></ul></li></ul><figure id="0e06f98c-4b7d-4ad9-81ac-19107bf3d9a2" class="image"><a href="img/Untitled%202.png"><img style="width:594px" src="img/Untitled%202.png"/></a></figure><p id="e333e863-ac5c-49bc-8dbd-6ab8950c079b" class="">키를 나누는 부분이다.</p><ol type="1" id="a895aebf-9d70-42dd-a5cd-c5678a6e6050" class="numbered-list" start="1"><li>total을 기준으로 중간 키 값을 기준 키로 지정</li></ol><ol type="1" id="e8dbbc87-c936-42be-8e6d-5a5a8799d9d6" class="numbered-list" start="2"><li>지정 키보다 위쪽에 있는 키들을 오른쪽 노드에 저장</li></ol><ol type="1" id="a1c2c027-51c7-47ce-bf74-56d3e3e506fb" class="numbered-list" start="3"><li>왼쪽 노드에서는 삭제</li></ol><p id="253800c0-2a49-441b-b865-0ff3c662fd6a" class="">
+</p><figure id="5bc8b50a-5cc4-40cc-88df-71f2333fa3f8" class="image"><a href="img/Untitled%203.png"><img style="width:531px" src="img/Untitled%203.png"/></a></figure><p id="f7df98c8-1b46-40d8-84c4-b62beee95150" class="">자식 노드를 나누는 부분이다.</p><ol type="1" id="9ac52e16-de6f-44cf-b0dc-236d85700e2e" class="numbered-list" start="1"><li>자식 노드를 하나씩 가져옴</li></ol><ol type="1" id="988cd617-34f0-42d0-b0d5-57fec237310b" class="numbered-list" start="2"><li>첫 번째 키 값이 기준 키 값보다 크다면, 오른쪽 노드에 자식 노드로 추가하고, 왼쪽 노드에서는 삭제</li></ol></li></ol><ol type="1" id="ac57ccec-ac04-4608-8394-50120af99589" class="numbered-list" start="2"><li><mark class="highlight-orange_background">addKey</mark><p id="03b1bdbf-8839-4f1b-9f0f-11eba070d2fd" class="">노드에 키를 추가하는 함수.</p><ul id="2bfa6bf5-ef92-4557-ba22-b00916a1aba9" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="b17e9890-3630-4ab7-8e66-06a786a29ea8" class="bulleted-list"><li style="list-style-type:circle">int key: 추가할 키</li></ul></li></ul><figure id="9db5ad0a-5e1e-4773-87b2-4cafacb6b3ac" class="image"><a href="img/Untitled%204.png"><img style="width:483px" src="img/Untitled%204.png"/></a></figure><ol type="1" id="5b624d74-669c-4929-bfbb-c417ceb61210" class="numbered-list" start="1"><li>추가할 키가 이미 존재하는지 검사. 존재한다면 false를 리턴하고 함수를 종료한다.</li></ol><ol type="1" id="c4ce1911-5c85-4bb4-9714-6c8fa0b479ba" class="numbered-list" start="2"><li>keys에 키를 추가 후 정렬</li></ol><ol type="1" id="3d54cf8a-0cfb-4b6c-b99a-39edb5f0a368" class="numbered-list" start="3"><li>keys의 개수가 가질 수 있는 최대 개수보다 많다면 true 리턴, 아니라면 false 리턴</li></ol></li></ol><ol type="1" id="929e2acf-4718-409f-bd07-a9b32d3dc60b" class="numbered-list" start="3"><li><mark class="highlight-orange_background">addChildNode</mark><p id="cfe736b5-c25d-4c9a-8e9a-c66cbb13deba" class="">자식 노드를 추가하는 함수</p><ul id="abffc907-f2b2-4a45-93e1-d6f306abf2a9" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="230365cf-894f-4f32-84f5-feaa9257bd65" class="bulleted-list"><li style="list-style-type:circle">Node child: 추가할 자식 노드</li></ul></li></ul><figure id="84f0d5d9-2e9f-428a-8fb2-14bb148f098b" class="image"><a href="img/Untitled%205.png"><img style="width:488px" src="img/Untitled%205.png"/></a></figure><p id="300c14c5-3f93-4354-8119-b4eaf83407c2" class="">자식 노드를 추가하고, 정렬한다.</p></li></ol><ol type="1" id="fdb66f2c-01d1-416b-9200-653b83f9843d" class="numbered-list" start="4"><li><mark class="highlight-orange_background">deleteKey</mark><p id="2acb2cf6-e091-4513-8380-4b86d426058b" class="">대상 위치에 있는 키를 삭제하는 함수</p><ul id="74f90a81-debb-4156-b6bc-36655de7e363" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="e526e2ab-41a0-4ffb-b533-1bc117c8f681" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: 삭제할 키 값이 존재하는 위치</li></ul></li></ul><figure id="1c124e2f-8b2d-4cd7-81e5-7ab5625d785b" class="image"><a href="img/Untitled%206.png"><img style="width:410px" src="img/Untitled%206.png"/></a></figure><ol type="1" id="6e3168ce-a3b7-4c86-99ca-25b91d353be1" class="numbered-list" start="1"><li>키 값을 앞으로 한 칸씩 당겨옴.</li></ol><ol type="1" id="36240644-c3eb-459c-a6a4-1e209f2f269d" class="numbered-list" start="2"><li>targetIdx부터 numkeys까지 반복</li></ol></li></ol><ol type="1" id="ab4f6e02-4b71-468a-be3f-43a6a76d5582" class="numbered-list" start="5"><li><mark class="highlight-orange_background">deleteChildNode</mark><p id="95c2a975-ba68-4110-9e2a-583152db0e2a" class="">대상 위치에 있는 자식 노드를 삭제하는 함수</p><ul id="6a6279ff-56ba-472b-9a43-8d577ba9d3f3" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="3e13e3ea-5b2c-44e2-9f9b-008f52bd7b0f" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: 삭제할 자식 노드가 존재하는 위치</li></ul></li></ul><figure id="657a4f75-dfde-4b88-a98e-213d7fe79b90" class="image"><a href="img/Untitled%207.png"><img style="width:415px" src="img/Untitled%207.png"/></a></figure><p id="3e953b72-b2e0-42d0-a5b1-788b2cfa71b4" class="">deleteKey와 원리가 같음.</p></li></ol><h1 id="7f70824a-319b-4bb5-a24c-ca4fdc5b8a70" class="">B-tree 구현하기</h1><h2 id="86dabf91-f5aa-490d-8152-4fe888716f51" class="">키 탐색 과정</h2><ol type="1" id="347c77d1-ff5b-4329-9375-6e2d8500d7fd" class="numbered-list" start="1"><li>노드에 키 값이 존재하는지 확인</li></ol><ol type="1" id="2fb114c9-8773-49e9-8602-c13cbbe978b6" class="numbered-list" start="2"><li>키 값이 존재하지 않고, 중간 노드라면 다시 1번으로 돌아감</li></ol><ol type="1" id="557de338-a8c2-4f04-860a-0533a0a72ef6" class="numbered-list" start="3"><li>키값이 존재하지 않고, 리프 노드라면 종료</li></ol><h2 id="edcb3ea0-3738-4af1-aac1-3e2ce5a24c8d" class="">키 탐색 구현</h2><p id="ffd0625a-df19-4332-b438-2ce9b81bc554" class=""><mark class="highlight-orange_background">findNode </mark>함수를 이용해 키를 탐색한다.</p><ul id="f6c05856-deb8-409c-8b3b-72b2e1694969" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="3c21c547-3e96-451e-af47-1c6f3234f6fe" class="bulleted-list"><li style="list-style-type:circle">int target: 탐색할 키</li></ul></li></ul><figure id="0c0727c0-a09f-4347-a6ce-4b71101fa1b0" class="image"><a href="img/Untitled%208.png"><img style="width:626px" src="img/Untitled%208.png"/></a></figure><p id="b4fabb0d-ab53-4959-ba72-6f8d468f800a" class="">currentNode가 리프 노드일때까지 반복하며 키 값이 들어갈 수 있는 노드를 탐색하는 부분. 탐색 과정에서 키 값을 노드에서 찾으면 존재하는 노드와 몇 번째 키인지 리턴한다.</p><ol type="1" id="79827cdf-26af-467b-8bcd-d507178684d7" class="numbered-list" start="1"><li>currentNode를 root로 지정</li></ol><ol type="1" id="73e52b07-4d78-45fa-a293-43a3fedd27f6" class="numbered-list" start="2"><li>currentNode의 키 값을 하나씩 가져와 대상 키보다 큰지 검사.<ul id="2e593b01-d427-41c5-ba47-f24b2915f2a6" class="bulleted-list"><li style="list-style-type:disc">i번째 키가 대상 키보다 크다 = i번째 자식 노드에 키 값이 존재해야 한다.</li></ul></li></ol><ol type="1" id="f9048550-7eb5-4f6e-b645-d71691c13c8c" class="numbered-list" start="3"><li>2번을 만족하면 자식 노드를 currentNode로 지정하고, 2번부터 다시 반복</li></ol><ol type="1" id="4701dd88-4cb8-4ae6-a512-33eeebfa5b50" class="numbered-list" start="4"><li>만약 내부 노드에서 키 값이 발견된다면, 발견된 노드와 몇 번째 키인지 리턴.</li></ol><ol type="1" id="f9882e34-7fa6-4866-b437-75a4ec8bbd81" class="numbered-list" start="5"><li>만약 키 값이 존재할 수 있는 자식 노드를 찾지 못했다면, 가장 마지막 자식 노드를 currentNode로 지정<ul id="68aa925b-b759-4d4e-b029-9ddafe034650" class="bulleted-list"><li style="list-style-type:disc">키는 i개 지만, 자식 노드는 항상 i+1개 이므로 i번째 자식 노드까지 대상 키 값이 존재할 수 있는 노드가 아니라면, i+1번째 노드는 반드시 존재할 수 있는 노드이다.</li></ul></li></ol><p id="0d1e30c7-5126-4801-8dd4-4e8547e90740" class="">
+</p><figure id="0a771731-b52b-480f-92db-d6d2161d5b05" class="image"><a href="img/Untitled%209.png"><img style="width:461px" src="img/Untitled%209.png"/></a></figure><p id="e2dd3456-0406-4f6e-bd0e-a06b680a65f5" class="">대상 키가 존재 가능한 자식 노드에 키 값이 이미 존재하는지 검사하는 부분. 있다면 키가 존재하는 부분과 위치를 리턴, 없다면 키를 추가할 수 있는 노드를 리턴.</p><ol type="1" id="4674f2a0-7211-40a2-853b-0b5cb9bffbad" class="numbered-list" start="1"><li>키를 앞부터 차례대로 가져옴</li></ol><ol type="1" id="935542c4-ea55-4e40-a739-565d5e02b07d" class="numbered-list" start="2"><li>대상 키 값과 정확히 같다면 발견된 노드와 몇 번째 키인지 리턴.</li></ol><ol type="1" id="93c68103-44d5-4516-ba83-4826df589987" class="numbered-list" start="3"><li>마지막 키까지 1번부터 반복</li></ol><ol type="1" id="773897aa-d0f4-4fff-9a5b-df523fa3b154" class="numbered-list" start="4"><li>대상 키 값이 존재하지 않는다면, 대상 키 값을 추가할 수 있는 노드를 리턴</li></ol><h2 id="f854ce34-6245-4088-a4ab-04ca37a9ab63" class="">노드 추가 과정</h2><ol type="1" id="e17e35b2-f27a-4264-bd6b-871929bf3dab" class="numbered-list" start="1"><li>리프 노드에 키 추가</li></ol><ol type="1" id="12107c80-12be-41a3-8ef9-11c6159c1bff" class="numbered-list" start="2"><li>키 개수가 조건 2를 만족하지 않는다면, 노드를 분할하고 부모 노드에 분할된 노드의 중간 키 값을 추가</li></ol><ol type="1" id="f597554b-13c9-4f34-b9fa-ffe70b2be881" class="numbered-list" start="3"><li>조건 2를 만족한다면, 함수 종료</li></ol><ol type="1" id="bf5472e7-e779-469c-bf2e-8da8d40852cc" class="numbered-list" start="4"><li>조건 2를 만족할때까지 2번부터 반복.</li></ol><h3 id="97917beb-7a90-4988-9ad0-6cb667cd682b" class="">시각화</h3><ol type="1" id="2380f188-84e4-4438-9a46-da42d7d6ebf4" class="numbered-list" start="1"><li><mark class="highlight-yellow_background">기본 삽입</mark><p id="837b4517-9b90-424a-b64a-6950f9c7a6af" class="">insert 2</p><figure id="509dbf4d-4312-4689-b72c-9de056a70bf3" class="image"><a href="img/Untitled%2010.png"><img style="width:161px" src="img/Untitled%2010.png"/></a></figure></li></ol><ol type="1" id="11d12d1a-5b59-48c3-941a-bdcfb8bd65ec" class="numbered-list" start="2"><li>추가 후 키 개수가 최대일 때<ol type="a" id="820dee5e-bbf7-44f9-bf42-37b335daebc8" class="numbered-list" start="1"><li><mark class="highlight-yellow_background">노드 분할</mark><ol type="i" id="af21bcd7-1417-4df2-bd1d-beb1ab07f442" class="numbered-list" start="1"><li>insert 2<figure id="af7ba24d-2d09-4742-9248-3160aee1ad5e" class="image"><a href="img/Untitled%2011.png"><img style="width:161px" src="img/Untitled%2011.png"/></a></figure></li></ol><ol type="i" id="650610a1-7740-413b-973e-32b7d59893ef" class="numbered-list" start="2"><li>추가한 노드의 중간값 부모 노드에 추가<figure id="c8d314a9-1636-435c-b602-c7575fa125f9" class="image"><a href="img/Untitled%2012.png"><img style="width:161px" src="img/Untitled%2012.png"/></a></figure></li></ol><ol type="i" id="68f77724-289c-4800-b695-d5caa6ec472b" class="numbered-list" start="3"><li>현재 노드 분할<figure id="871dacaf-4e6a-493a-8c99-ac7b26916faa" class="image"><a href="img/Untitled%2013.png"><img style="width:161px" src="img/Untitled%2013.png"/></a></figure></li></ol></li></ol><ol type="a" id="03e44ad6-619a-4112-9862-6a082bc768a3" class="numbered-list" start="2"><li><mark class="highlight-yellow_background">높이 증가</mark><ol type="a" id="ae927aa1-8609-45b5-9a78-b381f445cdab" class="numbered-list" start="1"><li>insert 2<figure id="c11201a4-ffa6-484e-93ed-74d283336bc7" class="image"><a href="img/Untitled%2014.png"><img style="width:101px" src="img/Untitled%2014.png"/></a></figure></li></ol><ol type="a" id="704a067f-f8bb-4c21-a920-9a773d7de36c" class="numbered-list" start="2"><li>부모 노드 생성 후 중간값 추가<figure id="42c3a9f5-72aa-424c-b1e0-0d4c3c5eb540" class="image"><a href="img/Untitled%2015.png"><img style="width:121px" src="img/Untitled%2015.png"/></a></figure></li></ol></li></ol><ol type="a" id="e1d82232-e3f1-432a-880f-2909dbb97126" class="numbered-list" start="3"><li><mark class="highlight-yellow_background">분할 재귀</mark><ol type="a" id="7493d076-92a3-464a-91d1-baa1b2905550" class="numbered-list" start="1"><li>insert 10<figure id="3ad0a9ff-fbc1-477c-b43f-e92af5564a50" class="image"><a href="img/Untitled%2016.png"><img style="width:361px" src="img/Untitled%2016.png"/></a></figure></li></ol><ol type="a" id="a0c13f4c-14d7-44a5-8972-a3f3a25a5cd1" class="numbered-list" start="2"><li>노드 분할<figure id="24163f3d-92a2-4ce2-8746-019028b9ef59" class="image"><a href="img/Untitled%2017.png"><img style="width:381px" src="img/Untitled%2017.png"/></a></figure></li></ol><ol type="a" id="6ab9e073-22ab-4acd-98e3-75cde196819d" class="numbered-list" start="3"><li>분할 뒤 부모 노드도 키 값이 최대 개수보다 많아졌으므로, 노드 분할 한번 더 반복<figure id="7ad3f64d-bb2f-48e3-8c63-896a34a38b80" class="image"><a href="img/Untitled%2018.png"><img style="width:341px" src="img/Untitled%2018.png"/></a></figure></li></ol><ol type="a" id="00336215-c23b-41ef-b269-4299220e5939" class="numbered-list" start="4"><li>ㅇㅇ</li></ol></li></ol></li></ol><h2 id="f0525219-abcd-4dc2-a7a9-03c266486859" class="">키 추가 구현</h2><p id="9c2a2a49-2116-4414-8a09-d925e5a0878c" class=""><mark class="highlight-orange_background">insertNode</mark>함수로 키를 추가한다.</p><ul id="2a44fecb-2d8b-4dce-81f4-22aebb92f23c" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="7f87f5a1-6ffe-4b77-b56b-cccc16c8ada4" class="bulleted-list"><li style="list-style-type:circle">int newData: 추가할 키 값</li></ul></li></ul><figure id="65fddc5c-6fd6-479f-be38-096bfcc9ba2d" class="image"><a href="img/Untitled%2019.png"><img style="width:516px" src="img/Untitled%2019.png"/></a></figure><p id="e1e274b7-2d69-4e78-a109-09676af0ca7f" class="">추가할 키 값이 존재하는지 찾고, 이미 존재한다면 함수 종료, 아니라면 추가할 노드를 가져오는 부분.</p><ol type="1" id="00bcd5ac-129d-4edf-93fc-9a3620da7523" class="numbered-list" start="1"><li>root 노드가 null 이라면 = B-tree가 비었다면<ul id="4868b34c-1087-46c5-96df-8598138aa331" class="bulleted-list"><li style="list-style-type:disc">root 노드를 만들고 키를 추가하고 함수 종료</li></ul></li></ol><ol type="1" id="3f23ec24-aaf1-4856-8632-df8b6aa1842d" class="numbered-list" start="2"><li>findNode함수를 이용해 키 값이 이미 존재하는지 검사</li></ol><ol type="1" id="8abf067a-177e-4406-b970-4f663f75dbf1" class="numbered-list" start="3"><li>키가 존재하지 않는다면 currentNode를 추가 가능한 노드로 지정</li></ol><ol type="1" id="5f39e695-08c2-4a05-b731-68bbd15794e5" class="numbered-list" start="4"><li>이미 존재한다면 키 중복 방지를 위해 함수 종료</li></ol><p id="7dffb69f-6dc2-4ca9-9f39-4020a0d57c8d" class="">
+</p><figure id="59148016-62d3-4329-be92-1eef11aaa773" class="image"><a href="img/Untitled%2020.png"><img style="width:522px" src="img/Untitled%2020.png"/></a></figure><p id="779c2d67-8236-45b3-86ab-fef5ed57431b" class="">노드에 키를 추가하고, 키의 개수가 최대 개수 이상이라서 조건 2를 만족하지 않느다면, 노드를 분할하는 부분. 리프 노드부터 시작해서 한 레벨씩 올라가도록 bottom-up 방식으로 구현했다.</p><ol type="1" id="b2be8779-b88a-4ac0-b49f-c26242850b9d" class="numbered-list" start="1"><li>addKey를 이용해서 값을 추가.</li></ol><ol type="1" id="ece39720-65d3-42b7-8da9-a2403282a50b" class="numbered-list" start="2"><li>addkey의 리턴값이 true라면 = 노드의 키 개수가 최대 개수 초과라면<ol type="a" id="233221ce-49f9-4f20-9976-e6ea79f4449a" class="numbered-list" start="1"><li>keys의 중간 idx 값을 divideIdx에 저장</li></ol><ol type="a" id="3a4e3001-0883-4dca-addc-badcd2c40a77" class="numbered-list" start="2"><li>현재 노드의 부모 노드가 존재한다면, 부모 노드에 keys의 중간 값을 추가</li></ol><ol type="a" id="dac36b9b-2843-4bbf-af20-0ba803f3f405" class="numbered-list" start="3"><li>아니라면 새 부모 노드를 만들어 새 부모 노드에 keys의 중간 값 추가</li></ol><ol type="a" id="9713ccc5-ec86-4a10-8a9e-3dc1e70f77b2" class="numbered-list" start="4"><li>divideNode 함수를 이용해 노드 분할 <mark class="highlight-orange_background">(노드 분할)</mark></li></ol><ol type="a" id="88ac3fca-ad31-4749-8376-0ec1fa665125" class="numbered-list" start="5"><li>분할된 오른쪽 노드의 부모 노드 지정. 부모 노드도 자식 노드로 오른쪽 노드 추가</li></ol><ol type="a" id="b6d9cb6d-73a0-4e06-a2e4-3d6bdedaef35" class="numbered-list" start="6"><li>currentNode가 root 노드와 같다면 부모 노드를  root로 지정 <mark class="highlight-orange_background">(높이 증가)</mark></li></ol><ol type="a" id="cb4d9649-2b33-4af8-a2da-2c114f55a1b7" class="numbered-list" start="7"><li>현재 노드의 키 개수가 최대 개수보다 작을때 까지 3번부터 반복 <mark class="highlight-orange_background">(분할 재귀)</mark></li></ol></li></ol><ol type="1" id="bbfe0dd2-4627-4e01-877a-2c5d3b450b6a" class="numbered-list" start="3"><li>addkey리턴값이 false라면 = 노드 키 개수가 최대 개수 이하라면, 함수 종료</li></ol><h2 id="9faa9f3a-d3d5-4c07-a3d2-d65fc97b58da" class="">키 삭제 구현</h2><p id="10a00dba-9087-4c0e-9150-d942cacb6840" class="">키를 삭제해도 B-tree의 균형을 깨뜨리지 않도록 만드는것이 관건이다.</p><h2 id="4a89ca8b-6549-43b0-8991-b15645d180d7" class="">키 삭제 과정</h2><p id="a89ccdd4-7909-406d-8287-1e12f9998d68" class="">크게 세 가지 케이스로 나눈다.</p><ol type="1" id="012ce316-4b37-4506-bc3a-f5de5b1efbee" class="numbered-list" start="1"><li>삭제할 키가 리프 노드에 있는 경우</li></ol><ol type="1" id="f61306df-b480-4e10-a98a-a67d50510ae8" class="numbered-list" start="2"><li>삭제할 키가 내부 노드에 있고, 자기 자신이나 자식 노드의 키가 최소 개수보다 많을 경우</li></ol><ol type="1" id="2c7c9432-1d6a-4f58-bd64-cbe5cf2a093d" class="numbered-list" start="3"><li>삭제할 키가 내부 노드에 있고, 자기 자신과 자식노드의 키가 최소 개수만 있을경우</li></ol><hr id="49525ffd-7f3e-42b1-8940-999ac3d07453"/><p id="1c501d4a-9a0f-4dba-93fc-293bcdbe30ad" class="">각 케이스의 세부 케이스는 다음과 같다.</p><p id="a476a01a-bd2e-448b-a1fc-6404926b7271" class=""><strong>case1. 삭제할 키가 리프 노드에 있는 경우</strong><div class="indented"><ol type="1" id="3b055742-6f5d-49aa-85cc-eec960c2cf87" class="numbered-list" start="1"><li>삭제할 키가 있는 노드가 root 노드라면<ol type="a" id="41121449-f846-40cc-8ccd-6d01f7d5dfe7" class="numbered-list" start="1"><li>키 삭제</li></ol></li></ol><ol type="1" id="8071e37f-1354-4347-b899-0280e7c29f63" class="numbered-list" start="2"><li>현재 노드의 키 개수가 최소보다 많다면<ol type="a" id="1be6e361-9261-4229-a18c-adec9f9f3d86" class="numbered-list" start="1"><li>키 삭제</li></ol></li></ol><ol type="1" id="75725eeb-b7c5-43fd-a3e1-d7ef12192e4a" class="numbered-list" start="3"><li>왼쪽 형제 노드가 존재하고, 노드의 키 개수가 최소보다 많다면<ol type="a" id="4ce33f01-ef35-4e74-845f-663c8bf1239c" class="numbered-list" start="1"><li>현재 노드에서 키 삭제</li></ol><ol type="a" id="5fc05dc2-0066-4caa-aacb-140899ce4c36" class="numbered-list" start="2"><li>현재 노드의 부모 키를 현재 노드로 이동</li></ol><ol type="a" id="780764f2-858d-4f70-a8eb-68ece132aeba" class="numbered-list" start="3"><li>왼쪽 노드에서 가장 큰 키를 부모 노드로 이동</li></ol></li></ol><ol type="1" id="6f3eb6eb-5332-45ea-8c14-637ece2fa4d7" class="numbered-list" start="4"><li>오른쪽 형제 노드가 존재하고, 노드의 키 개수가 최소보다 많다면<ol type="a" id="952cd629-92ac-47df-a160-c2b213e6459f" class="numbered-list" start="1"><li>현재 노드에서 키 삭제</li></ol><ol type="a" id="c856d1d1-2942-425c-948d-4e9245047b00" class="numbered-list" start="2"><li>현재 노드의 부모 키를 현재 노드로 이동</li></ol><ol type="a" id="638a400b-3f1f-41f0-b312-2ecfc5274e3f" class="numbered-list" start="3"><li>오른쪽 노드에서 가장 작은 키를 부모 노드로 이동</li></ol></li></ol><ol type="1" id="f6768635-93e9-445f-b3a6-81e0e060c748" class="numbered-list" start="5"><li>부모 노드의 키 개수가 최소보다 많다면<ol type="a" id="727cacb4-c9ed-4025-9c21-30ff0ece2b32" class="numbered-list" start="1"><li>부모 노드의 키를 형재 노드로 이동</li></ol><ol type="a" id="2d19b003-1e26-4dfa-963c-995b5c9c3e33" class="numbered-list" start="2"><li>부모 노드의 키를 추가한 형재 노드와 현재 노드 병합</li></ol></li></ol><ol type="1" id="54115b20-e47d-4ceb-9eaf-dfbf50a52beb" class="numbered-list" start="6"><li>1~4를 전부 만족하지 않는다면<ol type="a" id="dd6888c9-e864-4c60-90c5-3c755fa2a9d7" class="numbered-list" start="1"><li>5번의 과정을 수행</li></ol><ol type="a" id="e05d71cf-eb00-4f57-903d-a93e95cb6b5c" class="numbered-list" start="2"><li><mark class="highlight-orange_background">case 3의 2번</mark>으로 이동</li></ol></li></ol></div></p><p id="ccc1c05d-04bb-460f-9f3d-8681765d454b" class=""><strong>case2. 삭제할 키가 내부 노드에 있고, 자기 자신이나 자식 노드의 키가 최소 개수보다 많을 경우</strong><div class="indented"><ol type="1" id="ae59add8-335a-4675-95b9-bc61d7330f64" class="numbered-list" start="1"><li>자식이 리프 노드인 경우<ol type="a" id="bcae4ea5-fabe-43e2-a217-82708df41b29" class="numbered-list" start="1"><li>왼쪽 자식의 키 개수가 최소보다 크다면<ol type="i" id="477719cb-70a3-4e53-8169-5d1c2b91c658" class="numbered-list" start="1"><li>대상 키 삭제</li></ol><ol type="i" id="7c94546f-156a-4ae2-8bed-ad64218165aa" class="numbered-list" start="2"><li>왼쪽 자식 노드에서 가장 큰 값을 현재 노드로 이동</li></ol></li></ol><ol type="a" id="2a9ceedf-9ea5-4770-b7a5-90767c86bec9" class="numbered-list" start="2"><li>오른쪽 자식의 키 개수가 최소보다 크다면<ol type="i" id="50dc2306-b46a-441f-9e7c-d498db8d3585" class="numbered-list" start="1"><li>대상 키 삭제</li></ol><ol type="i" id="ae3b26bf-b543-4511-830d-7dae8f5a325b" class="numbered-list" start="2"><li>오른쪽 자식 노드에서 가장 작은 값을 현재 노드로 이동</li></ol></li></ol><ol type="a" id="192fd9b9-3b44-4a3c-b419-2b9287cf87c2" class="numbered-list" start="3"><li>현재 자식의 키 개수가 최소보다 크다면<ol type="i" id="86783d2e-6563-4214-9056-fc709830ec4f" class="numbered-list" start="1"><li>대상 키 삭제</li></ol><ol type="i" id="3ec74247-ceb0-4f89-b94e-61a96dc1b132" class="numbered-list" start="2"><li>왼쪽 자식과 오른쪽 자식을 병합</li></ol></li></ol><ol type="a" id="9ccea010-0427-42a1-bd55-9fb2dfa4fcef" class="numbered-list" start="4"><li>a~c를 모두 만족하지 않는다면<ol type="i" id="5926fc27-f0d0-4937-8688-a8a6624b010b" class="numbered-list" start="1"><li><mark class="highlight-orange_background">case 3</mark>으로 이동</li></ol></li></ol></li></ol><ol type="1" id="f66b071a-b942-4a9b-9beb-478211997866" class="numbered-list" start="2"><li>자식이 리프 노드가 아닌경우<ol type="a" id="001617b2-723d-4c4a-b71f-8e529662f14c" class="numbered-list" start="1"><li>왼쪽 자식 노드중 가장 큰 값과 현재 키의 자리를 바꿈</li></ol><ol type="a" id="c8bb8f77-4cc1-444d-a642-e88c8e0ef0d7" class="numbered-list" start="2"><li>리프 노드로 이동한 현재 키를 삭제</li></ol><ol type="a" id="7819df10-a6ad-492e-a8b0-7a636006613b" class="numbered-list" start="3"><li><mark class="highlight-orange_background">case 1</mark>로 이동</li></ol></li></ol></div></p><p id="75496dca-ee8f-471a-aa99-fa887e7e7e36" class=""><strong>case3. 삭제할 키가 내부 노드에 있고, 자기 자신과 자식노드의 키가 최소 개수만 있을경우</strong><div class="indented"><ol type="1" id="c03f7d99-900d-4988-b162-233de49883c6" class="numbered-list" start="1"><li>대상 키를 삭제하고, 왼쪽/오른쪽 자식 노드를 병합</li></ol><ol type="1" id="910d0def-8e8a-46f0-b6b4-b2e0df937621" class="numbered-list" start="2"><li>현재 노드와 현재 노드의 형제 노드, 현재 노드의 부모 키를 병합하고, 병합된 노드를 현재 노드로 지정</li></ol><ol type="1" id="4bcf631f-848b-4d63-b05b-b703ddace8f4" class="numbered-list" start="3"><li>2번에서 병합된 현재 노드의 키 개수가 최대 개수 초과라면<ol type="a" id="fa20d2a8-33d4-40a4-b638-93a2f4701b59" class="numbered-list" start="1"><li>현재 노드를 다시 좌우 노드로 분할</li></ol></li></ol><ol type="1" id="174ca803-8ea9-401c-83bb-ba7315f474cf" class="numbered-list" start="4"><li>2번에서 병합된 현재 노드의 부모 노드가 키를 최소 개수 미만으로 가지고 있다면<ol type="a" id="f81ae743-34b1-495f-8655-d3e317e648ad" class="numbered-list" start="1"><li><mark class="highlight-orange_background">2번부터 재귀적으로 다시 실행</mark></li></ol></li></ol></div></p><h2 id="51fc5eec-6c8d-480e-9337-ba64a23438b1" class="">시각화</h2><ol type="1" id="325a7061-6969-408f-bd21-e16ee433847d" class="numbered-list" start="1"><li>기본 삭제<ol type="a" id="be619e8c-039e-4e65-8e0f-403f3d17869b" class="numbered-list" start="1"><li>delete 8<figure id="367c35b4-7bb0-448c-a5f2-ecf209d2248a" class="image"><a href="img/Untitled%2021.png"><img style="width:151px" src="img/Untitled%2021.png"/></a></figure><figure id="d92cc31d-b72b-448a-8f84-44ce3b6fc572" class="image"><a href="img/Untitled%2022.png"><img style="width:101px" src="img/Untitled%2022.png"/></a></figure></li></ol></li></ol><ol type="1" id="2ef3e47f-1816-4e6e-b94d-3f4cd4af22a1" class="numbered-list" start="2"><li>형제 노드 빌리기<ol type="a" id="96743e95-78ec-4c07-b8d6-3d4a7d13b68d" class="numbered-list" start="1"><li>delete 5<figure id="ec0ca18e-5ca2-4fd3-8827-1b2c3b1f5108" class="image"><a href="img/Untitled%2023.png"><img style="width:141px" src="img/Untitled%2023.png"/></a></figure><figure id="e88bbd25-9a3e-4268-8d95-c584ea6b47e2" class="image"><a href="img/Untitled%2024.png"><img style="width:141px" src="img/Untitled%2024.png"/></a></figure></li></ol><ol type="a" id="117e4cd1-bf94-4b1c-a10c-55c77d375f6c" class="numbered-list" start="2"><li>부모 키를 비어있는 현재 노드로 이동<figure id="69a295f3-8d1e-48c0-be8d-7aab75b4875a" class="image"><a href="img/Untitled%2025.png"><img style="width:141px" src="img/Untitled%2025.png"/></a></figure></li></ol><ol type="a" id="042dbb18-ca7d-4dec-9ac1-dabe566e0154" class="numbered-list" start="3"><li>자식 노드 키를 비어있는 부모 노드로 이동<figure id="b2224a57-685b-4f67-ac6c-05daef63cbf3" class="image"><a href="img/Untitled%2026.png"><img style="width:101px" src="img/Untitled%2026.png"/></a></figure></li></ol></li></ol><ol type="1" id="afc0356c-7bf1-4820-b4bf-a36fe12bf9e7" class="numbered-list" start="3"><li>자식 노드 빌리기<ol type="a" id="d5ec234f-a3da-4221-b3e3-994239e12589" class="numbered-list" start="1"><li>delete 15<figure id="a3e318f9-2538-4857-92cb-c3c804674002" class="image"><a href="img/Untitled%2027.png"><img style="width:141px" src="img/Untitled%2027.png"/></a></figure><figure id="8ec88ef7-03bf-4689-8d92-4423471aacb1" class="image"><a href="img/Untitled%2028.png"><img style="width:141px" src="img/Untitled%2028.png"/></a></figure></li></ol><ol type="a" id="859aeb5d-46ef-41e7-afec-53f2f759f8e9" class="numbered-list" start="2"><li>여유있는 자식 노드에서 키 가져오기<figure id="5953c56f-9063-4544-b1d1-162d3694924f" class="image"><a href="img/Untitled%2029.png"><img style="width:101px" src="img/Untitled%2029.png"/></a></figure></li></ol></li></ol><ol type="1" id="306c4f26-ae22-451e-a60c-0ad5291476b5" class="numbered-list" start="4"><li>노드 병합<ol type="a" id="bc4694c8-e6ae-40d6-9e5b-e18e11b2e9d4" class="numbered-list" start="1"><li>delete 25<figure id="81ccbe7c-5589-4165-94d8-fd1c319a1561" class="image"><a href="img/Untitled%2030.png"><img style="width:161px" src="img/Untitled%2030.png"/></a></figure><figure id="b9a2170b-ba83-41d1-ac31-516417b12f13" class="image"><a href="img/Untitled%2031.png"><img style="width:161px" src="img/Untitled%2031.png"/></a></figure></li></ol><ol type="a" id="0bafc5f6-98a3-4907-b2b5-983f706b76d9" class="numbered-list" start="2"><li>자식 노드 병합<figure id="af824435-e214-4fcd-ae7c-017edcc614d9" class="image"><a href="img/Untitled%2032.png"><img style="width:141px" src="img/Untitled%2032.png"/></a></figure></li></ol></li></ol><ol type="1" id="63607436-1924-4afe-8c92-d306472a2b56" class="numbered-list" start="5"><li>높이 감소<ol type="a" id="e27bd34b-a526-4c18-9f6d-a46062b06309" class="numbered-list" start="1"><li>delete 10<figure id="43e075ca-bae0-4df0-bc54-b78a5893e3f4" class="image"><a href="img/Untitled%2033.png"><img style="width:221px" src="img/Untitled%2033.png"/></a></figure><figure id="7aaabbb6-fb05-40a2-83e8-c3da64781128" class="image"><a href="img/Untitled%2034.png"><img style="width:221px" src="img/Untitled%2034.png"/></a></figure></li></ol><ol type="a" id="61dbf710-b32d-489a-8e8f-50697353201f" class="numbered-list" start="2"><li>자식 노드 병합<figure id="82d91db5-e4bb-4de3-8fda-18dd60111866" class="image"><a href="img/Untitled%2035.png"><img style="width:211px" src="img/Untitled%2035.png"/></a></figure></li></ol><ol type="a" id="c826bec8-8b22-4a36-b0e3-fac719d75b6f" class="numbered-list" start="3"><li>부모 키 형제 노드로 이동<figure id="2d89f614-f172-4d1e-ad52-fde7ce014af3" class="image"><a href="img/Untitled%2036.png"><img style="width:211px" src="img/Untitled%2036.png"/></a></figure></li></ol><ol type="a" id="c541d58d-9d3d-450d-84f0-183e2570afb1" class="numbered-list" start="4"><li>형제 노드와 병합<figure id="39864658-3ecc-4fe7-82a8-38e7fdadcc8d" class="image"><a href="img/Untitled%2037.png"><img style="width:201px" src="img/Untitled%2037.png"/></a></figure></li></ol><ol type="a" id="f0e1f5ed-cee2-49b5-88ba-0afc239b4e7f" class="numbered-list" start="5"><li>아무것도 없는 루트 노드 삭제<figure id="586c94f1-ef75-44c5-8c57-3aaba5f93344" class="image"><a href="img/Untitled%2038.png"><img style="width:201px" src="img/Untitled%2038.png"/></a></figure></li></ol></li></ol><ol type="1" id="f77395c8-0562-49c5-a374-50ce0c5e43a6" class="numbered-list" start="6"><li>병합 재귀<ol type="a" id="d52621d3-2b28-4416-bb73-d43ab6c67ef7" class="numbered-list" start="1"><li>delete 10<figure id="edda9c27-bba4-47ba-97f3-66e24ae2e037" class="image"><a href="img/Untitled%2039.png"><img style="width:451px" src="img/Untitled%2039.png"/></a></figure><figure id="08d05be0-02cc-4b63-a8e6-a5128025aba3" class="image"><a href="img/Untitled%2040.png"><img style="width:451px" src="img/Untitled%2040.png"/></a></figure></li></ol><ol type="a" id="68fb97f0-6564-4546-841d-08407f0edd86" class="numbered-list" start="2"><li>자식 노드 병합<figure id="e7a6c92a-8065-47f2-a9ae-e0c65ef005df" class="image"><a href="img/Untitled%2041.png"><img style="width:441px" src="img/Untitled%2041.png"/></a></figure></li></ol><ol type="a" id="236a2e29-019f-4fd4-921b-b77de400c369" class="numbered-list" start="3"><li>부모 키 형제 노드로 이동<figure id="e1ceb6a4-a8bc-4593-b9cd-89a472c26af2" class="image"><a href="img/Untitled%2042.png"><img style="width:441px" src="img/Untitled%2042.png"/></a></figure></li></ol><ol type="a" id="19ed9b21-357c-466e-a89c-3f062eb7f87f" class="numbered-list" start="4"><li>형제 노드와 현재 노드 병합<figure id="56462b1d-786a-46da-9970-83c11dbc06c7" class="image"><a href="img/Untitled%2043.png"><img style="width:442px" src="img/Untitled%2043.png"/></a></figure></li></ol><ol type="a" id="33ad2efb-c43f-4e7e-92a9-b98b120c43f8" class="numbered-list" start="5"><li>부모 노드가 b 단계와 같은 상태이므로 노드 병합 반복<figure id="42da57e9-f843-4bd0-ad4d-7549700ffd50" class="image"><a href="img/Untitled%2044.png"><img style="width:442px" src="img/Untitled%2044.png"/></a></figure></li></ol><ol type="a" id="3291df13-9b8a-4829-8306-12948753e617" class="numbered-list" start="6"><li>높이 감소<figure id="a29bcd26-1f1e-48a3-ad38-8cfab3402113" class="image"><a href="img/Untitled%2045.png"><img style="width:442px" src="img/Untitled%2045.png"/></a></figure></li></ol></li></ol><h2 id="ed0d3dc9-ea0a-4ed9-a4e1-d85b3c81a989" class="">각 케이스별 실제 구현</h2><h3 id="17f36678-4ff0-43b6-97a0-5d25c3778084" class="">공통적인 함수</h3><p id="e1e9d137-6a03-4e2f-bae1-ff07edcd4f9d" class=""><mark class="highlight-orange_background">deleteNode</mark> 함수로 크게 어떤 케이스에 해당되는 삭제 과정인지 판단하고, 적절한 함수를 실행시키는 함수이다.</p><ul id="429c6e9c-7418-4901-bbc6-d151d1256b07" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="707725ab-ebfd-41c8-9217-d8eaa8353b8d" class="bulleted-list"><li style="list-style-type:circle">int target: 삭제할 키</li></ul></li></ul><figure id="6d8d9357-fbcf-499c-9cae-52ab7bdf1e31" class="image"><a href="img/Untitled%2046.png"><img style="width:649px" src="img/Untitled%2046.png"/></a></figure><p id="2a94dfa8-c883-4e69-924a-0f824ad8a61b" class="">케이스가 크게 삭제할 키가 리프 노드에 있는지와 없는지로 나뉘므로, 삭제할 키가 리프 노드인지 검사하고 리프 노드라면 case1 함수를, 아니라면 case2 함수 실행.</p><h3 id="577c45c5-6696-4988-b28c-2464fc82ae31" class=""><strong>case1. 삭제할 키가 리프 노드에 있는 경우</strong></h3><p id="856880e2-d280-412c-ac74-56585bcc226c" class=""><mark class="highlight-orange_background">deleteLeafNodeKey</mark> 함수로 case1의 경우를 처리.</p><ul id="23f8d698-b673-4eb6-9d0a-cba5b211497e" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="fbd9469d-c605-4fd6-be54-9ba5e8c0a3f9" class="bulleted-list"><li style="list-style-type:circle">Node currentNode: 삭제할 키가 있는 현재 노드</li></ul><ul id="7a974132-f2b7-48ae-98af-40d0baa92033" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: currentNode에서 삭제할 키의 keys 배열에서 위치</li></ul><ul id="d1136ef2-1ae2-4480-bf20-9ae6c45a5121" class="bulleted-list"><li style="list-style-type:circle">int leastKeyNum: 노드가 가지고 있어야 할 최소 키 개수 + 1</li></ul></li></ul><figure id="cf71e2a6-4f4e-41b4-ae1a-cef47bfb053b" class="image"><a href="img/Untitled%2047.png"><img style="width:668px" src="img/Untitled%2047.png"/></a></figure><p id="5a6b2a73-c95a-45c1-ae8d-67e10f4917f6" class="">case1.1을 처리하는 부분</p><ol type="1" id="3e62613c-b722-428a-b096-7f722b3be135" class="numbered-list" start="1"><li>현재 노드가 루트라면</li></ol><ol type="1" id="0b1aa9ae-c9cd-4f83-a95a-8bcb5aac607e" class="numbered-list" start="2"><li>루트 노드는 키를 최소 1개까지 보유 가능하므로 바로 삭제. <mark class="highlight-orange_background">(기본 삭제)</mark></li></ol><ol type="1" id="7d60abeb-442c-4de9-8c67-f67ecef37974" class="numbered-list" start="3"><li>삭제 후 키 개수가 0개라면 B-tree를 빈 트리로 처리</li></ol><p id="7f8f34f3-1c5f-4e45-877b-48acdafb762c" class="">
+</p><figure id="705721be-f311-42de-9868-99d8efd3d618" class="image"><a href="img/Untitled%2048.png"><img style="width:459px" src="img/Untitled%2048.png"/></a></figure><p id="d0ab74fa-ad56-47c2-8faa-5622f50ac181" class="">case1.2를 처리하는 부분.</p><ol type="1" id="1873ff00-de3d-454e-8f81-ac9640ecd693" class="numbered-list" start="1"><li>현재 노드의 키 개수가 최소보다 많다면</li></ol><ol type="1" id="c7a57361-8941-492b-bd5d-a6cc49c7fc29" class="numbered-list" start="2"><li>키 삭제. <mark class="highlight-orange_background">(기본 삭제)</mark></li></ol><p id="797f9581-ea5f-42b1-9da5-92e278c764ba" class="">
+</p><figure id="0a95e208-9eac-4aa2-81d4-73215a300b4b" class="image"><a href="img/Untitled%2049.png"><img style="width:885px" src="img/Untitled%2049.png"/></a></figure><p id="f26ea2a4-a065-4314-9905-c827186b1297" class="">case1.3를 처리하는 부분. <mark class="highlight-orange_background">(형제 노드 빌리기)</mark></p><ol type="1" id="9b7c5b69-fd57-4239-a03e-55783bec38e6" class="numbered-list" start="1"><li>현재 노드의 위치가 0보다 크고(=형제 노드가 왼쪽에 존재하고), 왼쪽 형제 노드의 키 개수가 최소보다 많다면</li></ol><ol type="1" id="63dde4d3-5593-4f35-aef8-0cddf6c1db42" class="numbered-list" start="2"><li>왼쪽 형제 노드를 가져와 leftNode에 저장</li></ol><ol type="1" id="ee5bfd25-907b-4014-861a-0098ef13fb8f" class="numbered-list" start="3"><li>왼쪽 형제 노드의 가장 큰 값을 maxKey에 저장</li></ol><ol type="1" id="a036a1fd-8e2c-4bd3-bf30-196a28c3a8a0" class="numbered-list" start="4"><li>현재 노드에서 삭제 대상 키 삭제</li></ol><ol type="1" id="59761abb-01b5-4b78-9e0b-c3698280bcfd" class="numbered-list" start="5"><li>현재 노드의 부모 키를 현재 노드에 추가. 이때 부모 키는 부모 노드의 키를 오른쪽애서 왼쪽으로 탐색할 때, 현재 노드의 키보다 작은 키 중 가장 첫 키이다.</li></ol><ol type="1" id="c2db57ca-2574-4df4-bebf-6799b834b5f5" class="numbered-list" start="6"><li>현재 노드에 추가한 키는 부모 노드에서 삭제</li></ol><ol type="1" id="fc691cd7-d91b-485e-93cf-3575affc6406" class="numbered-list" start="7"><li>부모 노드에 왼쪽 형제 노드의 가장 큰 값 추가</li></ol><p id="ac45b62c-da41-4d85-9635-e6c2d805b83e" class="">
+</p><figure id="66d576f2-dd25-4e28-b5ee-ae6afd5af31a" class="image"><a href="img/Untitled%2050.png"><img style="width:803px" src="img/Untitled%2050.png"/></a></figure><p id="3dce1607-84cc-4be4-a885-59a3f4b2d2bb" class="">case1.4를 처리하는 부분. case1.3의 처리 과정에서 왼쪽 형제 노드가 오른쪽 형제 노드로, 가장 큰 값이 가장 작은 값으로 바꾸어 생각하면 된다. <mark class="highlight-orange_background">(형제 노드 빌리기)</mark></p><p id="ec19d211-fd9b-43d6-a24f-80f1ae4e88c4" class="">
+</p><figure id="b09aee8a-e9dc-4704-ab27-a64fc4ac9dde" class="image"><a href="img/Untitled%2051.png"><img style="width:579px" src="img/Untitled%2051.png"/></a></figure><p id="555f04ad-f551-4d01-a26c-5cd842f94f0d" class="">case 1.5를 처리하는 부분. <mark class="highlight-orange_background">(노드 병합)</mark></p><ol type="1" id="f1fc23b5-2a98-4f2d-84dc-8519e142be71" class="numbered-list" start="1"><li>부모 노드가 키를 빌려올 여유가 될 때</li></ol><ol type="1" id="af8bc497-d910-41dc-84fb-d92c3f2b18f0" class="numbered-list" start="2"><li>왼쪽과 오른쪽 형제 노드중 존재하는 형제 노드를 siblingNode에 저장</li></ol><ol type="1" id="4f99f1e0-e4c5-42c1-ac43-c2f002680149" class="numbered-list" start="3"><li>형제 노드에 부모 노드의 대상 키 값을 가져와 추가하고, 부모 노드에서는 삭제</li></ol><ol type="1" id="61031d45-a5db-4f96-94e1-fcd3db68bf89" class="numbered-list" start="4"><li>현재 노드에서 삭제할 값을 삭제</li></ol><ol type="1" id="480e3e13-cdbb-4801-a5c9-99ae2f94cb2c" class="numbered-list" start="5"><li>형재 노드와 현재 노드를 병합 후 mergedNode에 저장</li></ol><ol type="1" id="074ceef2-4728-4d51-90a7-b667d0f50de7" class="numbered-list" start="6"><li>부모 노드에서 병합 전 두 노드를 자식에서 삭제하고, mergedNode를 부모 노드에 자식 노드로 추가</li></ol><ol type="1" id="7d3a7b82-9faf-4d60-bd26-c64163c43b12" class="numbered-list" start="7"><li>mergedNode의 부모를 병합 전 현재 노드의 부모 노드로 지정</li></ol><p id="56e44e5e-62b6-436d-8e8f-a6d83f51ea06" class="">
+</p><figure id="688ba91f-bd6d-42e7-949d-82cc252060de" class="image"><a href="img/Untitled%2052.png"><img style="width:639px" src="img/Untitled%2052.png"/></a></figure><p id="51587af1-ab89-490b-981b-4e90e86d917e" class="">case1.6을 처리하는 부분. case1.5를 처리하고, 부모 노드의 상황에 따라 다음 함수 실행을 결정한다.</p><ol type="1" id="cf49cf7f-7425-493c-98a5-b0e4f89f6763" class="numbered-list" start="1"><li>case1.5와 같은 과정 처리. <mark class="highlight-orange_background">(노드 병합)</mark></li></ol><ol type="1" id="8215f3be-922a-4a07-bdfe-88f335ac6b7b" class="numbered-list" start="2"><li>부모 노드가 root인 동시에 키 개수가 0개라면, 기존 root 노드를 삭제하고 현재 노드를 root 노드로 지정 <mark class="highlight-orange_background">(높이 감소)</mark></li></ol><ol type="1" id="9a2342c1-5396-463e-ab56-ec1ae0a1de61" class="numbered-list" start="3"><li>아니라면 case3으로 이동</li></ol><h3 id="104d1512-3413-414d-9651-4f98eed8b598" class=""><strong>case2. 삭제할 키가 내부 노드에 있고, 자기 자신이나 자식 노드의 키가 최소 개수보다 많을 경우</strong></h3><ol type="1" id="0ce2f70d-44c0-45dd-9176-997a87a7b648" class="numbered-list" start="1"><li><mark class="highlight-orange_background">deleteInternalNodeLeastUp</mark>로 case2의 경우를 처리<ul id="222842a7-bd69-4e9c-b018-1b1cc28778f2" class="bulleted-list"><li style="list-style-type:disc">파라미터 <ul id="9013778b-af38-42cd-92a4-5397ce455917" class="bulleted-list"><li style="list-style-type:circle">Node currentNode: 삭제할 키가 있는 현재 노드</li></ul><ul id="e6b18003-b8d3-466d-ad3e-d0ffabd7535b" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: currentNode에서 삭제할 키의 keys 배열에서 위치</li></ul><ul id="fd4db606-acce-4137-a466-cc5e2c792517" class="bulleted-list"><li style="list-style-type:circle">int leastKeyNum: 노드가 가지고 있어야 할 최소 키 개수 + 1</li></ul></li></ul><figure id="d61f81fb-b30e-4045-a89d-73d73e2d04db" class="image"><a href="img/Untitled%2053.png"><img style="width:1458px" src="img/Untitled%2053.png"/></a></figure><figure id="a59c5ceb-c07c-4130-8a8f-cbc7e17fabe1" class="image"><a href="img/Untitled%2054.png"><img style="width:1458px" src="img/Untitled%2054.png"/></a></figure><p id="447b7133-bc08-450a-ba58-005990acf1f6" class="">case 2를 처리하는 부분.</p><ol type="1" id="583b944a-206c-4c0d-afd9-0bc91f2769e6" class="numbered-list" start="1"><li>현재 노드의 자식 노드가 리프 노드가 맞다면<ol type="a" id="76a38f54-74fd-40f0-8248-6dd100ad2df4" class="numbered-list" start="1"><li>왼쪽 자식 노드가 키를 최소 개수보다 많이 가지고 있다면 <mark class="highlight-orange_background">(자식 노드 빌리기)</mark><ol type="i" id="66aaebc2-42ea-4808-a69c-81ecfbf8eaf6" class="numbered-list" start="1"><li>현재 노드에서 키 삭제</li></ol><ol type="i" id="1d382325-050a-4870-be63-4ad1c138a994" class="numbered-list" start="2"><li>왼쪽 자식 노드의 가장 큰 키 값 저장하고, 왼쪽 자식 노드에서는 삭제</li></ol><ol type="i" id="dace0604-5f8a-4d93-965e-0be6c9d05cea" class="numbered-list" start="3"><li>현재 노드에 왼쪽 자식 노드에서 가장 큰 값을 추가</li></ol></li></ol><ol type="a" id="57ad6ee1-cacb-4759-9b74-db14f9463cbb" class="numbered-list" start="2"><li>오른쪽 자식 노드가 키를 최소 개수보다 많이 가지고 있다면 <mark class="highlight-orange_background">(자식 노드 빌리기)</mark><ol type="i" id="24f88668-6842-4895-b0f2-aff1b2b7f20a" class="numbered-list" start="1"><li>현재 노드에서 키 삭제</li></ol><ol type="i" id="43adeed9-b297-4584-a923-d2cc807a17ae" class="numbered-list" start="2"><li>오른쪽 자식 노드의 가장 작은 키 값 저장하고, 오른쪽 자식 노드에서는 삭제</li></ol><ol type="i" id="e9aa84e9-cb8d-40f2-bbe1-b7d3f9132788" class="numbered-list" start="3"><li>현재 노드에 오른쪽 자식 노드에서 가장 작은 값을 추가</li></ol></li></ol><ol type="a" id="7a89bbd9-80bc-48e4-953b-e3db2dadbdc3" class="numbered-list" start="3"><li>현재 노드의 키 개수가 최소보다 크다면 <mark class="highlight-orange_background">(노드 병합)</mark><ol type="i" id="b48d42cb-fd70-4ff6-af87-feb7d667a265" class="numbered-list" start="1"><li>현재 노드에서 키 삭제</li></ol><ol type="i" id="0bb1fb6d-5c16-4daf-bb64-7f690e762174" class="numbered-list" start="2"><li>왼쪽 자식과 오른쪽 자식 병합 후, 병합된 노드의 부모 노드를 현재 노드로 지정</li></ol></li></ol><ol type="a" id="adec0690-fb4c-49cf-8b6c-6bf5c45ed6d4" class="numbered-list" start="4"><li>현재 노드 자신과 바로 아래 레벨의 모든 자식 노드의 키 개수가 최소 이하라면<ol type="i" id="16b54d89-d9fe-4416-80e5-750fa81fdabb" class="numbered-list" start="1"><li>현재 노드가 root면서 키 개수가 0개보다 많다면 deleteWithSawpKey 함수로 case 2.2 처리 <mark class="highlight-orange_background">(자식 노드 빌리기)</mark></li></ol><ol type="i" id="28147348-80da-44c8-b675-af8a23060a29" class="numbered-list" start="2"><li>아니라면 case 3으로 이동</li></ol></li></ol></li></ol><ol type="1" id="2fd2d232-ebfc-4469-aea5-3305c4914ae6" class="numbered-list" start="2"><li>현재 노드의 자식 노드가 리프 노드가 아니라면<ol type="a" id="bd0fce05-292f-4763-8aaf-f3bc2f5441cb" class="numbered-list" start="1"><li>deleteWithSawpKey 함수로 case 2.2 처리 <mark class="highlight-orange_background">(자식 노드 빌리기)</mark></li></ol></li></ol></li></ol><p id="f481721b-1360-49ca-8291-249d83bedfab" class="">
+</p><ol type="1" id="f1533f9c-069f-4939-9b29-9bed6dc0ff28" class="numbered-list" start="2"><li>deleteWithSawpKey로 case 2.2의 경우 처리. <mark class="highlight-orange_background">(자식 노드 빌리기)</mark><ul id="d177330f-c97f-4dfe-917c-25a22b55cf00" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="858e280a-c604-4eba-8d06-5c44185b2138" class="bulleted-list"><li style="list-style-type:circle">Node curretNode: 삭제할 키가 있는 현재 노드</li></ul><ul id="407c06b8-6022-4967-9afc-bad60c539f12" class="bulleted-list"><li style="list-style-type:circle">Node childNode: 현재 노드의 왼쪽 자식 노드</li></ul><ul id="95f87ec9-e358-4744-ae6b-26f8383ea30c" class="bulleted-list"><li style="list-style-type:circle">int leastKeyNum: 노드가 가져야할 최소 키 개수 + 1</li></ul><ul id="56159e5a-acec-47d4-8a16-3ac4fb7dd845" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: currentNode에서 삭제할 키의 idx</li></ul></li></ul><figure id="fa9fac45-90ad-4cea-ab20-80e797fc21d6" class="image"><a href="img/Untitled%2055.png"><img style="width:798px" src="img/Untitled%2055.png"/></a></figure><p id="70547341-9f3d-4b5a-adcd-58177161413a" class="">삭제해야할 키 값을 리프 노드의 키 값과 교환하며 case 1로 만들어 처리.</p><ol type="1" id="bdcef1ef-15a0-4421-9c07-722ee8c0f40c" class="numbered-list" start="1"><li>childNode의 맨 오른쪽 노드를 리프 노드가 나올때까지 가져옴. B-tree에 존재하는 삭제할 키보다 작은 키중 가장 큰 값을 가져오기 위함.</li></ol><ol type="1" id="3b2b70b9-6685-471c-9593-67a70af43600" class="numbered-list" start="2"><li>삭제할 키 값과 1번에서 구한 키 값을 위치 교환함</li></ol><ol type="1" id="510d5e11-8a3d-4722-b32e-6968d8a082aa" class="numbered-list" start="3"><li>deleteLeafNodeKey 함수로 이동하여 case 1로 처리</li></ol></li></ol><h3 id="7192966f-f331-429f-9a04-1ba0d95284bf" class=""><strong>case3. 삭제할 키가 내부 노드에 있고, 자기 자신과 자식노드의 키가 최소 개수만 있을경우</strong></h3><p id="6b20c03e-88ab-4260-b2fa-d369791dda9d" class=""><mark class="highlight-orange_background">deleteInternalNodeLeastDown</mark>으로 case 3의 경우 처리</p><ul id="b2727c1f-42f5-47f9-8f18-3fd685f1420e" class="bulleted-list"><li style="list-style-type:disc">파라미터<ul id="1ba3e541-ee79-4de5-9a8f-531a107c6cff" class="bulleted-list"><li style="list-style-type:circle">Node currentNode: 현재 노드</li></ul><ul id="7aa392d1-e789-4e2b-aecc-2a6d340268e0" class="bulleted-list"><li style="list-style-type:circle">int targetIdx: 삭제할 키의 idx. 만약 값이 -1이라면, 키 삭제 부분은 건너 뛰고 노드 병합으로 바로 넘어감</li></ul><ul id="c4b000f4-3cdd-4042-b8a3-c9f170f17ce0" class="bulleted-list"><li style="list-style-type:circle">int leastKeyNum: 노드가 가져야 할 최소 키 개수 +1</li></ul><figure id="99ddf974-0354-4058-81e9-4b275650a0b5" class="image"><a href="img/Untitled%2056.png"><img style="width:748px" src="img/Untitled%2056.png"/></a></figure></li></ul><p id="623b3dbe-12ab-4525-8690-bc473106a152" class="">현재 노드에서 키를 삭제하고 두 자식 노드를 병합하는 부분. 이 부분을 건너뛸 수 있게 만든 이유는 바로 case3.2로 넘어오는 case1.6 때문이다.</p><ol type="1" id="da6fe5db-fee1-40ed-a967-a146e2486b61" class="numbered-list" start="1"><li>현재 노드에서 대상 키 삭제</li></ol><ol type="1" id="ebe1688a-a3b7-4d31-b82e-45d251b3594b" class="numbered-list" start="2"><li>현재 노드의 좌/우 자식 노드들을 하나로 병합. <mark class="highlight-orange_background">(노드 병합)</mark></li></ol><ol type="1" id="ce4bbf54-dbed-4dd0-8420-01398d82349e" class="numbered-list" start="3"><li>병합된 노드를 새 자식 노드로 추가</li></ol><p id="a03fe1ff-9500-4a09-a323-72316048dd87" class="">
+</p><figure id="f8512fa9-83fd-448c-94be-5e30263dff07" class="image"><a href="img/Untitled%2057.png"><img style="width:459px" src="img/Untitled%2057.png"/></a></figure><p id="a486daac-3cff-4584-8787-1163d7a05b78" class="">현재 노드가 root 노드라면, 병합하고 하나밖에 없는 자식 노드를 가져와 root 노드로 지정. <mark class="highlight-orange_background">(높이 감소)</mark></p><p id="c2c54b28-9a7e-4c7a-ba07-368a21b240f9" class="">
+</p><figure id="4165e467-0c86-4331-87c5-d27baaffda02" class="image"><a href="img/Untitled%2058.png"><img style="width:562px" src="img/Untitled%2058.png"/></a></figure><p id="d94c6dc2-a854-4e87-a7a8-4acf2be9b969" class="">현재 노드와 형제 노드를 결합하여 하나의 노드를 만드는 부분. <mark class="highlight-orange_background">(노드 병합)</mark></p><ol type="1" id="3689b794-f2b9-4cb5-89b6-b9c9d547c50b" class="numbered-list" start="1"><li>좌/우 형제 노드 중 존재하는 형제 노드를 가져옴</li></ol><ol type="1" id="6859f39f-3dc5-4eca-9b55-fccd67075a9b" class="numbered-list" start="2"><li>가져온 형제 노드에 부모 키 값 넣고, 부모 노드에서는 삭제</li></ol><ol type="1" id="dd21a595-8732-4519-8a02-f8e4d98c96fd" class="numbered-list" start="3"><li>현재 노드와 형제 노드를 병합하고, 부모 노드에 추가.</li></ol><p id="e31a2522-0f04-4fc8-a495-df5263912783" class="">
+</p><figure id="54a84fc7-d4a5-4bc1-b06e-90ecc510e635" class="image"><a href="img/Untitled%2059.png"><img style="width:625px" src="img/Untitled%2059.png"/></a></figure><p id="d89d1ca1-34b4-47d1-b647-7439e64302cd" class="">노드를 병합하고 난 뒤에 상태를 보며 적절한 단계로 넘어가게 해주는 부분.</p><ol type="1" id="2b9c88cc-b2d9-4356-8713-be9e31a7c4e5" class="numbered-list" start="1"><li>병합된 노드가 가질 수 있는 최대 키 개수보다 많이 가지고 있다면<ol type="a" id="a246bcc5-ec73-436e-b44d-db482516d4a8" class="numbered-list" start="1"><li>병합된 노드를 중간 idx를 기준으로 나누고 나누어진 두 노드를 다시 부모 노드에 추가</li></ol></li></ol><ol type="1" id="d81c9e9b-2453-4c20-8bb0-faec0df9612d" class="numbered-list" start="2"><li>부모 노드가 root 노드가 아니면서 부모 노드의 키 값이 최소 값보다 작다면<ol type="a" id="a9b81d3e-7582-43c3-9ec7-d9033c318e05" class="numbered-list" start="1"><li>case 3.2로 바로 이동. deleteInternalNodeLeastDown을 실행하며 targetIdx값을 -1로 넘겨준다.  <mark class="highlight-orange_background">(병합 재귀)</mark></li></ol></li></ol><ol type="1" id="bacc069b-b359-4775-8d5c-3d55b941b5a0" class="numbered-list" start="3"><li>부모 노드가 root 노드면서 비었다면<ol type="a" id="78a97abc-ace9-4db8-ac01-33c5d0879459" class="numbered-list" start="1"><li>병합된 노드를 새 root 노드로 지정  <mark class="highlight-orange_background">(높이 감소)</mark></li></ol></li></ol><h2 id="c3f9d084-6105-405b-86c4-178e5eeff806" class="">테스트 케이스</h2><p id="ec327000-7306-474f-b7b4-7da1a7e4cc5f" class="">테스트 케이스의 차수는 3이다.</p><p id="54eff22e-5598-423c-8329-c001651edd3d" class="">명령어 순서는 다음과 같다.</p><pre id="ee8f9179-1c15-4536-9a82-d8e5d19a7fcc" class="code code-wrap"><code>i,100,삽입,기본 삽입
+i,50,삽입,기본 삽입
+i,150,삽입,노드 분할/높이 증가
+i,25,삽입,기본 삽입
+i,75,삽입,노드 분할
+i,125,삽입,기본 삽입
+i,175,삽입,분할 재귀/높이 증가
+i,10,삽입,기본 삽입
+d,25,삭제,기본 삭제
+i,90,삽입,기본 삽입
+d,10,삭제,형제 노드 빌리기
+i,10,삽입,기본 삽입
+i,80,삽입,기본 삽입
+d,75,삭제,자식 노드 빌리기
+d,100,삭제,자식 노드 빌리기
+i,100,삽입,기본 삽입
+i,140,삽입,노드 분할
+d,150,삭제,노드 병합
+d,50,삭제,노드 병합/높이 감소
+i,150,삽입,분할 재귀/높이 증가
+i,45,삽입,노드 분할
+i,95,삽입,기본 삽입
+i,110,삽입,분할 재귀
+i,160,삽입,기본 삽입
+i,180,삽입,노드 분할
+i,155,삽입,기본 삽입
+i,165,삽입,분할 재귀/높이 증가
+d,10,삭제,병합 재귀/높이 감소</code></pre><ol type="1" id="36efa794-2c9b-4d3d-a43b-74df54fbc79e" class="numbered-list" start="1"><li>i,100,삽입,기본 삽입<figure id="20805b68-27bc-4a14-8ee7-ba92773902d6" class="image"><a href="img/tc1.png"><img style="width:72px" src="img/tc1.png"/></a></figure></li></ol><ol type="1" id="8ebde9ed-c64b-4bcd-b785-402db75d3936" class="numbered-list" start="2"><li>i,50,삽입,기본 삽입<figure id="a608477e-1ce4-40db-8868-37893de7a6a8" class="image"><a href="img/tc2.png"><img style="width:92px" src="img/tc2.png"/></a></figure></li></ol><ol type="1" id="542af24c-8e52-4ef0-81ee-385d9f877d71" class="numbered-list" start="3"><li>i,150,삽입,노드 분할/높이 증가<figure id="b202fd83-45e0-4441-948d-71dcc137c4b1" class="image"><a href="img/tc3.png"><img style="width:112px" src="img/tc3.png"/></a></figure><figure id="89b826ad-d2a5-44ca-ae26-a7d585e95db1" class="image"><a href="img/tc4.png"><img style="width:172px" src="img/tc4.png"/></a></figure></li></ol><ol type="1" id="3000462d-119c-4e19-a946-fb731d00c32c" class="numbered-list" start="4"><li>i,25,삽입,기본 삽입<figure id="3b4d301c-6cdf-4cf6-a454-6844865e404e" class="image"><a href="img/tc5.png"><img style="width:172px" src="img/tc5.png"/></a></figure></li></ol><ol type="1" id="516e2aa3-7c31-4468-a8a9-c69fef39c0c7" class="numbered-list" start="5"><li>i,75,삽입,노드 분할<figure id="1a6161b9-31f4-4544-a680-9d253d3df3bc" class="image"><a href="img/tc6.png"><img style="width:172px" src="img/tc6.png"/></a></figure><figure id="e8b80a7a-7004-41d4-a2bf-a0fbbd0296b8" class="image"><a href="img/tc7.png"><img style="width:252px" src="img/tc7.png"/></a></figure></li></ol><ol type="1" id="6dafabf5-d362-4b34-a235-0c149823dcbd" class="numbered-list" start="6"><li>i,125,삽입,기본 삽입<figure id="7f44d644-7e3d-461b-8def-b33b9b9cbd4c" class="image"><a href="img/tc8.png"><img style="width:252px" src="img/tc8.png"/></a></figure></li></ol><ol type="1" id="1b79a770-3739-49da-baa5-10f34d3d4caa" class="numbered-list" start="7"><li>i,175,삽입,분할 재귀/높이 증가<figure id="be697e94-d89a-478a-8c43-c2885a6cfebc" class="image"><a href="img/tc9.png"><img style="width:252px" src="img/tc9.png"/></a></figure><figure id="5d19e688-e251-46af-8544-344fc1dfd395" class="image"><a href="img/tc10.png"><img style="width:342px" src="img/tc10.png"/></a></figure><figure id="c447405a-261d-459a-a7f1-2df9f9f9c998" class="image"><a href="img/tc11.png"><img style="width:341px" src="img/tc11.png"/></a></figure></li></ol><ol type="1" id="a33c3911-2aef-49d2-bf0a-03359652b232" class="numbered-list" start="8"><li>i,10,삽입,기본 삽입<figure id="aa9a0a16-5f39-4706-8d7b-ed0477aa9c44" class="image"><a href="img/tc12.png"><img style="width:341px" src="img/tc12.png"/></a></figure></li></ol><ol type="1" id="d711291e-bcc5-4795-a76b-955b94d0475c" class="numbered-list" start="9"><li>d,25,삭제,기본 삭제<figure id="82184622-1deb-4ac7-9333-7c5339a335de" class="image"><a href="img/tc13.png"><img style="width:341px" src="img/tc13.png"/></a></figure></li></ol><ol type="1" id="0dd07446-278d-4a9e-af5f-e9e32b8943da" class="numbered-list" start="10"><li>i,90,삽입,기본 삽입<figure id="04165287-19db-4094-a3b5-5466a48f28bc" class="image"><a href="img/tc14.png"><img style="width:341px" src="img/tc14.png"/></a></figure></li></ol><ol type="1" id="2ae3baf2-d408-4d07-ad45-ea9751d564d6" class="numbered-list" start="11"><li>d,10,삭제,형제 노드 빌리기<figure id="dda2b911-b1eb-4c13-88c8-aa337fb4dd47" class="image"><a href="img/tc15.png"><img style="width:341px" src="img/tc15.png"/></a></figure><figure id="f18f45a8-8f4a-4257-89c0-d43d7e5e27a3" class="image"><a href="img/tc16.png"><img style="width:341px" src="img/tc16.png"/></a></figure><figure id="38c48125-b5e4-4a3b-bb67-1548dcabda45" class="image"><a href="img/tc17.png"><img style="width:341px" src="img/tc17.png"/></a></figure></li></ol><ol type="1" id="45ac0241-8ba0-4320-914f-6aec8a91661c" class="numbered-list" start="12"><li>i,10,삽입,기본 삽입<figure id="034ee86f-085e-4518-8f54-7aeaaa9c0e28" class="image"><a href="img/tc18.png"><img style="width:341px" src="img/tc18.png"/></a></figure></li></ol><ol type="1" id="217b27c8-49f1-4e37-9743-7ad3b94d7d6b" class="numbered-list" start="13"><li>i,80,삽입,기본 삽입<figure id="2e87a519-cdec-4270-a052-942788ce04b2" class="image"><a href="img/tc19.png"><img style="width:341px" src="img/tc19.png"/></a></figure></li></ol><ol type="1" id="fc7cb075-3486-4bb6-8ed1-87132d11d213" class="numbered-list" start="14"><li>d,75,삭제,자식 노드 빌리기<figure id="947af426-6493-4358-9ab7-4dde07b96aa3" class="image"><a href="img/tc20.png"><img style="width:341px" src="img/tc20.png"/></a></figure><figure id="00365a29-20f5-4c32-bb19-1924e1fbf384" class="image"><a href="img/tc21.png"><img style="width:341px" src="img/tc21.png"/></a></figure></li></ol><ol type="1" id="e20d11d8-a7ad-4452-b351-6ddc614598ce" class="numbered-list" start="15"><li>d,100,삭제,자식 노드 빌리기<figure id="2a46af11-9897-47e1-b5c2-d0db97a43d75" class="image"><a href="img/tc22.png"><img style="width:341px" src="img/tc22.png"/></a></figure><figure id="5254937d-d9ce-4a74-bac3-9dcb7495057b" class="image"><a href="img/tc23.png"><img style="width:341px" src="img/tc23.png"/></a></figure></li></ol><ol type="1" id="f2b7a144-f359-4dcb-b0e4-efb61a754e39" class="numbered-list" start="16"><li>i,100,삽입,기본 삽입<figure id="b560689e-18bd-4af1-9cfc-591507393d72" class="image"><a href="img/tc24.png"><img style="width:341px" src="img/tc24.png"/></a></figure></li></ol><ol type="1" id="6c5bdc53-55d1-4ee0-8a12-32adf717c2ed" class="numbered-list" start="17"><li>i,140,삽입,노드 분할<figure id="9c883585-f67a-4c9f-ba35-453cc9a38704" class="image"><a href="img/tc25.png"><img style="width:341px" src="img/tc25.png"/></a></figure><figure id="ffceed17-6627-40de-99e2-a4b6ef4f31ea" class="image"><a href="img/tc26.png"><img style="width:431px" src="img/tc26.png"/></a></figure></li></ol><ol type="1" id="c212a963-a1ba-4566-84ae-5e32f57dbfed" class="numbered-list" start="18"><li>d,150,삭제,노드 병합<figure id="dbb5386f-0067-49c7-a1ff-9bfda54471a5" class="image"><a href="img/tc27.png"><img style="width:337px" src="img/tc27.png"/></a></figure></li></ol><ol type="1" id="22cdab9f-e8e3-4337-a1b4-97302a612877" class="numbered-list" start="19"><li>d,50,삭제,노드 병합/높이 감소<figure id="e4a4f373-e3be-492e-91a6-48bcbcb16b9f" class="image"><a href="img/tc28.png"><img style="width:337px" src="img/tc28.png"/></a></figure><figure id="e6ebad76-055e-4b16-8f16-7289521900cd" class="image"><a href="img/tc29.png"><img style="width:337px" src="img/tc29.png"/></a></figure><figure id="a5beaab0-5c7f-4128-aaa4-47394a65ef1c" class="image"><a href="img/tc30.png"><img style="width:248px" src="img/tc30.png"/></a></figure><figure id="71e2c645-53be-401e-8ddf-617fea3e7437" class="image"><a href="img/tc31.png"><img style="width:248px" src="img/tc31.png"/></a></figure></li></ol><ol type="1" id="9df04b62-6d0f-494b-b35b-e332f80805f5" class="numbered-list" start="20"><li>i,150,삽입,분할 재귀/높이 증가<figure id="a95f6df8-bf9e-4361-8620-eb16c1e6d071" class="image"><a href="img/tc32.png"><img style="width:248px" src="img/tc32.png"/></a></figure><figure id="eb294687-7684-400b-963c-2781d89dac82" class="image"><a href="img/tc33.png"><img style="width:333px" src="img/tc33.png"/></a></figure><figure id="bcb092dd-e916-4397-9e62-d7af647d35f1" class="image"><a href="img/tc34.png"><img style="width:333px" src="img/tc34.png"/></a></figure></li></ol><ol type="1" id="4198b5b8-51c0-4cec-b80d-b286a3293ef6" class="numbered-list" start="21"><li>i,45,삽입,노드 분할<figure id="6453c112-fc41-433b-ae4a-ded751823321" class="image"><a href="img/tc35.png"><img style="width:333px" src="img/tc35.png"/></a></figure><figure id="10c612ff-beef-4e58-adb6-3b62b10f07f5" class="image"><a href="img/tc36.png"><img style="width:391px" src="img/tc36.png"/></a></figure></li></ol><ol type="1" id="2cc8f296-1abe-4a48-b4be-397c0656202a" class="numbered-list" start="22"><li>i,95,삽입,기본 삽입<figure id="7ade89ab-6891-48d7-853a-281e7db3f690" class="image"><a href="img/tc37.png"><img style="width:391px" src="img/tc37.png"/></a></figure></li></ol><ol type="1" id="71ab6e18-3b2d-41aa-89de-1e3f7137ef6a" class="numbered-list" start="23"><li>i,110,삽입,분할 재귀<figure id="35b2c4ea-c613-44fd-81d9-5734ebc8bd8b" class="image"><a href="img/tc38.png"><img style="width:391px" src="img/tc38.png"/></a></figure><figure id="b5ab8f42-285f-4496-98be-bf4448f1b5a2" class="image"><a href="img/tc39.png"><img style="width:471px" src="img/tc39.png"/></a></figure><figure id="c58226d5-5bc6-4bfc-8951-ecdb04a18033" class="image"><a href="img/tc40.png"><img style="width:470px" src="img/tc40.png"/></a></figure></li></ol><ol type="1" id="235b321d-3304-4c3a-96d6-63eee919f498" class="numbered-list" start="24"><li>i,160,삽입,기본 삽입<figure id="c3465f07-964a-4746-a55f-114aa6cb914a" class="image"><a href="img/tc41.png"><img style="width:470px" src="img/tc41.png"/></a></figure></li></ol><ol type="1" id="75bcbf15-2370-45be-b3ae-e941e32dc4ba" class="numbered-list" start="25"><li>i,180,삽입,노드 분할<figure id="bfd8628c-e51d-4025-9d52-3295bb2512f3" class="image"><a href="img/tc42.png"><img style="width:470px" src="img/tc42.png"/></a></figure><figure id="fedc36ad-4636-40b6-a488-be3eb672ff72" class="image"><a href="img/tc43.png"><img style="width:554px" src="img/tc43.png"/></a></figure></li></ol><ol type="1" id="543fbbfc-920f-4d27-924f-3189693b9153" class="numbered-list" start="26"><li>i,155,삽입,기본 삽입<figure id="11d9d40b-2697-4ba3-842a-8b5b9c725680" class="image"><a href="img/tc44.png"><img style="width:554px" src="img/tc44.png"/></a></figure></li></ol><ol type="1" id="388811ef-c6d3-48a4-9e02-b26fd8705564" class="numbered-list" start="27"><li>i,165,삽입,분할 재귀/높이 증가<figure id="e8c64303-12af-4e88-942c-e7c8ad69553b" class="image"><a href="img/tc45.png"><img style="width:554px" src="img/tc45.png"/></a></figure><figure id="4c6c9352-d737-4aa5-b8b6-72516137d378" class="image"><a href="img/tc46.png"><img style="width:637px" src="img/tc46.png"/></a></figure><figure id="e26f156a-33a2-4034-8da6-a8db91df6412" class="image"><a href="img/tc47.png"><img style="width:636px" src="img/tc47.png"/></a></figure><figure id="354525d1-6758-4a09-bf07-aca9d327a112" class="image"><a href="img/tc48.png"><img style="width:636px" src="img/tc48.png"/></a></figure></li></ol><ol type="1" id="49b9dbd5-a9de-4adb-9d5d-4f2ea2b03e20" class="numbered-list" start="28"><li>d,10,삭제,병합 재귀/높이 감소<figure id="4224e980-76d6-411d-b208-7d39dc6407c3" class="image"><a href="img/tc49.png"><img style="width:636px" src="img/tc49.png"/></a></figure><figure id="097574e5-6783-48b4-98f0-2100617d7544" class="image"><a href="img/tc50.png"><img style="width:596px" src="img/tc50.png"/></a></figure><figure id="729d77cf-a92d-4953-9e07-59a58bba384c" class="image"><a href="img/tc51.png"><img style="width:558px" src="img/tc51.png"/></a></figure><figure id="f05d63ec-71e7-4012-adee-d7734c9ee995" class="image"><a href="img/tc52.png"><img style="width:558px" src="img/tc52.png"/></a></figure></li></ol><p id="24981026-ae42-4d5c-bf9f-e0b685d20133" class="">
+</p></div></article></body></html>
