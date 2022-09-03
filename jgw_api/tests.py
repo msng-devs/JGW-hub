@@ -516,9 +516,9 @@ class PostApiTestOK(APITestCase):
         Board.objects.create(
             board_name='개발',
             board_layout=0,
-            role_role_pk_write_level=Role.objects.get(role_pk=1),
-            role_role_pk_read_level=Role.objects.get(role_pk=1),
-            role_role_pk_comment_write_level=Role.objects.get(role_pk=1)
+            role_role_pk_write_level=Role.objects.get(role_nm='ROLE_USER1'),
+            role_role_pk_read_level=Role.objects.get(role_nm='ROLE_USER1'),
+            role_role_pk_comment_write_level=Role.objects.get(role_nm='ROLE_USER1')
         )
 
         now = datetime.datetime.now()
@@ -562,8 +562,8 @@ class PostApiTestOK(APITestCase):
             'post_content': content_data,
             'post_write_time': now,
             'post_update_time': now,
-            'category_category_id_pk': 1,
-            'board_boadr_id_pk': 1,
+            'category_category_id_pk': Category.objects.get(category_name="Java").category_id_pk,
+            'board_boadr_id_pk': Board.objects.get(board_name='개발').board_id_pk,
             'member_member_pk': '3aPLyVUaecbw4zUj8JsLTeNUgyB2',
             'images': imgs
         }

@@ -183,7 +183,8 @@ class PostViewSet(viewsets.ModelViewSet):
             decoded_data = base64.b64decode(data)
             with open(os.path.join(img_path, name), 'wb') as f:
                 f.write(decoded_data)
-            img_urls.append({'image_url': os.path.join(img_path, name).replace('\\', '/')})
+            url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
+            img_urls.append({'url': 'uploaded/' + url})
         return img_urls
 
     # post

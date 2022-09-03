@@ -22,4 +22,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('hubapi/', include('jgw_api.urls'))
 ]
-urlpatterns += static(r'uploded', document_root=settings.MEDIA_ROOT)
+urlpatterns += static(r'uploaded', document_root=settings.MEDIA_ROOT)
