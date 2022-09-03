@@ -1,6 +1,8 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
+from django.conf import settings
+
 from .models import (
     Category,
     Board,
@@ -10,7 +12,8 @@ from .serializers import (
     CategorySerializer,
     BoardSerializer,
     BoardSerializerWrite,
-    PostSerializer
+    PostSerializer,
+    ImageSerializer
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
@@ -19,6 +22,10 @@ from .custom_pagination import (
 )
 
 import base64
+import os
+import shutil
+import traceback
+import ast
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -160,15 +167,46 @@ class PostViewSet(viewsets.ModelViewSet):
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
+    def __save_images_storge(self, images_data, folder_pk):
+        if settings.TESTING:
+            img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
+            if os.path.exists(img_path):
+                shutil.rmtree(img_path)
+            os.makedirs(img_path, exist_ok=True)
+        else:
+            img_path = os.path.join(settings.MEDIA_ROOT, 'imgs', str(folder_pk))
+        img_urls = []
+        for img in images_data:
+            img = ast.literal_eval(img)
+            name = img['name']
+            data = img['data']
+            decoded_data = base64.b64decode(data)
+            with open(os.path.join(img_path, name), 'wb') as f:
+                f.write(decoded_data)
+            img_urls.append({'image_url': os.path.join(img_path, name).replace('\\', '/')})
+        return img_urls
+
     # post
     def create(self, request, *args, **kwargs):
         try:
-            serializer = BoardSerializerWrite(data=request.data, many=isinstance(request.data, list))
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+            request.data._mutable = True
+            images_data = request.data.pop('images')
+            post_data = request.data
+
+            # post save
+            post_serializer = PostSerializer(data=post_data)
+            post_serializer.is_valid(raise_exception=True)
+            self.perform_create(post_serializer)
+            post_pk = post_serializer.data['post_id_pk']
+
+            img_urls = self.__save_images_storge(images_data, post_pk)
+            print(img_urls)
+            assert False
+
             headers = self.get_success_headers(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         except Exception as err:
+            print(traceback.format_exc())
             error_responses_data = {
                 'detail': 'board with this board name already exists.'
             }

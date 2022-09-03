@@ -4,9 +4,17 @@ from rest_framework.response import Response
 from jgw_api.models import (
     Category,
     Board,
-    Role
+    Role,
+    Member,
+    Rank,
+    Post,
+    Major
 )
+
+import os
+import base64
 import random
+import datetime
 
 class CategoryApiTestOK(APITestCase):
     def setUp(self):
@@ -481,3 +489,95 @@ class BoardApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+class PostApiTestOK(APITestCase):
+    def setUp(self):
+        self.url = '/hubapi/post/'
+
+    @classmethod
+    def setUpTestData(cls):
+        Role.objects.create(role_nm='ROLE_GUEST')
+        Role.objects.create(role_nm='ROLE_USER0')
+        Role.objects.create(role_nm='ROLE_USER1')
+        Role.objects.create(role_nm='ROLE_ADMIN')
+        Role.objects.create(role_nm='ROLE_DEV')
+
+        Major.objects.create(major_nm='인공지능학과')
+
+        Rank.objects.create(rank_nm='none')
+        Rank.objects.create(rank_nm='수습회원')
+        Rank.objects.create(rank_nm='정회원')
+        Rank.objects.create(rank_nm='준OB')
+        Rank.objects.create(rank_nm='OB')
+
+        Category.objects.create(category_name="Java")
+        Category.objects.create(category_name="Python")
+
+        Board.objects.create(
+            board_name='개발',
+            board_layout=0,
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=1),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=1)
+        )
+
+        now = datetime.datetime.now()
+        Member.objects.create(
+            member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2',
+            member_nm='testName',
+            member_created_dttm=now,
+            member_modified_dttm=now,
+            member_email='test@test.com',
+            member_cell_phone_number='01000000000',
+            member_student_id='2022020202',
+            member_year=38,
+            role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
+            rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
+            major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+            member_leave_absence=0,
+            member_created_by='system',
+            member_modified_by='system',
+            member_dateofbirth=now,
+            member_status='mmmmmmm'
+        )
+
+
+    def test_post_post(self):
+        print("Post Api POST Running...")
+
+        test_files_root_url = './test/file_upload_test'
+        # given
+        with open(os.path.join(test_files_root_url, 'test.html'), 'r', encoding='utf-8') as f:
+            content_data = f.readlines()
+            content_data = ''.join([content.rstrip() for content in content_data])
+        imgs = []
+        for i in os.listdir(os.path.join(test_files_root_url, 'img')):
+            with open(os.path.join(test_files_root_url, 'img', i), 'rb') as f:
+                encoded_img = base64.b64encode(f.read())
+            imgs.append({'name': i, 'data': encoded_img})
+
+        now = datetime.datetime.now()
+        data = {
+            'post_title': 'B-tree 구현하기',
+            'post_content': content_data,
+            'post_write_time': now,
+            'post_update_time': now,
+            'category_category_id_pk': 1,
+            'board_boadr_id_pk': 1,
+            'member_member_pk': '3aPLyVUaecbw4zUj8JsLTeNUgyB2',
+            'images': imgs
+        }
+
+        # when
+        respons: Response = self.client.post(self.url, data=data)
+
+        # then
+        responses_data = [{"board_id_pk": i.board_id_pk,
+                           "board_name": i.board_name,
+                            'board_layout': i.board_layout,
+                            "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
+                            "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
+                           'role_role_pk_comment_write_level': i.role_role_pk_comment_write_level.role_pk}
+                          for i in Board.objects.all().order_by('board_id_pk')]
+        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(respons.content, responses_data)

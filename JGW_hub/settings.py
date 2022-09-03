@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 from secrets_content.files.secret_key import MY_SECRET_KEY, MY_DATABASES
 
@@ -27,6 +28,7 @@ SECRET_KEY = MY_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 ALLOWED_HOSTS = []
 
@@ -112,7 +114,9 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5 * 1024 * 1024 * 1024
 
 
 # Static files (CSS, JavaScript, Images)
@@ -145,10 +149,4 @@ SPECTACULAR_SETTINGS = {
     'SERVE_AUTHENTICATION': None,
     'SERVE_INCLUDE_SCHEMA': False,
 }
-
-# SWAGGER_SETTINGS = {
-#    'SECURITY_DEFINITIONS': {
-#
-#    }
-# }
 
