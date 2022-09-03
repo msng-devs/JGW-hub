@@ -14,8 +14,11 @@ from .serializers import (
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
-    BoardPageNumberPagination
+    BoardPageNumberPagination,
+    PostPageNumberPagination
 )
+
+import base64
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -153,6 +156,20 @@ class BoardViewSet(viewsets.ModelViewSet):
 
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
-    queryset = Post.objects.all().order_by('board_id_pk')
-    pagination_class = BoardPageNumberPagination
+    queryset = Post.objects.all()
+    pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+
+    # post
+    def create(self, request, *args, **kwargs):
+        try:
+            serializer = BoardSerializerWrite(data=request.data, many=isinstance(request.data, list))
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as err:
+            error_responses_data = {
+                'detail': 'board with this board name already exists.'
+            }
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
