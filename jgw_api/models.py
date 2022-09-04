@@ -25,8 +25,7 @@ class ApiRoute(models.Model):
 
 class Attendance(models.Model):
     attendance_type_attendance_type_pk = models.ForeignKey('AttendanceType', models.DO_NOTHING, db_column='ATTENDANCE_TYPE_ATTENDANCE_TYPE_PK', blank=True, null=True)  # Field name made lowercase.
-    member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK')  # Field name made lowercase.
-    attendance_pk = models.BigAutoField(db_column='ATTENDANCE_PK', primary_key=True)  # Field name made lowercase.
+    member_member_pk = models.OneToOneField('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', primary_key=True)  # Field name made lowercase.
     attendance_modified_dttm = models.DateTimeField(db_column='ATTENDANCE_MODIFIED_DTTM')  # Field name made lowercase.
     attendance_created_dttm = models.DateTimeField(db_column='ATTENDANCE_CREATED_DTTM')  # Field name made lowercase.
     timetable_timetable_pk = models.ForeignKey('Timetable', models.DO_NOTHING, db_column='TIMETABLE_TIMETABLE_PK')  # Field name made lowercase.
@@ -37,6 +36,7 @@ class Attendance(models.Model):
     class Meta:
         managed = True
         db_table = 'ATTENDANCE'
+        unique_together = (('member_member_pk', 'timetable_timetable_pk'),)
 
 
 class AttendanceType(models.Model):
@@ -51,7 +51,7 @@ class AttendanceType(models.Model):
 class Board(models.Model):
     board_id_pk = models.AutoField(db_column='BOARD_ID_PK', primary_key=True)  # Field name made lowercase.
     board_name = models.CharField(db_column='BOARD_NAME', unique=True, max_length=45)  # Field name made lowercase.
-    board_layout = models.IntegerField(db_column='BOARD_LAYOUT', default=0)  # Field name made lowercase.
+    board_layout = models.IntegerField(db_column='BOARD_LAYOUT')  # Field name made lowercase.
     role_role_pk_write_level = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK_WRITE_LEVEL', related_name='board_write_level', default=1)  # Field name made lowercase.
     role_role_pk_read_level = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK_READ_LEVEL', related_name='board_read_level', default=1)  # Field name made lowercase.
     role_role_pk_comment_write_level = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK_COMMENT_WRITE_LEVEL', related_name='board_comment_write_level', default=1)  # Field name made lowercase.
@@ -127,7 +127,9 @@ class Event(models.Model):
 
 class Image(models.Model):
     image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
+    image_name = models.CharField(db_column='IMAGE_NAME', max_length=45, blank=True, null=True)  # Field name made lowercase.
     image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
+    post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
@@ -159,7 +161,7 @@ class Member(models.Model):
     member_created_by = models.CharField(db_column='MEMBER_CREATED_BY', max_length=30)  # Field name made lowercase.
     member_modified_by = models.CharField(db_column='MEMBER_MODIFIED_BY', max_length=30)  # Field name made lowercase.
     member_dateofbirth = models.DateField(db_column='MEMBER_DATEOFBIRTH')  # Field name made lowercase.
-    member_status = models.CharField(db_column='MEMBER_STATUS', max_length=7)  # Field name made lowercase.
+    member_status = models.IntegerField(db_column='MEMBER_STATUS')  # Field name made lowercase.
 
     class Meta:
         managed = True
