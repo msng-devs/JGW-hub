@@ -576,8 +576,6 @@ class PostApiTestOK(APITestCase):
         # when
         response: Response = self.client.post(self.url, data=data)
 
-        print(response.content.decode('utf-8'))
-
         # then
         post_instance = Post.objects.get(post_title='B-tree 구현하기')
         responses_data = {
@@ -590,7 +588,11 @@ class PostApiTestOK(APITestCase):
                 'category_id_pk': category_instance.category_id_pk,
                 'category_name': category_instance.category_name
             },
-            "image_image_id_pk": post_instance.image_image_id_pk.image_id_pk,
+            "image_image_id_pk": {
+                'image_id_pk': post_instance.image_image_id_pk.image_id_pk,
+                'image_name': post_instance.image_image_id_pk.image_name,
+                'image_url': post_instance.image_image_id_pk.image_url,
+            },
             'board_boadr_id_pk': {
                 'board_id_pk': board_instance.board_id_pk,
                 'board_name': board_instance.board_name,

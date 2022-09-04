@@ -242,10 +242,10 @@ class PostViewSet(viewsets.ModelViewSet):
                 self.perform_update(thumbnail_serializer)
 
             get_serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
-            # response_data = get_serializer.data
-            # response_data['images'] = img_serializer.data
+            response_data = get_serializer.data
+            response_data['images'] = img_serializer.data
 
-            return Response(get_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(response_data, status=status.HTTP_201_CREATED)
         except Exception as err:
             print(traceback.format_exc())
             error_responses_data = {
