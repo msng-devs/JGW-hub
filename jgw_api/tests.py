@@ -574,7 +574,9 @@ class PostApiTestOK(APITestCase):
         }
 
         # when
-        respons: Response = self.client.post(self.url, data=data)
+        response: Response = self.client.post(self.url, data=data)
+
+        print(response.content.decode('utf-8'))
 
         # then
         post_instance = Post.objects.get(post_title='B-tree 구현하기')
@@ -608,8 +610,8 @@ class PostApiTestOK(APITestCase):
                 "post_post_id_pk": i.post_post_id_pk.post_id_pk
             } for i in Image.objects.all().order_by('image_id_pk')]
         }
-        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(respons.content, responses_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(response.content, responses_data)
 
     def test_post_post_no_img(self):
         print("Post no Images Api POST Running...")
