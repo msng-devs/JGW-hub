@@ -576,8 +576,8 @@ class PostApiTestOK(APITestCase):
         # when
         respons: Response = self.client.post(self.url, data=data)
 
-        post_instance = Post.objects.get(post_title='B-tree 구현하기')
         # then
+        post_instance = Post.objects.get(post_title='B-tree 구현하기')
         responses_data = {
             'post_id_pk': post_instance.post_id_pk,
             'post_title': post_instance.post_title,
@@ -611,7 +611,6 @@ class PostApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(respons.content, responses_data)
 
-
     def test_post_post_no_img(self):
         print("Post no Images Api POST Running...")
 
@@ -636,7 +635,6 @@ class PostApiTestOK(APITestCase):
 
         # when
         response: Response = self.client.post(self.url, data=data)
-
 
         post_instance = Post.objects.get(post_title='html test')
         # then
@@ -663,12 +661,7 @@ class PostApiTestOK(APITestCase):
                 'member_pk': member_instance.member_pk,
                 'member_nm': member_instance.member_nm
             },
-            'images': [{
-                "image_id_pk": i.image_id_pk,
-                "image_name": i.image_name,
-                "image_url": i.image_url,
-                "post_post_id_pk": i.post_post_id_pk.post_id_pk
-            } for i in Image.objects.all().order_by('image_id_pk')]
+            'images': []
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(response.content, responses_data)

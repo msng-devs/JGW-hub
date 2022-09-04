@@ -169,6 +169,23 @@ class PostViewSet(viewsets.ModelViewSet):
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
 
+    # get
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if 'page' in request.query_params:
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            response_data = {
+                'count': Post.objects.count(),
+                'next': None,
+                'previous': None,
+                'results': serializer.data
+            }
+            return Response(response_data)
+
     def __save_images_storge(self, images_data, folder_pk):
         if settings.TESTING:
             img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
@@ -224,7 +241,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 thumbnail_serializer.is_valid(raise_exception=True)
                 self.perform_update(thumbnail_serializer)
 
-            get_serializer = PostGetSerializer(Post.objects.get(post_id_pk=post_pk))
+            get_serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
             response_data = get_serializer.data
             response_data['images'] = img_serializer.data
 
