@@ -11,9 +11,10 @@ from .models import (
 from .serializers import (
     CategorySerializer,
     BoardSerializer,
-    BoardSerializerWrite,
+    BoardWriteSerializer,
     PostSerializer,
-    ImageSerializer
+    ImageSerializer,
+    PostGetSerializer
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
@@ -26,6 +27,7 @@ import os
 import shutil
 import traceback
 import ast
+from urllib import parse
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -126,7 +128,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     # post
     def create(self, request, *args, **kwargs):
         try:
-            serializer = BoardSerializerWrite(data=request.data, many=isinstance(request.data, list))
+            serializer = BoardWriteSerializer(data=request.data, many=isinstance(request.data, list))
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             headers = self.get_success_headers(serializer.data)
@@ -141,7 +143,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
         try:
-            serializer = BoardSerializerWrite(instance, data=request.data, partial=True)
+            serializer = BoardWriteSerializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
@@ -162,7 +164,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
 class PostViewSet(viewsets.ModelViewSet):
-    serializer_class = PostSerializer
+    serializer_class = PostGetSerializer
     queryset = Post.objects.all()
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'head', 'patch', 'delete']
@@ -180,11 +182,17 @@ class PostViewSet(viewsets.ModelViewSet):
             img = ast.literal_eval(img)
             name = img['name']
             data = img['data']
+
+            # name = parse.quote(name)
             decoded_data = base64.b64decode(data)
             with open(os.path.join(img_path, name), 'wb') as f:
                 f.write(decoded_data)
             url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
-            img_urls.append({'url': 'uploaded/' + url})
+            img_urls.append({
+                'image_name': name,
+                'image_url': 'uploaded/' + url,
+                'post_post_id_pk': folder_pk
+            })
         return img_urls
 
     # post
@@ -200,12 +208,24 @@ class PostViewSet(viewsets.ModelViewSet):
             self.perform_create(post_serializer)
             post_pk = post_serializer.data['post_id_pk']
 
+            # img save
             img_urls = self.__save_images_storge(images_data, post_pk)
-            print(img_urls)
-            assert False
+            img_serializer = ImageSerializer(data=img_urls, many=True)
+            img_serializer.is_valid(raise_exception=True)
+            self.perform_create(img_serializer)
 
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            if img_urls:
+                thumbnail_pk = img_serializer.data[0]['image_id_pk']
+                thumbnail_data = {'image_image_id_pk': thumbnail_pk}
+                thumbnail_serializer = PostSerializer(Post.objects.get(post_id_pk=post_pk), data=thumbnail_data, partial=True)
+                thumbnail_serializer.is_valid(raise_exception=True)
+                self.perform_update(thumbnail_serializer)
+
+            get_serializer = PostGetSerializer(Post.objects.get(post_id_pk=post_pk))
+            response_data = get_serializer.data
+            response_data['images'] = img_serializer.data
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
         except Exception as err:
             print(traceback.format_exc())
             error_responses_data = {
