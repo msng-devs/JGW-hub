@@ -199,7 +199,10 @@ class PostViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         try:
             request.data._mutable = True
-            images_data = request.data.pop('images')
+            if 'images' in request.data:
+                images_data = request.data.pop('images')
+            else:
+                images_data = []
             post_data = request.data
 
             # post save
