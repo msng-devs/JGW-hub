@@ -8,7 +8,8 @@ from jgw_api.models import (
     Member,
     Rank,
     Post,
-    Major
+    Major,
+    Image
 )
 
 import os
@@ -538,7 +539,7 @@ class PostApiTestOK(APITestCase):
             member_created_by='system',
             member_modified_by='system',
             member_dateofbirth=now,
-            member_status='mmmmmmm'
+            member_status=1
         )
 
 
@@ -571,13 +572,37 @@ class PostApiTestOK(APITestCase):
         # when
         respons: Response = self.client.post(self.url, data=data)
 
+        post_instance = Post.objects.get(post_title='B-tree 구현하기')
         # then
-        responses_data = [{"board_id_pk": i.board_id_pk,
-                           "board_name": i.board_name,
-                            'board_layout': i.board_layout,
-                            "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-                            "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
-                           'role_role_pk_comment_write_level': i.role_role_pk_comment_write_level.role_pk}
-                          for i in Board.objects.all().order_by('board_id_pk')]
+        responses_data = {
+            'post_id_pk': post_instance.post_id_pk,
+            'post_title': post_instance.post_title,
+            'post_content': post_instance.post_content,
+            'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'category_category_id_pk': {
+                'category_id_pk': Category.objects.get(category_name="Java").category_id_pk,
+                'category_name': Category.objects.get(category_name="Java").category_name
+            },
+            "image_image_id_pk": 1,
+            'board_boadr_id_pk': {
+                'board_id_pk': Board.objects.get(board_name='개발').board_id_pk,
+                'board_name': Board.objects.get(board_name='개발').board_name,
+                'board_layout': Board.objects.get(board_name='개발').board_layout,
+                'role_role_pk_write_level': Board.objects.get(board_name='개발').role_role_pk_write_level.role_pk,
+                'role_role_pk_read_level': Board.objects.get(board_name='개발').role_role_pk_read_level.role_pk,
+                'role_role_pk_comment_write_level': Board.objects.get(board_name='개발').role_role_pk_comment_write_level.role_pk,
+            },
+            'member_member_pk': {
+                'member_pk': Member.objects.get(member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2').member_pk,
+                'member_nm': Member.objects.get(member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2').member_nm
+            },
+            'images': [{
+                "image_id_pk": i.image_id_pk,
+                "image_name": i.image_name,
+                "image_url": i.image_url,
+                "post_post_id_pk": i.post_post_id_pk.post_id_pk
+            } for i in Image.objects.all().order_by('image_id_pk')]
+        }
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(respons.content, responses_data)
+        self.assertJSONEqual(respons.content.decode('utf-8'), responses_data)
