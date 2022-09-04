@@ -605,4 +605,4 @@ class PostApiTestOK(APITestCase):
             } for i in Image.objects.all().order_by('image_id_pk')]
         }
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(respons.content.decode('utf-8'), responses_data)
+        self.assertJSONEqual(respons.content, responses_data)
