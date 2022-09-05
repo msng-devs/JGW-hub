@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 
@@ -171,7 +173,23 @@ class PostViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        queryset = Post.objects.all()
+
+        from_date = datetime.datetime.min
+        to_date = datetime.datetime.max
+        time_query = '%Y-%m-%dT%H:%M:%S'
+        if 'from_date' in request.query_params:
+            from_date = datetime.datetime.strptime(request.query_params['from_date'], time_query)
+        if 'to_date' in request.query_params:
+            to_date = datetime.datetime.strptime(request.query_params['to_date'], time_query)
+
+        queryset = queryset.filter(post_write_time__range=(from_date, to_date))
+
+        if 'order' in request.query_params:
+            if 'desc' in request.query_params and request.query_params['desc']:
+                queryset = queryset.order_by('-' + request.query_params['order'])
+            else:
+                queryset = queryset.order_by(request.query_params['order'])
         if 'page' in request.query_params:
             page = self.paginate_queryset(queryset)
             serializer = self.get_serializer(page, many=True)

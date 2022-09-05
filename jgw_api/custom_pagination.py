@@ -33,6 +33,8 @@ class BoardPageNumberPagination(PageNumberPagination):
         ]))
 
 class PostPageNumberPagination(PageNumberPagination):
+    page_size = 15
+
     def get_paginated_response(self, data):
         previous = self.get_previous_link()
         if previous is not None and previous.endswith('post/'):
