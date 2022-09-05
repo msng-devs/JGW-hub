@@ -175,21 +175,38 @@ class PostViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = Post.objects.all()
 
-        from_date = datetime.datetime.min
-        to_date = datetime.datetime.max
+        print(request.query_params)
+
+        start_date = datetime.datetime.min
+        end_date = datetime.datetime.max
         time_query = '%Y-%m-%dT%H:%M:%S'
         if 'from_date' in request.query_params:
-            from_date = datetime.datetime.strptime(request.query_params['from_date'], time_query)
+            start_date = datetime.datetime.strptime(request.query_params['from_date'], time_query)
         if 'to_date' in request.query_params:
-            to_date = datetime.datetime.strptime(request.query_params['to_date'], time_query)
+            end_date = datetime.datetime.strptime(request.query_params['to_date'], time_query)
+        queryset = queryset.filter(post_write_time__range=(start_date, end_date))
 
-        queryset = queryset.filter(post_write_time__range=(from_date, to_date))
+        if 'writer_uid' in request.query_params:
+            queryset = queryset.filter(member_member_pk=request.query_params['writer_uid'])
+
+        if 'writer_name' in request.query_params:
+            queryset = queryset.filter(member_member_pk__member_nm__contains=request.query_params['writer_name'])
+
+        if 'category' in request.query_params:
+            queryset = queryset.filter(category_category_id_pk=request.query_params['category'])
+
+        if 'board' in request.query_params:
+            queryset = queryset.filter(board_boadr_id_pk=request.query_params['board'])
+
+        if 'title' in request.query_params:
+            queryset = queryset.filter(post_title__icontains=request.query_params['title'])
 
         if 'order' in request.query_params:
             if 'desc' in request.query_params and request.query_params['desc']:
                 queryset = queryset.order_by('-' + request.query_params['order'])
             else:
                 queryset = queryset.order_by(request.query_params['order'])
+
         if 'page' in request.query_params:
             page = self.paginate_queryset(queryset)
             serializer = self.get_serializer(page, many=True)
