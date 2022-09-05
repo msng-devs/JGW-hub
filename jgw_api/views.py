@@ -180,10 +180,10 @@ class PostViewSet(viewsets.ModelViewSet):
         start_date = datetime.datetime.min
         end_date = datetime.datetime.max
         time_query = '%Y-%m-%dT%H:%M:%S'
-        if 'from_date' in request.query_params:
-            start_date = datetime.datetime.strptime(request.query_params['from_date'], time_query)
-        if 'to_date' in request.query_params:
-            end_date = datetime.datetime.strptime(request.query_params['to_date'], time_query)
+        if 'start_date' in request.query_params:
+            start_date = datetime.datetime.strptime(request.query_params['start_date'], time_query)
+        if 'end_date' in request.query_params:
+            end_date = datetime.datetime.strptime(request.query_params['end_date'], time_query)
         queryset = queryset.filter(post_write_time__range=(start_date, end_date))
 
         if 'writer_uid' in request.query_params:

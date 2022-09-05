@@ -12,6 +12,8 @@ from jgw_api.models import (
     Image
 )
 
+from django.utils.crypto import get_random_string
+
 import os
 import base64
 import random
@@ -492,11 +494,15 @@ class BoardApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
 
 class PostApiTestOK(APITestCase):
+
     def setUp(self):
         self.url = '/hubapi/post/'
+        # self.now = datetime.datetime.now()
 
     @classmethod
     def setUpTestData(cls):
+        now = datetime.datetime.now()
+
         Role.objects.create(role_nm='ROLE_GUEST')
         Role.objects.create(role_nm='ROLE_USER0')
         Role.objects.create(role_nm='ROLE_USER1')
@@ -511,37 +517,102 @@ class PostApiTestOK(APITestCase):
         Rank.objects.create(rank_nm='준OB')
         Rank.objects.create(rank_nm='OB')
 
-        Category.objects.create(category_name="Java")
-        Category.objects.create(category_name="Python")
+        for i in range(10):
+            Category.objects.create(category_name=get_random_string(length=random.randint(1, 10)) + str(i))
 
-        Board.objects.create(
-            board_name='개발',
-            board_layout=0,
-            role_role_pk_write_level=Role.objects.get(role_nm='ROLE_USER1'),
-            role_role_pk_read_level=Role.objects.get(role_nm='ROLE_USER1'),
-            role_role_pk_comment_write_level=Role.objects.get(role_nm='ROLE_USER1')
-        )
+        for i in range(5):
+            Board.objects.create(
+                board_name=get_random_string(length=random.randint(1, 5)) + str(i),
+                board_layout=random.randint(1, 3),
+                role_role_pk_write_level=Role.objects.get(role_nm='ROLE_USER1'),
+                role_role_pk_read_level=Role.objects.get(role_nm='ROLE_USER1'),
+                role_role_pk_comment_write_level=Role.objects.get(role_nm='ROLE_USER1')
+            )
 
-        now = datetime.datetime.now()
-        Member.objects.create(
-            member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2',
-            member_nm='testName',
-            member_created_dttm=now,
-            member_modified_dttm=now,
-            member_email='test@test.com',
-            member_cell_phone_number='01000000000',
-            member_student_id='2022020202',
-            member_year=38,
-            role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
-            rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
-            major_major_pk=Major.objects.get(major_nm='인공지능학과'),
-            member_leave_absence=0,
-            member_created_by='system',
-            member_modified_by='system',
-            member_dateofbirth=now,
-            member_status=1
-        )
+        for i in range(10):
+            Member.objects.create(
+                member_pk=get_random_string(length=29) + str(i),
+                member_nm=get_random_string(length=random.randint(1, 5)) + str(i),
+                member_created_dttm=now,
+                member_modified_dttm=now,
+                member_email=f'test{i}@test.com',
+                member_cell_phone_number='01000000000',
+                member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
+                member_year=38,
+                role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
+                rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
+                major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+                member_leave_absence=0,
+                member_created_by='system',
+                member_modified_by='system',
+                member_dateofbirth=now,
+                member_status=1
+            )
 
+        for i in range(20):
+            now += datetime.timedelta(days=1)
+            category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
+            board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+            member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
+            Post.objects.create(
+                post_title=get_random_string(length=25) + str(i),
+                post_content=get_random_string(length=500) + str(i),
+                post_write_time=now,
+                post_update_time=now,
+                category_category_id_pk=category_instance,
+                board_boadr_id_pk=board_instance,
+                member_member_pk=member_instance
+            )
+
+    def test_post_get_all(self):
+        print("Post Api GET ALL Running...")
+
+        # given
+        # query_parameters = {
+        #     'start_date', 'end_date', 'writer_uid', 'writer_name',
+        #                     'category', 'board', 'title', 'order', 'desc'}
+        #
+        # data = dict()
+        # for query in query_parameters:
+        #     if random.randint(0, 1):
+        #         data[query] = []
+
+        # when
+        respons: Response = self.client.get(self.url)
+
+        # then
+        return_data = {
+                'count': Post.objects.count(),
+                'next': None,
+                'previous': None,
+                'results': [
+                    {
+                        'post_id_pk': i.post_id_pk,
+                        'post_title': i.post_title,
+                        'post_content': i.post_content,
+                        'post_write_time': i.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                        'post_update_time': i.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                        'category_category_id_pk': {
+                            'category_id_pk': i.category_category_id_pk.category_id_pk,
+                            'category_name': i.category_category_id_pk.category_name
+                        },
+                        "image_image_id_pk": i.image_image_id_pk,
+                        'board_boadr_id_pk': {
+                            'board_id_pk': i.board_boadr_id_pk.board_id_pk,
+                            'board_name': i.board_boadr_id_pk.board_name,
+                            'board_layout': i.board_boadr_id_pk.board_layout,
+                            'role_role_pk_write_level': i.board_boadr_id_pk.role_role_pk_write_level.role_pk,
+                            'role_role_pk_read_level': i.board_boadr_id_pk.role_role_pk_read_level.role_pk,
+                            'role_role_pk_comment_write_level': i.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
+                        },
+                        'member_member_pk': {
+                            'member_pk': i.member_member_pk.member_pk,
+                            'member_nm': i.member_member_pk.member_nm
+                        }
+                    } for i in Post.objects.all()]
+            }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
 
     def test_post_post_with_img(self):
         print("Post with Images Api POST Running...")
@@ -558,9 +629,9 @@ class PostApiTestOK(APITestCase):
             imgs.append({'name': i, 'data': encoded_img})
 
         now = datetime.datetime.now()
-        category_instance = Category.objects.get(category_name="Java")
-        board_instance = Board.objects.get(board_name='개발')
-        member_instance = Member.objects.get(member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2')
+        category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
+        board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+        member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
 
         data = {
             'post_title': 'B-tree 구현하기',
@@ -569,7 +640,7 @@ class PostApiTestOK(APITestCase):
             'post_update_time': now,
             'category_category_id_pk': category_instance.category_id_pk,
             'board_boadr_id_pk': board_instance.board_id_pk,
-            'member_member_pk': '3aPLyVUaecbw4zUj8JsLTeNUgyB2',
+            'member_member_pk': member_instance.member_pk,
             'images': imgs
         }
 
@@ -622,9 +693,9 @@ class PostApiTestOK(APITestCase):
         content_data = '<!DOCTYPE html><html><head></head><body><h1>TEST</h1></body></html>'
 
         now = datetime.datetime.now()
-        category_instance = Category.objects.get(category_name="Java")
-        board_instance = Board.objects.get(board_name='개발')
-        member_instance = Member.objects.get(member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2')
+        category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
+        board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+        member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
 
         data = {
             'post_title': 'html test',
@@ -633,7 +704,7 @@ class PostApiTestOK(APITestCase):
             'post_update_time': now,
             'category_category_id_pk': category_instance.category_id_pk,
             'board_boadr_id_pk': board_instance.board_id_pk,
-            'member_member_pk': '3aPLyVUaecbw4zUj8JsLTeNUgyB2',
+            'member_member_pk': member_instance.member_pk,
             'images': []
         }
 
@@ -669,60 +740,3 @@ class PostApiTestOK(APITestCase):
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(response.content, responses_data)
-
-    def test_post_get_all(self):
-        print("Post Api GET ALL Running...")
-
-        # given
-        now = datetime.datetime.now()
-        category_instance = Category.objects.get(category_name="Java")
-        board_instance = Board.objects.get(board_name='개발')
-        member_instance = Member.objects.get(member_pk='3aPLyVUaecbw4zUj8JsLTeNUgyB2')
-
-        for i in range(20):
-            Post.objects.create(
-                post_title=f'title{i}',
-                post_content='content' * i,
-                post_write_time=now,
-                post_update_time=now,
-                category_category_id_pk=category_instance,
-                board_boadr_id_pk=board_instance,
-                member_member_pk=member_instance
-            )
-
-        # when
-        respons: Response = self.client.get(self.url)
-
-        # then
-        return_data = {
-                'count': Post.objects.count(),
-                'next': None,
-                'previous': None,
-                'results': [
-                    {
-                        'post_id_pk': i.post_id_pk,
-                        'post_title': i.post_title,
-                        'post_content': i.post_content,
-                        'post_write_time': i.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                        'post_update_time': i.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                        'category_category_id_pk': {
-                            'category_id_pk': category_instance.category_id_pk,
-                            'category_name': category_instance.category_name
-                        },
-                        "image_image_id_pk": i.image_image_id_pk,
-                        'board_boadr_id_pk': {
-                            'board_id_pk': board_instance.board_id_pk,
-                            'board_name': board_instance.board_name,
-                            'board_layout': board_instance.board_layout,
-                            'role_role_pk_write_level': board_instance.role_role_pk_write_level.role_pk,
-                            'role_role_pk_read_level': board_instance.role_role_pk_read_level.role_pk,
-                            'role_role_pk_comment_write_level': board_instance.role_role_pk_comment_write_level.role_pk,
-                        },
-                        'member_member_pk': {
-                            'member_pk': member_instance.member_pk,
-                            'member_nm': member_instance.member_nm
-                        }
-                    } for i in Post.objects.all()]
-            }
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(respons.content, return_data)
