@@ -494,6 +494,7 @@ class BoardApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
 
 class PostApiTestOK(APITestCase):
+    now = datetime.datetime.now()
 
     def setUp(self):
         self.url = '/hubapi/post/'
@@ -501,7 +502,7 @@ class PostApiTestOK(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        now = datetime.datetime.now()
+        now = cls.now
 
         Role.objects.create(role_nm='ROLE_GUEST')
         Role.objects.create(role_nm='ROLE_USER0')
@@ -567,15 +568,31 @@ class PostApiTestOK(APITestCase):
     def test_post_get_all(self):
         print("Post Api GET ALL Running...")
 
+        now = self.now
+        start = now + datetime.timedelta(days=random.randint(0, 10))
+        end = start + datetime.timedelta(days=random.randint(0, 10))
+
+        member = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
+        category = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
+        board = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+
         # given
-        # query_parameters = {
-        #     'start_date', 'end_date', 'writer_uid', 'writer_name',
-        #                     'category', 'board', 'title', 'order', 'desc'}
-        #
-        # data = dict()
-        # for query in query_parameters:
-        #     if random.randint(0, 1):
-        #         data[query] = []
+        query_parameters = {
+            'start_date': start,
+            'end_date': end,
+            'writer_uid': member.member_pk,
+            'writer_name': member.member_nm,
+            'category': category.category_id_pk,
+            'board': board.board_id_pk,
+            'title': start,
+            'order': start,
+            'desc': start
+        }
+
+        data = dict()
+        for query in query_parameters:
+            if random.randint(0, 1):
+                data[query] = []
 
         # when
         respons: Response = self.client.get(self.url)
