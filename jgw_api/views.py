@@ -206,6 +206,8 @@ class PostViewSet(viewsets.ModelViewSet):
                 queryset = queryset.order_by('-' + request.query_params['order'])
             else:
                 queryset = queryset.order_by(request.query_params['order'])
+        else:
+            queryset = queryset.order_by('post_write_time')
 
         if 'page' in request.query_params:
             page = self.paginate_queryset(queryset)
