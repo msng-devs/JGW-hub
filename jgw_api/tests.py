@@ -14,10 +14,13 @@ from jgw_api.models import (
 
 from django.utils.crypto import get_random_string
 
+from .views import post_get_all_query
+
 import os
 import base64
 import random
 import datetime
+import traceback
 
 class CategoryApiTestOK(APITestCase):
     def setUp(self):
@@ -550,11 +553,11 @@ class PostApiTestOK(APITestCase):
                 member_status=1
             )
 
-        for i in range(20):
+        for i in range(50):
             now += datetime.timedelta(days=1)
-            category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
-            board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
-            member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
+            category_instance = random.choice(Category.objects.all())
+            board_instance = random.choice(Board.objects.all())
+            member_instance = random.choice(Member.objects.all())
             Post.objects.create(
                 post_title=get_random_string(length=25) + str(i),
                 post_content=get_random_string(length=500) + str(i),
@@ -568,68 +571,99 @@ class PostApiTestOK(APITestCase):
     def test_post_get_all(self):
         print("Post Api GET ALL Running...")
 
-        now = self.now
-        start = now + datetime.timedelta(days=random.randint(0, 10))
-        end = start + datetime.timedelta(days=random.randint(0, 10))
+        try:
+            for _ in range(500):
+                now = self.now
+                start = now + datetime.timedelta(days=random.randint(0, 10))
+                end = start + datetime.timedelta(days=random.randint(0, 10))
+                page = random.randint(1, 5)
 
-        member = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
-        category = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
-        board = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+                member = random.choice(Member.objects.all())
+                category = random.choice(Category.objects.all())
+                board = random.choice(Board.objects.all())
+                post = random.choice(Post.objects.all())
 
-        # given
-        query_parameters = {
-            'start_date': start,
-            'end_date': end,
-            'writer_uid': member.member_pk,
-            'writer_name': member.member_nm,
-            'category': category.category_id_pk,
-            'board': board.board_id_pk,
-            'title': start,
-            'order': start,
-            'desc': start
-        }
+                # given
+                query_parameters = {
+                    'start_date': start.strftime('%Y-%m-%dT%H-%M-%S'),
+                    'end_date': end.strftime('%Y-%m-%dT%H-%M-%S'),
+                    'writer_uid': member.member_pk,
+                    'writer_name': member.member_nm,
+                    'category': category.category_id_pk,
+                    'board': board.board_id_pk,
+                    'title': post.post_title,
+                    'order': random.choice(post._meta.fields).name,
+                    'desc': random.randint(0, 1),
+                    'page': page,
+                }
 
-        data = dict()
-        for query in query_parameters:
-            if random.randint(0, 1):
-                data[query] = []
+                query_data = dict()
+                for key, value in random.sample(query_parameters.items(), k=random.randint(0, 3)):
+                    query_data[key] = value
 
-        # when
-        respons: Response = self.client.get(self.url)
+                instance = post_get_all_query(query_data, Post.objects.all())
+                page_size = 15
+                count_all = instance.count()
+                if 'page' in query_data:
+                    if count_all > page_size:
+                        page_size = count_all // page
+                        query_data['page_size'] = page_size
+                        instance = instance[page_size * (page - 1):page_size * page]
+                    else:
+                        del query_data['page']
 
-        # then
-        return_data = {
-                'count': Post.objects.count(),
-                'next': None,
-                'previous': None,
-                'results': [
-                    {
-                        'post_id_pk': i.post_id_pk,
-                        'post_title': i.post_title,
-                        'post_content': i.post_content,
-                        'post_write_time': i.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                        'post_update_time': i.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                        'category_category_id_pk': {
-                            'category_id_pk': i.category_category_id_pk.category_id_pk,
-                            'category_name': i.category_category_id_pk.category_name
-                        },
-                        "image_image_id_pk": i.image_image_id_pk,
-                        'board_boadr_id_pk': {
-                            'board_id_pk': i.board_boadr_id_pk.board_id_pk,
-                            'board_name': i.board_boadr_id_pk.board_name,
-                            'board_layout': i.board_boadr_id_pk.board_layout,
-                            'role_role_pk_write_level': i.board_boadr_id_pk.role_role_pk_write_level.role_pk,
-                            'role_role_pk_read_level': i.board_boadr_id_pk.role_role_pk_read_level.role_pk,
-                            'role_role_pk_comment_write_level': i.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
-                        },
-                        'member_member_pk': {
-                            'member_pk': i.member_member_pk.member_pk,
-                            'member_nm': i.member_member_pk.member_nm
-                        }
-                    } for i in Post.objects.all()]
-            }
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(respons.content, return_data)
+                # when
+                respons: Response = self.client.get(self.url, data=query_data)
+
+                page_exist = 'page' in query_data
+                query_data = sorted(query_data.items(), key=lambda x: x[0])
+
+                # then
+                return_data = {
+                    'count': instance.count(),
+                    'next': "http://testserver/hubapi/post/?" +
+                            '&'.join([f'{k}={v + 1 if k == "page" else v}' for k, v in query_data])
+                    if page_size * page < count_all and page_exist and count_all else None,
+                    'previous': "http://testserver/hubapi/post/?" +
+                                '&'.join([f'{k}={v - 1 if k == "page" else v}' for k, v in query_data])
+                    if page > 1 and page_exist and count_all else None,
+                    'results': [
+                        {
+                            'post_id_pk': i.post_id_pk,
+                            'post_title': i.post_title,
+                            'post_content': i.post_content,
+                            'post_write_time': i.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                            'post_update_time': i.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                            'category_category_id_pk': {
+                                'category_id_pk': i.category_category_id_pk.category_id_pk,
+                                'category_name': i.category_category_id_pk.category_name
+                            },
+                            "image_image_id_pk": i.image_image_id_pk,
+                            'board_boadr_id_pk': {
+                                'board_id_pk': i.board_boadr_id_pk.board_id_pk,
+                                'board_name': i.board_boadr_id_pk.board_name,
+                                'board_layout': i.board_boadr_id_pk.board_layout,
+                                'role_role_pk_write_level': i.board_boadr_id_pk.role_role_pk_write_level.role_pk,
+                                'role_role_pk_read_level': i.board_boadr_id_pk.role_role_pk_read_level.role_pk,
+                                'role_role_pk_comment_write_level': i.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
+                            },
+                            'member_member_pk': {
+                                'member_pk': i.member_member_pk.member_pk,
+                                'member_nm': i.member_member_pk.member_nm
+                            }
+                        } for i in instance]
+                }
+
+                # print(query_data)
+                # print(respons.content.decode('utf-8'))
+                # print(return_data)
+                # print()
+
+                self.assertEqual(respons.status_code, status.HTTP_200_OK)
+                self.assertJSONEqual(respons.content, return_data)
+        except:
+            print(traceback.format_exc())
+            self.assert_(False, 'error')
 
     def test_post_post_with_img(self):
         print("Post with Images Api POST Running...")

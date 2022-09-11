@@ -165,6 +165,40 @@ class BoardViewSet(viewsets.ModelViewSet):
         }
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
+def post_get_all_query(query_params, queryset):
+    start_date = datetime.datetime.min
+    end_date = datetime.datetime.max
+    time_query = '%Y-%m-%dT%H-%M-%S'
+    if 'start_date' in query_params:
+        start_date = datetime.datetime.strptime(query_params['start_date'], time_query)
+    if 'end_date' in query_params:
+        end_date = datetime.datetime.strptime(query_params['end_date'], time_query)
+    queryset = queryset.filter(post_write_time__range=(start_date, end_date))
+
+    if 'writer_uid' in query_params:
+        queryset = queryset.filter(member_member_pk=query_params['writer_uid'])
+
+    if 'writer_name' in query_params:
+        queryset = queryset.filter(member_member_pk__member_nm__contains=query_params['writer_name'])
+
+    if 'category' in query_params:
+        queryset = queryset.filter(category_category_id_pk=query_params['category'])
+
+    if 'board' in query_params:
+        queryset = queryset.filter(board_boadr_id_pk=query_params['board'])
+
+    if 'title' in query_params:
+        queryset = queryset.filter(post_title__icontains=query_params['title'])
+
+    if 'order' in query_params:
+        if 'desc' in query_params and int(query_params['desc']):
+            queryset = queryset.order_by('-' + query_params['order'])
+        else:
+            queryset = queryset.order_by(query_params['order'])
+    else:
+        queryset = queryset.order_by('post_write_time')
+    return queryset
+
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostGetSerializer
     queryset = Post.objects.all()
@@ -174,49 +208,16 @@ class PostViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         queryset = Post.objects.all()
+        queryset = post_get_all_query(request.query_params, queryset)
 
-        print(request.query_params)
-
-        start_date = datetime.datetime.min
-        end_date = datetime.datetime.max
-        time_query = '%Y-%m-%dT%H:%M:%S'
-        if 'start_date' in request.query_params:
-            start_date = datetime.datetime.strptime(request.query_params['start_date'], time_query)
-        if 'end_date' in request.query_params:
-            end_date = datetime.datetime.strptime(request.query_params['end_date'], time_query)
-        queryset = queryset.filter(post_write_time__range=(start_date, end_date))
-
-        if 'writer_uid' in request.query_params:
-            queryset = queryset.filter(member_member_pk=request.query_params['writer_uid'])
-
-        if 'writer_name' in request.query_params:
-            queryset = queryset.filter(member_member_pk__member_nm__contains=request.query_params['writer_name'])
-
-        if 'category' in request.query_params:
-            queryset = queryset.filter(category_category_id_pk=request.query_params['category'])
-
-        if 'board' in request.query_params:
-            queryset = queryset.filter(board_boadr_id_pk=request.query_params['board'])
-
-        if 'title' in request.query_params:
-            queryset = queryset.filter(post_title__icontains=request.query_params['title'])
-
-        if 'order' in request.query_params:
-            if 'desc' in request.query_params and request.query_params['desc']:
-                queryset = queryset.order_by('-' + request.query_params['order'])
-            else:
-                queryset = queryset.order_by(request.query_params['order'])
-        else:
-            queryset = queryset.order_by('post_write_time')
-
-        if 'page' in request.query_params:
+        if 'page' in request.query_params and queryset.count():
             page = self.paginate_queryset(queryset)
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         else:
             serializer = self.get_serializer(queryset, many=True)
             response_data = {
-                'count': Post.objects.count(),
+                'count': queryset.count(),
                 'next': None,
                 'previous': None,
                 'results': serializer.data
