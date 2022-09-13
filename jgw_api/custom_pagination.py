@@ -42,7 +42,7 @@ class PostPageNumberPagination(PageNumberPagination):
         if previous is not None:
             query = {k: v for k, v in list(map(lambda x: x.split('='), previous.split('?')[1].split('&')))}
             print(query)
-            if 'page' in query and query['page'] == '2':
+            if 'page' not in query:
                 query['page'] = '1'
                 query = sorted(query.items(), key=lambda x: x[0])
                 previous = previous.split('?')[0] + '?' + '&'.join([f'{i[0]}={i[1]}' for i in query])

@@ -79,13 +79,13 @@ class PostApiTestOK(APITestCase):
                 member_status=1
             )
 
-        for i in range(50):
+        for i in range(100):
             now += datetime.timedelta(days=1)
             category_instance = random.choice(Category.objects.all())
             board_instance = random.choice(Board.objects.all())
             member_instance = random.choice(Member.objects.all())
             Post.objects.create(
-                post_title=get_random_string(length=25) + str(i),
+                post_title=get_random_string(length=98) + str(i),
                 post_content=get_random_string(length=500) + str(i),
                 post_write_time=now,
                 post_update_time=now,
@@ -94,7 +94,7 @@ class PostApiTestOK(APITestCase):
                 member_member_pk=member_instance
             )
 
-    def __get_responses_data(self, instance):
+    def __get_responses_data(self, instance, query_parameters):
         return_data = {
             'count': instance.count(),
             'next': None,
@@ -225,6 +225,83 @@ class PostApiTestOK(APITestCase):
             print(traceback.format_exc())
             self.assert_(False, 'error')
 
+    def test_post_get_all_page(self):
+        print("Post Api GET ALL PAGE Running...")
+
+        post = random.choice(Post.objects.all())
+        page_size = random.choice([10, 25, 50])
+        # page = Post.objects.count() // page_size
+        page = 1
+
+        # given
+        query_parameters = {
+            'page': 1,
+            'page_size': page_size,
+            'order': random.choice(post._meta.fields).name,
+            'desc': random.randint(0, 1),
+        }
+
+        # when
+        respons: Response = self.client.get(self.url, data=query_parameters)
+
+        # then
+        instance = post_get_all_query(query_parameters, Post.objects.all())
+
+        return_data = self.__get_responses_data(instance, query_parameters)
+
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_post_get_all_title(self):
+        print("Post Api GET ALL TITLE Running...")
+
+        post = random.choice(Post.objects.all())
+
+        # given
+        query_parameters = {
+            'title': get_random_string(
+                length=1,
+                allowed_chars=''.join([chr(i) for i in range(ord('A'), ord('z') + 1) if not (ord('Z') < i < ord('a'))])
+            ),
+            'order': random.choice(post._meta.fields).name,
+            'desc': random.randint(0, 1),
+        }
+
+        # when
+        respons: Response = self.client.get(self.url, data=query_parameters)
+
+        # then
+        instance = post_get_all_query(query_parameters, Post.objects.all())
+
+        return_data = self.__get_responses_data(instance, query_parameters)
+
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_post_get_all_board(self):
+        print("Post Api GET ALL BOARD Running...")
+
+        post = random.choice(Post.objects.all())
+        board = random.choice(Board.objects.all())
+
+        # given
+        query_parameters = {
+            'board': board.board_id_pk,
+            'order': random.choice(post._meta.fields).name,
+            'desc': random.randint(0, 1),
+        }
+
+        # when
+        respons: Response = self.client.get(self.url, data=query_parameters)
+
+        # then
+        instance = post_get_all_query(query_parameters, Post.objects.all())
+
+        return_data = self.__get_responses_data(instance, query_parameters)
+
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
     def test_post_get_all_category(self):
         print("Post Api GET ALL CATEGORY Running...")
 
@@ -244,7 +321,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance)
+        return_data = self.__get_responses_data(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -270,7 +347,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance)
+        return_data = self.__get_responses_data(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -294,7 +371,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance)
+        return_data = self.__get_responses_data(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -303,8 +380,8 @@ class PostApiTestOK(APITestCase):
         print("Post Api GET ALL DATE Running...")
 
         now = self.now
-        start = now + datetime.timedelta(days=random.randint(0, 10))
-        end = start + datetime.timedelta(days=random.randint(0, 10))
+        start = now + datetime.timedelta(days=random.randint(0, 30))
+        end = start + datetime.timedelta(days=random.randint(0, 70))
 
         post = random.choice(Post.objects.all())
 
@@ -322,7 +399,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance)
+        return_data = self.__get_responses_data(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
