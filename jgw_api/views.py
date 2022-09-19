@@ -210,8 +210,6 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         queryset = post_get_all_query(request.query_params, queryset)
 
-        print(queryset)
-
         if 'page' in request.query_params and queryset.count():
             page = self.paginate_queryset(queryset)
             serializer = self.get_serializer(page, many=True)
@@ -225,6 +223,14 @@ class PostViewSet(viewsets.ModelViewSet):
                 'results': serializer.data
             }
             return Response(response_data)
+
+    # get by id
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = PostSerializer(instance)
+
+        post_pk = serializer.data['post_id_pk']
+        return Response(serializer.data)
 
     def __save_images_storge(self, images_data, folder_pk):
         if settings.TESTING:

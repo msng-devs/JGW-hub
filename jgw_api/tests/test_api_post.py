@@ -172,8 +172,8 @@ class PostApiTestOK(APITestCase):
 
         return_data = self.__get_responses_data(instance, query_parameters)
 
-        print(respons.content.decode('utf-8'))
-        print(return_data)
+        # print(respons.content.decode('utf-8'))
+        # print(return_data)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
