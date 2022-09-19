@@ -456,3 +456,54 @@ class PostApiTestOK(APITestCase):
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(response.content, responses_data)
+
+    def test_post_get_by_id(self):
+        print("Post Api GET BY ID Running...")
+
+        # given
+
+        # when
+        post_instance = Post.objects.all()[random.randint(0, self.post_count - 1)]
+        key = post_instance.post_id_pk
+        respons: Response = self.client.get(f"{self.url}{key}/")
+
+        thumbnail_image = post_instance.image_image_id_pk
+
+        # then
+        responses_data = {
+            'post_id_pk': post_instance.post_id_pk,
+            'post_title': post_instance.post_title,
+            'post_content': post_instance.post_content,
+            'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'category_category_id_pk': {
+                'category_id_pk': post_instance.category_category_id_pk.category_id_pk,
+                'category_name': post_instance.category_category_id_pk.category_name
+            },
+            "image_image_id_pk":
+                None if thumbnail_image is None else {
+                'image_id_pk': thumbnail_image.image_id_pk,
+                'image_name': thumbnail_image.image_name,
+                'image_url': thumbnail_image.image_url,
+            },
+            'board_boadr_id_pk': {
+                'board_id_pk': post_instance.board_boadr_id_pk.board_id_pk,
+                'board_name': post_instance.board_boadr_id_pk.board_name,
+                'board_layout': post_instance.board_boadr_id_pk.board_layout,
+                'role_role_pk_write_level': post_instance.board_boadr_id_pk.role_role_pk_write_level.role_pk,
+                'role_role_pk_read_level': post_instance.board_boadr_id_pk.role_role_pk_read_level.role_pk,
+                'role_role_pk_comment_write_level': post_instance.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
+            },
+            'member_member_pk': {
+                'member_pk': post_instance.member_member_pk.member_pk,
+                'member_nm': post_instance.member_member_pk.member_nm
+            },
+            'images': [{
+                "image_id_pk": i.image_id_pk,
+                "image_name": i.image_name,
+                "image_url": i.image_url,
+                "post_post_id_pk": i.post_post_id_pk.post_id_pk
+            } for i in Image.objects.all().filter(post_post_id_pk=key).order_by('image_id_pk')]
+        }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, responses_data)

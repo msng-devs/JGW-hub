@@ -8,7 +8,8 @@ from django.conf import settings
 from .models import (
     Category,
     Board,
-    Post
+    Post,
+    Image
 )
 from .serializers import (
     CategorySerializer,
@@ -227,10 +228,20 @@ class PostViewSet(viewsets.ModelViewSet):
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = PostSerializer(instance)
+        post_serializer = PostSerializer(instance)
 
-        post_pk = serializer.data['post_id_pk']
-        return Response(serializer.data)
+        post_pk = post_serializer.data['post_id_pk']
+
+        response_data = post_serializer.data
+
+        img_instance = Image.objects.all().filter(post_post_id_pk=post_pk).order_by('image_id_pk')
+        if img_instance.count():
+            image_serializer = ImageSerializer(img_instance)
+            response_data['images'] = image_serializer.data
+        else:
+            response_data['images'] = []
+
+        return Response(response_data)
 
     def __save_images_storge(self, images_data, folder_pk):
         if settings.TESTING:
