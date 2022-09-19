@@ -210,6 +210,8 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         queryset = post_get_all_query(request.query_params, queryset)
 
+        print(queryset)
+
         if 'page' in request.query_params and queryset.count():
             page = self.paginate_queryset(queryset)
             serializer = self.get_serializer(page, many=True)
