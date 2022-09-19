@@ -228,7 +228,7 @@ class PostViewSet(viewsets.ModelViewSet):
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        post_serializer = PostSerializer(instance)
+        post_serializer = self.get_serializer(instance)
 
         post_pk = post_serializer.data['post_id_pk']
 

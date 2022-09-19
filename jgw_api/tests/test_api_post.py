@@ -505,5 +505,6 @@ class PostApiTestOK(APITestCase):
                 "post_post_id_pk": i.post_post_id_pk.post_id_pk
             } for i in Image.objects.all().filter(post_post_id_pk=key).order_by('image_id_pk')]
         }
+
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, responses_data)
