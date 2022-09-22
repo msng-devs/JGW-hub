@@ -15,10 +15,14 @@ class RoleSerializer(serializers.ModelSerializer):
         model = Role
         fields = '__all__'
 
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +34,8 @@ class ImageNestedPostSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['image_id_pk', 'image_name', 'image_url']
 
+
+
 class MemberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
@@ -39,6 +45,8 @@ class MemberNestedPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Member
         fields = ['member_pk', 'member_nm']
+
+
 
 class BoardWriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,6 +63,8 @@ class BoardSerializer(serializers.ModelSerializer):
         fields = ['board_id_pk', 'board_name', 'board_layout', 'role_role_pk_write_level',
                   'role_role_pk_read_level', 'role_role_pk_comment_write_level']
 
+
+
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -70,3 +80,9 @@ class PostGetSerializer(serializers.ModelSerializer):
         model = Post
         fields = ['post_id_pk', 'post_title', 'post_content', 'post_write_time', 'post_update_time',
                   'category_category_id_pk', 'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
+
+class PostPatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'
+        read_only_fields = ('post_write_time', 'member_member_pk', 'image_image_id_pk')

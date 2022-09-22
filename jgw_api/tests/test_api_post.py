@@ -508,3 +508,23 @@ class PostApiTestOK(APITestCase):
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, responses_data)
+
+    def test_post_patch_by_id(self):
+        print("Post Api PATCH BY ID Running...")
+        # given
+        patch_data = {
+            "post_title": "Test" * 10
+        }
+
+        # when
+        target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
+        key = target.post_id_pk
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
+
+        # then
+        return_data = {
+            "category_id_pk": key,
+            "category_name": "JS"
+        }
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)

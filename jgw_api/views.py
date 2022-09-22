@@ -17,7 +17,8 @@ from .serializers import (
     BoardWriteSerializer,
     PostSerializer,
     ImageSerializer,
-    PostGetSerializer
+    PostGetSerializer,
+    PostPatchSerializer
 )
 from .custom_pagination import (
     CategoryPageNumberPagination,
@@ -243,6 +244,26 @@ class PostViewSet(viewsets.ModelViewSet):
 
         return Response(response_data)
 
+    # patch
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        try:
+            serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+            instance = Post.objects.filter(post_id_pk=instance.post_id_pk)
+
+            responses_serializer = PostGetSerializer(instance)
+            return Response(responses_serializer.data)
+        except:
+            error_responses_data = {
+                'detail': 'Test'
+            }
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
     def __save_images_storge(self, images_data, folder_pk):
         if settings.TESTING:
             img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
@@ -309,3 +330,10 @@ class PostViewSet(viewsets.ModelViewSet):
                 'detail': 'board with this board name already exists.'
             }
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
+    # put
+    def update(self, request, *args, **kwargs):
+        response_data = {
+            "detail": "Use patch."
+        }
+        return Response(response_data, status=status.HTTP_403_FORBIDDEN)
