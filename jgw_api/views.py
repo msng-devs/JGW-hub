@@ -33,6 +33,14 @@ import traceback
 import ast
 from urllib import parse
 
+def get_user_header(request):
+    user_uid = request.META.get('user_id', None)
+    user_role_id = request.META.get('user_role_id')
+    if user_uid is None or user_role_id is None:
+        return None
+    else:
+        return user_uid, user_role_id
+
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('category_id_pk')
