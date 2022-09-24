@@ -9,7 +9,8 @@ from .models import (
     Category,
     Board,
     Post,
-    Image
+    Image,
+    Config
 )
 from .serializers import (
     CategorySerializer,
@@ -34,12 +35,19 @@ import ast
 from urllib import parse
 
 def get_user_header(request):
-    user_uid = request.META.get('user_id', None)
-    user_role_id = request.META.get('user_role_id')
+    user_uid = request.META.get('user_pk', None)
+    user_role_id = request.META.get('user_role_pk')
     if user_uid is None or user_role_id is None:
         return None
     else:
         return user_uid, user_role_id
+
+def get_admin_role_pk():
+    config_admin_role = Config.objects.filter(config_nm='admin_role_pk')
+    if config_admin_role:
+        return int(config_admin_role[0].config_val)
+    else:
+        return None
 
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
@@ -255,8 +263,15 @@ class PostViewSet(viewsets.ModelViewSet):
     # patch
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
+        user_header = get_user_header(request)
+        if user_header is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        admin_role_pk = get_admin_role_pk()
+        if admin_role_pk is None:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
             serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 

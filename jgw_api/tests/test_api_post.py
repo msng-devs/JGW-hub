@@ -9,7 +9,8 @@ from jgw_api.models import (
     Rank,
     Post,
     Major,
-    Image
+    Image,
+    Config
 )
 
 from django.utils.crypto import get_random_string
@@ -39,6 +40,8 @@ class PostApiTestOK(APITestCase):
         Role.objects.create(role_nm='ROLE_USER1')
         Role.objects.create(role_nm='ROLE_ADMIN')
         Role.objects.create(role_nm='ROLE_DEV')
+
+        Config.objects.create(config_nm='admin_role_pk', config_val='4')
 
         Major.objects.create(major_nm='인공지능학과')
 
@@ -512,14 +515,19 @@ class PostApiTestOK(APITestCase):
     def test_post_patch_by_id(self):
         print("Post Api PATCH BY ID Running...")
         # given
+        target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
+        key = target.post_id_pk
+
         patch_data = {
             "post_title": "Test" * 10
         }
+        header_data = {
+            'user_pk': target.member_member_pk.member_pk,
+            'user_role_pk': target.member_member_pk.role_role_pk.role_pk
+        }
 
         # when
-        target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
-        key = target.post_id_pk
-        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data, **header_data)
 
         # then
         return_data = {
