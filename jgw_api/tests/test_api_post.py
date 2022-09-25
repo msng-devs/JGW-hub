@@ -98,7 +98,7 @@ class PostApiTestOK(APITestCase):
                 member_member_pk=member_instance
             )
 
-    def __get_responses_data(self, instance, query_parameters):
+    def __get_responses_data_pagenation(self, instance, query_parameters):
         next = previous = None
         if 'page' in query_parameters:
             page = query_parameters['page']
@@ -113,34 +113,36 @@ class PostApiTestOK(APITestCase):
             'count': instance.count(),
             'next': next,
             'previous': previous,
-            'results': [
-                {
-                    'post_id_pk': i.post_id_pk,
-                    'post_title': i.post_title,
-                    'post_content': i.post_content,
-                    'post_write_time': i.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                    'post_update_time': i.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                    'category_category_id_pk': {
-                        'category_id_pk': i.category_category_id_pk.category_id_pk,
-                        'category_name': i.category_category_id_pk.category_name
-                    },
-                    "image_image_id_pk": i.image_image_id_pk,
-                    'board_boadr_id_pk': {
-                        'board_id_pk': i.board_boadr_id_pk.board_id_pk,
-                        'board_name': i.board_boadr_id_pk.board_name,
-                        'board_layout': i.board_boadr_id_pk.board_layout,
-                        'role_role_pk_write_level': i.board_boadr_id_pk.role_role_pk_write_level.role_pk,
-                        'role_role_pk_read_level': i.board_boadr_id_pk.role_role_pk_read_level.role_pk,
-                        'role_role_pk_comment_write_level': i.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
-                    },
-                    'member_member_pk': {
-                        'member_pk': i.member_member_pk.member_pk,
-                        'member_nm': i.member_member_pk.member_nm
-                    }
-                } for i in instance]
+            'results': [self.__get_response_data(i) for i in instance]
         }
-
         return return_data
+
+    def __get_response_data(self, instance):
+        responses_data = {
+            'post_id_pk': instance.post_id_pk,
+            'post_title': instance.post_title,
+            'post_content': instance.post_content,
+            'post_write_time': instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'post_update_time': instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'category_category_id_pk': {
+                'category_id_pk': instance.category_category_id_pk.category_id_pk,
+                'category_name': instance.category_category_id_pk.category_name
+            },
+            "image_image_id_pk": instance.image_image_id_pk,
+            'board_boadr_id_pk': {
+                'board_id_pk': instance.board_boadr_id_pk.board_id_pk,
+                'board_name': instance.board_boadr_id_pk.board_name,
+                'board_layout': instance.board_boadr_id_pk.board_layout,
+                'role_role_pk_write_level': instance.board_boadr_id_pk.role_role_pk_write_level.role_pk,
+                'role_role_pk_read_level': instance.board_boadr_id_pk.role_role_pk_read_level.role_pk,
+                'role_role_pk_comment_write_level': instance.board_boadr_id_pk.role_role_pk_comment_write_level.role_pk,
+            },
+            'member_member_pk': {
+                'member_pk': instance.member_member_pk.member_pk,
+                'member_nm': instance.member_member_pk.member_nm
+            }
+        }
+        return responses_data
 
     def test_post_get_all_page(self):
         print("Post Api GET ALL PAGE Running...")
@@ -157,15 +159,6 @@ class PostApiTestOK(APITestCase):
             'desc': random.randint(0, 1),
         }
 
-        # page_size = 10
-        # page = 1
-        # query_parameters = {
-        #     'page': page,
-        #     'page_size': page_size,
-        #     'order': 'image_image_id_pk',
-        #     'desc': 0,
-        # }
-
         # when
         respons: Response = self.client.get(self.url, data=query_parameters)
 
@@ -173,7 +166,7 @@ class PostApiTestOK(APITestCase):
         instance = post_get_all_query(query_parameters, Post.objects.all())
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         # print(respons.content.decode('utf-8'))
         # print(return_data)
@@ -202,7 +195,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -226,7 +219,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -250,7 +243,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -276,7 +269,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -300,7 +293,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -328,7 +321,7 @@ class PostApiTestOK(APITestCase):
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
 
-        return_data = self.__get_responses_data(instance, query_parameters)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -530,9 +523,6 @@ class PostApiTestOK(APITestCase):
         respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data, **header_data)
 
         # then
-        return_data = {
-            "category_id_pk": key,
-            "category_name": "JS"
-        }
+        return_data = self.__get_response_data(target)
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)

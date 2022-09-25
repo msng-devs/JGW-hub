@@ -271,17 +271,22 @@ class PostViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
             serializer = PostPatchSerializer(instance, data=request.data, partial=True)
-
             serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
+            user_uid, user_role_id = user_header
+            if admin_role_pk <= user_role_id or user_uid == instance.member_member_pk.member_pk:
+                self.perform_update(serializer)
 
-            if getattr(instance, '_prefetched_objects_cache', None):
-                instance._prefetched_objects_cache = {}
-            instance = Post.objects.filter(post_id_pk=instance.post_id_pk)
+                if getattr(instance, '_prefetched_objects_cache', None):
+                    instance._prefetched_objects_cache = {}
+                instance = Post.objects.filter(post_id_pk=instance.post_id_pk)
 
-            responses_serializer = PostGetSerializer(instance)
-            return Response(responses_serializer.data)
+                responses_serializer = self.get_serializer(instance[0])
+                return Response(responses_serializer.data)
+            else:
+                return Response(status=status.HTTP_403_FORBIDDEN)
         except:
+            if settings.TESTING:
+                traceback.print_exc()
             error_responses_data = {
                 'detail': 'Test'
             }
