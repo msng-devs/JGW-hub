@@ -523,6 +523,7 @@ class PostApiTestOK(APITestCase):
         respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data, **header_data)
 
         # then
+        target = Post.objects.all().order_by('post_id_pk').filter(post_id_pk=key)[0]
         return_data = self.__get_response_data(target)
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
