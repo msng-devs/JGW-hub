@@ -265,10 +265,16 @@ class PostViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         user_header = get_user_header(request)
         if user_header is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            responses_data = {
+                'detail': 'User Header not Exist.'
+            }
+            return Response(responses_data, status=status.HTTP_400_BAD_REQUEST)
         admin_role_pk = get_admin_role_pk()
         if admin_role_pk is None:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            responses_data = {
+                'detail': 'Admin Role not Exist.'
+            }
+            return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
             serializer = PostPatchSerializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
@@ -283,7 +289,10 @@ class PostViewSet(viewsets.ModelViewSet):
                 responses_serializer = self.get_serializer(instance[0])
                 return Response(responses_serializer.data)
             else:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+                responses_data = {
+                    'detail': 'Not Allowed.'
+                }
+                return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
         except:
             if settings.TESTING:
                 traceback.print_exc()
