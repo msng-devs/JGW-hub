@@ -276,7 +276,8 @@ class PostViewSet(viewsets.ModelViewSet):
             }
             return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
-            serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+            post_data = request.data['post']
+            serializer = PostPatchSerializer(instance, data=post_data, partial=True)
             serializer.is_valid(raise_exception=True)
             user_uid, user_role_id = user_header
             if admin_role_pk <= user_role_id or user_uid == instance.member_member_pk.member_pk:
