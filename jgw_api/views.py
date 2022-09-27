@@ -375,3 +375,8 @@ class PostViewSet(viewsets.ModelViewSet):
             "detail": "Use patch."
         }
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+
+class ImageViewSet(viewsets.ModelViewSet):
+    serializer_class = ImageSerializer
+    queryset = Image.objects.all()
+    http_method_names = ['get', 'post', 'head', 'delete']
