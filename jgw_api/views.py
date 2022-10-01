@@ -246,18 +246,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         post_serializer = self.get_serializer(instance)
-
-        post_pk = post_serializer.data['post_id_pk']
-
         response_data = post_serializer.data
-
-        img_instance = Image.objects.all().filter(post_post_id_pk=post_pk).order_by('image_id_pk')
-        if img_instance.count():
-            image_serializer = ImageSerializer(img_instance)
-            response_data['images'] = image_serializer.data
-        else:
-            response_data['images'] = []
-
         return Response(response_data)
 
     # patch
@@ -301,66 +290,17 @@ class PostViewSet(viewsets.ModelViewSet):
             }
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
 
-    def __save_images_storge(self, images_data, folder_pk):
-        if settings.TESTING:
-            img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
-            if os.path.exists(img_path):
-                shutil.rmtree(img_path)
-            os.makedirs(img_path, exist_ok=True)
-        else:
-            img_path = os.path.join(settings.MEDIA_ROOT, 'imgs', str(folder_pk))
-        img_urls = []
-        for img in images_data:
-            img = ast.literal_eval(img)
-            name = img['name']
-            data = img['data']
-
-            # name = parse.quote(name)
-            decoded_data = base64.b64decode(data)
-            with open(os.path.join(img_path, name), 'wb') as f:
-                f.write(decoded_data)
-            url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
-            img_urls.append({
-                'image_name': name,
-                'image_url': 'uploaded/' + url,
-                'post_post_id_pk': folder_pk
-            })
-        return img_urls
-
     # post
     def create(self, request, *args, **kwargs):
         try:
-            request.data._mutable = True
-            if 'images' in request.data:
-                images_data = request.data.pop('images')
-            else:
-                images_data = []
             post_data = request.data
 
             # post save
             post_serializer = PostSerializer(data=post_data)
             post_serializer.is_valid(raise_exception=True)
             self.perform_create(post_serializer)
-            post_pk = post_serializer.data['post_id_pk']
 
-            # img save
-            img_urls = self.__save_images_storge(images_data, post_pk)
-            img_serializer = ImageSerializer(data=img_urls, many=True)
-            img_serializer.is_valid(raise_exception=True)
-            self.perform_create(img_serializer)
-
-            if img_urls:
-                thumbnail_pk = img_serializer.data[0]['image_id_pk']
-                thumbnail_data = {'image_image_id_pk': thumbnail_pk}
-                thumbnail_serializer = PostSerializer(Post.objects.get(post_id_pk=post_pk), data=thumbnail_data, partial=True)
-                thumbnail_serializer.is_valid(raise_exception=True)
-                self.perform_update(thumbnail_serializer)
-
-            get_serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
-            response_data = get_serializer.data
-            response_data['images'] = img_serializer.data
-
-            return Response(response_data, status=status.HTTP_201_CREATED)
+            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
         except Exception as err:
             print(traceback.format_exc())
             error_responses_data = {
