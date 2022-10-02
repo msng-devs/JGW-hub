@@ -293,16 +293,16 @@ class PostViewSet(viewsets.ModelViewSet):
     # post
     def create(self, request, *args, **kwargs):
         try:
-            post_data = request.data
-
-            # post save
-            post_serializer = PostSerializer(data=post_data)
+            post_serializer = PostSerializer(data=request.data)
             post_serializer.is_valid(raise_exception=True)
             self.perform_create(post_serializer)
 
-            return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+            post_pk = post_serializer.data['post_id_pk']
+            serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except Exception as err:
-            print(traceback.format_exc())
+            traceback.print_exc()
             error_responses_data = {
                 'detail': 'board with this board name already exists.'
             }

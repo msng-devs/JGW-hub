@@ -326,77 +326,77 @@ class PostApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
-    def test_post_post_with_img(self):
-        print("Post with Images Api POST Running...")
-
-        test_files_root_url = './test/file_upload_test'
-        # given
-        with open(os.path.join(test_files_root_url, 'test.html'), 'r', encoding='utf-8') as f:
-            content_data = f.readlines()
-            content_data = ''.join([content.rstrip() for content in content_data])
-        imgs = []
-        for i in os.listdir(os.path.join(test_files_root_url, 'img')):
-            with open(os.path.join(test_files_root_url, 'img', i), 'rb') as f:
-                encoded_img = base64.b64encode(f.read())
-            imgs.append({'name': i, 'data': encoded_img})
-
-        now = datetime.datetime.now()
-        category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
-        board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
-        member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
-
-        data = {
-            'post_title': 'B-tree 구현하기',
-            'post_content': content_data,
-            'post_write_time': now,
-            'post_update_time': now,
-            'category_category_id_pk': category_instance.category_id_pk,
-            'board_boadr_id_pk': board_instance.board_id_pk,
-            'member_member_pk': member_instance.member_pk,
-            'images': imgs
-        }
-
-        # when
-        response: Response = self.client.post(self.url, data=data)
-
-        # then
-        post_instance = Post.objects.get(post_title='B-tree 구현하기')
-        responses_data = {
-            'post_id_pk': post_instance.post_id_pk,
-            'post_title': post_instance.post_title,
-            'post_content': post_instance.post_content,
-            'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            'category_category_id_pk': {
-                'category_id_pk': category_instance.category_id_pk,
-                'category_name': category_instance.category_name
-            },
-            "image_image_id_pk": {
-                'image_id_pk': post_instance.image_image_id_pk.image_id_pk,
-                'image_name': post_instance.image_image_id_pk.image_name,
-                'image_url': post_instance.image_image_id_pk.image_url,
-            },
-            'board_boadr_id_pk': {
-                'board_id_pk': board_instance.board_id_pk,
-                'board_name': board_instance.board_name,
-                'board_layout': board_instance.board_layout,
-                'role_role_pk_write_level': board_instance.role_role_pk_write_level.role_pk,
-                'role_role_pk_read_level': board_instance.role_role_pk_read_level.role_pk,
-                'role_role_pk_comment_write_level': board_instance.role_role_pk_comment_write_level.role_pk,
-            },
-            'member_member_pk': {
-                'member_pk': member_instance.member_pk,
-                'member_nm': member_instance.member_nm
-            },
-            'images': [{
-                "image_id_pk": i.image_id_pk,
-                "image_name": i.image_name,
-                "image_url": i.image_url,
-                "post_post_id_pk": i.post_post_id_pk.post_id_pk
-            } for i in Image.objects.all().order_by('image_id_pk')]
-        }
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(response.content, responses_data)
+    # def test_post_post_with_img(self):
+    #     print("Post with Images Api POST Running...")
+    #
+    #     test_files_root_url = './test/file_upload_test'
+    #     # given
+    #     with open(os.path.join(test_files_root_url, 'test.html'), 'r', encoding='utf-8') as f:
+    #         content_data = f.readlines()
+    #         content_data = ''.join([content.rstrip() for content in content_data])
+    #     imgs = []
+    #     for i in os.listdir(os.path.join(test_files_root_url, 'img')):
+    #         with open(os.path.join(test_files_root_url, 'img', i), 'rb') as f:
+    #             encoded_img = base64.b64encode(f.read())
+    #         imgs.append({'name': i, 'data': encoded_img})
+    #
+    #     now = datetime.datetime.now()
+    #     category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
+    #     board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
+    #     member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
+    #
+    #     data = {
+    #         'post_title': 'B-tree 구현하기',
+    #         'post_content': content_data,
+    #         'post_write_time': now,
+    #         'post_update_time': now,
+    #         'category_category_id_pk': category_instance.category_id_pk,
+    #         'board_boadr_id_pk': board_instance.board_id_pk,
+    #         'member_member_pk': member_instance.member_pk,
+    #         'images': imgs
+    #     }
+    #
+    #     # when
+    #     response: Response = self.client.post(self.url, data=data)
+    #
+    #     # then
+    #     post_instance = Post.objects.get(post_title='B-tree 구현하기')
+    #     responses_data = {
+    #         'post_id_pk': post_instance.post_id_pk,
+    #         'post_title': post_instance.post_title,
+    #         'post_content': post_instance.post_content,
+    #         'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+    #         'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+    #         'category_category_id_pk': {
+    #             'category_id_pk': category_instance.category_id_pk,
+    #             'category_name': category_instance.category_name
+    #         },
+    #         "image_image_id_pk": {
+    #             'image_id_pk': post_instance.image_image_id_pk.image_id_pk,
+    #             'image_name': post_instance.image_image_id_pk.image_name,
+    #             'image_url': post_instance.image_image_id_pk.image_url,
+    #         },
+    #         'board_boadr_id_pk': {
+    #             'board_id_pk': board_instance.board_id_pk,
+    #             'board_name': board_instance.board_name,
+    #             'board_layout': board_instance.board_layout,
+    #             'role_role_pk_write_level': board_instance.role_role_pk_write_level.role_pk,
+    #             'role_role_pk_read_level': board_instance.role_role_pk_read_level.role_pk,
+    #             'role_role_pk_comment_write_level': board_instance.role_role_pk_comment_write_level.role_pk,
+    #         },
+    #         'member_member_pk': {
+    #             'member_pk': member_instance.member_pk,
+    #             'member_nm': member_instance.member_nm
+    #         },
+    #         'images': [{
+    #             "image_id_pk": i.image_id_pk,
+    #             "image_name": i.image_name,
+    #             "image_url": i.image_url,
+    #             "post_post_id_pk": i.post_post_id_pk.post_id_pk
+    #         } for i in Image.objects.all().order_by('image_id_pk')]
+    #     }
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     self.assertJSONEqual(response.content, responses_data)
 
     def test_post_post_no_img(self):
         print("Post no Images Api POST Running...")
@@ -416,8 +416,7 @@ class PostApiTestOK(APITestCase):
             'post_update_time': now,
             'category_category_id_pk': category_instance.category_id_pk,
             'board_boadr_id_pk': board_instance.board_id_pk,
-            'member_member_pk': member_instance.member_pk,
-            'images': []
+            'member_member_pk': member_instance.member_pk
         }
 
         # when
@@ -447,8 +446,7 @@ class PostApiTestOK(APITestCase):
             'member_member_pk': {
                 'member_pk': member_instance.member_pk,
                 'member_nm': member_instance.member_nm
-            },
-            'images': []
+            }
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(response.content, responses_data)
@@ -493,13 +491,7 @@ class PostApiTestOK(APITestCase):
             'member_member_pk': {
                 'member_pk': post_instance.member_member_pk.member_pk,
                 'member_nm': post_instance.member_member_pk.member_nm
-            },
-            'images': [{
-                "image_id_pk": i.image_id_pk,
-                "image_name": i.image_name,
-                "image_url": i.image_url,
-                "post_post_id_pk": i.post_post_id_pk.post_id_pk
-            } for i in Image.objects.all().filter(post_post_id_pk=key).order_by('image_id_pk')]
+            }
         }
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
