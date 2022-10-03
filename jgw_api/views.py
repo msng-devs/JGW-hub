@@ -49,6 +49,38 @@ def get_admin_role_pk():
     else:
         return None
 
+def save_images_storge(images_data):
+    if settings.TESTING:
+        img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs')
+        if os.path.exists(img_path):
+            shutil.rmtree(img_path)
+        os.makedirs(img_path, exist_ok=True)
+    img_urls = []
+    for img in images_data:
+        img = ast.literal_eval(str(img))
+        name = img['image_name']
+        data = img['image_data']
+        folder_pk = img['post_post_id_pk']
+
+        # name = parse.quote(name)
+        decoded_data = base64.b64decode(data)
+        if settings.TESTING:
+            img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
+            if os.path.exists(img_path):
+                shutil.rmtree(img_path)
+            os.makedirs(img_path, exist_ok=True)
+        else:
+            img_path = os.path.join(settings.MEDIA_ROOT, 'imgs', str(folder_pk))
+        with open(os.path.join(img_path, name), 'wb') as f:
+            f.write(decoded_data)
+        url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
+        img_urls.append({
+            'image_name': name,
+            'image_url': 'uploaded/' + url,
+            'post_post_id_pk': folder_pk
+        })
+    return img_urls
+
 class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('category_id_pk')
@@ -320,41 +352,9 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     http_method_names = ['get', 'post', 'head', 'delete']
 
-    def __save_images_storge(self, images_data):
-        if settings.TESTING:
-            img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs')
-            if os.path.exists(img_path):
-                shutil.rmtree(img_path)
-            os.makedirs(img_path, exist_ok=True)
-        img_urls = []
-        for img in images_data:
-            img = ast.literal_eval(img)
-            name = img['image_name']
-            data = img['image_data']
-            folder_pk = img['post_post_id_pk']
-
-            # name = parse.quote(name)
-            decoded_data = base64.b64decode(data)
-            if settings.TESTING:
-                img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
-                if os.path.exists(img_path):
-                    shutil.rmtree(img_path)
-                os.makedirs(img_path, exist_ok=True)
-            else:
-                img_path = os.path.join(settings.MEDIA_ROOT, 'imgs', str(folder_pk))
-            with open(os.path.join(img_path, name), 'wb') as f:
-                f.write(decoded_data)
-            url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
-            img_urls.append({
-                'image_name': name,
-                'image_url': 'uploaded/' + url,
-                'post_post_id_pk': folder_pk
-            })
-        return img_urls
-
     def create(self, request, *args, **kwargs):
         data = request.data
-        data = self.__save_images_storge(data)
+        data = save_images_storge(data)
         img_serializer = ImageSerializer(data=data, many=True)
         img_serializer.is_valid()
         return Response(img_serializer.data, status=status.HTTP_201_CREATED)
@@ -363,6 +363,13 @@ class ImageViewSet(viewsets.ModelViewSet):
         queryset = Image.objects.all()
         if 'post_id' in request.query_params:
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
+        else:
+            error_responses = {
+                'detail': "post_id required."
+            }
+            return Response(error_responses, status=status.HTTP_400_BAD_REQUEST)
+
+        queryset = queryset.order_by('image_id_pk')
 
         if 'page' in request.query_params and queryset.count():
             page = self.paginate_queryset(queryset)
@@ -379,11 +386,13 @@ class ImageViewSet(viewsets.ModelViewSet):
             return Response(response_data)
 
     def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        # instance = self.get_object()
+        # serializer = self.get_serializer(instance)
+        # return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
+        print(request.data)
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
