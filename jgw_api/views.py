@@ -66,11 +66,11 @@ def save_images_storge(images_data):
         decoded_data = base64.b64decode(data)
         if settings.TESTING:
             img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs', str(folder_pk))
-            if os.path.exists(img_path):
-                shutil.rmtree(img_path)
-            os.makedirs(img_path, exist_ok=True)
+            # if os.path.exists(img_path):
+            #     shutil.rmtree(img_path)
         else:
             img_path = os.path.join(settings.MEDIA_ROOT, 'imgs', str(folder_pk))
+        os.makedirs(img_path, exist_ok=True)
         with open(os.path.join(img_path, name), 'wb') as f:
             f.write(decoded_data)
         url = os.path.join(img_path, name).replace('\\', '/').split(settings.MEDIA_URL)[1]
@@ -357,6 +357,7 @@ class ImageViewSet(viewsets.ModelViewSet):
         data = save_images_storge(data)
         img_serializer = ImageSerializer(data=data, many=True)
         img_serializer.is_valid()
+        self.perform_create(img_serializer)
         return Response(img_serializer.data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
