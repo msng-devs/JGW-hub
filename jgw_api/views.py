@@ -38,7 +38,10 @@ def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
     user_role_id = request.META.get('user_role_pk')
     if user_uid is None or user_role_id is None:
-        return None
+        responses_data = {
+            'detail': 'Header Required.'
+        }
+        return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return user_uid, user_role_id
 
@@ -47,7 +50,50 @@ def get_admin_role_pk():
     if config_admin_role:
         return int(config_admin_role[0].config_val)
     else:
-        return None
+        responses_data = {
+            'detail': 'Admin Role not Exist.'
+        }
+        return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def get_min_upload_role_pk():
+    config_admin_role = Config.objects.filter(config_nm='min_upload_role_pk')
+    if config_admin_role:
+        return int(config_admin_role[0].config_val)
+    else:
+        responses_data = {
+            'detail': 'Minimum upload role not exist.'
+        }
+        return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def request_check(request):
+    header_checked = get_user_header(request)
+    if isinstance(header_checked, Response):
+        return header_checked
+    user_uid, user_role_id = header_checked
+    return user_uid, user_role_id
+
+def request_check_admin_role(request):
+    header_checked = get_user_header(request)
+    if isinstance(header_checked, Response):
+        return header_checked
+    admin_role_checked = get_admin_role_pk()
+    if isinstance(admin_role_checked, Response):
+        return admin_role_checked
+    user_uid, user_role_id = header_checked
+    return user_uid, user_role_id, admin_role_checked
+
+def request_check_admin_upload_role(request):
+    header_checked = get_user_header(request)
+    if isinstance(header_checked, Response):
+        return header_checked
+    admin_role_checked = get_admin_role_pk()
+    if isinstance(admin_role_checked, Response):
+        return admin_role_checked
+    min_upload_role_checked = get_min_upload_role_pk()
+    if isinstance(min_upload_role_checked, Response):
+        return min_upload_role_checked
+    user_uid, user_role_id = header_checked
+    return user_uid, user_role_id, admin_role_checked, min_upload_role_checked
 
 def save_images_storge(images_data, member_pk):
     if settings.TESTING:
@@ -290,7 +336,7 @@ class PostViewSet(viewsets.ModelViewSet):
             responses_data = {
                 'detail': 'User Header not Exist.'
             }
-            return Response(responses_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         admin_role_pk = get_admin_role_pk()
         if admin_role_pk is None:
             responses_data = {
@@ -354,17 +400,29 @@ class ImageViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'delete']
 
     def create(self, request, *args, **kwargs):
-        header = get_user_header(request)
-        if header is None:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        user_uid, user_role_id = header
+        checked = request_check_admin_upload_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk, min_upload_role_pk = checked
 
-        data = request.data
-        data = save_images_storge(data, user_uid)
-        img_serializer = ImageSerializer(data=data, many=True)
-        img_serializer.is_valid()
-        self.perform_create(img_serializer)
-        return Response(img_serializer.data, status=status.HTTP_201_CREATED)
+        if user_role_id >= admin_role_pk or user_role_id >= min_upload_role_pk:
+            try:
+                data = request.data
+                data = save_images_storge(data, user_uid)
+                img_serializer = ImageSerializer(data=data, many=True)
+                img_serializer.is_valid()
+                self.perform_create(img_serializer)
+                return Response(img_serializer.data, status=status.HTTP_201_CREATED)
+            except:
+                detail = {
+                    'detail': 'Error uploading image.'
+                }
+                return Response(detail, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            detail = {
+                'detail': 'Image upload not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
     def list(self, request, *args, **kwargs):
         queryset = Image.objects.all()
@@ -393,13 +451,23 @@ class ImageViewSet(viewsets.ModelViewSet):
             return Response(response_data)
 
     def retrieve(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-        # instance = self.get_object()
-        # serializer = self.get_serializer(instance)
-        # return Response(serializer.data)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        print(request.data)
+        checked = request_check_admin_upload_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk, min_upload_role_pk = checked
+
         instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            detail = {
+                'detail': 'Image delete not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
