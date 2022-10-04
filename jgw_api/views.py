@@ -49,7 +49,7 @@ def get_admin_role_pk():
     else:
         return None
 
-def save_images_storge(images_data):
+def save_images_storge(images_data, member_pk):
     if settings.TESTING:
         img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs')
         if os.path.exists(img_path):
@@ -77,7 +77,8 @@ def save_images_storge(images_data):
         img_urls.append({
             'image_name': name,
             'image_url': 'uploaded/' + url,
-            'post_post_id_pk': folder_pk
+            'post_post_id_pk': folder_pk,
+            'member_member_pk': member_pk
         })
     return img_urls
 
@@ -353,8 +354,13 @@ class ImageViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'delete']
 
     def create(self, request, *args, **kwargs):
+        header = get_user_header(request)
+        if header is None:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user_uid, user_role_id = header
+
         data = request.data
-        data = save_images_storge(data)
+        data = save_images_storge(data, user_uid)
         img_serializer = ImageSerializer(data=data, many=True)
         img_serializer.is_valid()
         self.perform_create(img_serializer)
