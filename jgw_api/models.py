@@ -16,7 +16,7 @@ class ApiRoute(models.Model):
     role_role_pk = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK', blank=True, null=True)  # Field name made lowercase.
     service_service_pk = models.ForeignKey('Service', models.DO_NOTHING, db_column='SERVICE_SERVICE_PK')  # Field name made lowercase.
     api_route_gateway_refresh = models.IntegerField(db_column='API_ROUTE_GATEWAY_REFRESH', blank=True, null=True)  # Field name made lowercase.
-    api_route_add_user_info = models.IntegerField(db_column='API_ROUTE_ADD_USER_INFO', blank=True, null=True)  # Field name made lowercase.
+    api_route_only_token = models.IntegerField(db_column='API_ROUTE_ONLY_TOKEN', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
@@ -130,6 +130,7 @@ class Image(models.Model):
     image_name = models.CharField(db_column='IMAGE_NAME', max_length=45, blank=True, null=True)  # Field name made lowercase.
     image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
     post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK', blank=True, null=True)  # Field name made lowercase.
+    member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
