@@ -95,42 +95,52 @@ class ImageApiTestOK(APITestCase):
                 encoded_img = base64.b64encode(f.read())
             imgs.append({'image_name': i, 'image_data': encoded_img, 'post_post_id_pk': int(post_post_id_pk)})
 
-        post_post_id_pk = Post.objects.all()[1].post_id_pk
-        for i in image_files[10:20]:
-            with open(os.path.join(cls.test_files_root_url, 'img', i), 'rb') as f:
-                encoded_img = base64.b64encode(f.read())
-            imgs.append({'image_name': i, 'image_data': encoded_img, 'post_post_id_pk': int(post_post_id_pk)})
-
-        for i in save_images_storge(imgs):
+        for i in save_images_storge(imgs, Member.objects.all()[0].member_pk):
             Image.objects.create(
                 image_name=i['image_name'],
                 image_url=i['image_url'],
                 post_post_id_pk=Post.objects.get(post_id_pk=int(i['post_post_id_pk']))
             )
 
+        imgs = []
+        for i in image_files[10:20]:
+            with open(os.path.join(cls.test_files_root_url, 'img', i), 'rb') as f:
+                encoded_img = base64.b64encode(f.read())
+            imgs.append({'image_name': i, 'image_data': encoded_img, 'post_post_id_pk': None})
+
+        for i in save_images_storge(imgs, None):
+            Image.objects.create(
+                image_name=i['image_name'],
+                image_url=i['image_url'],
+                post_post_id_pk=Post.objects.get(post_id_pk=int(i['post_post_id_pk']))
+                    if i['post_post_id_pk'] is not None else None
+            )
+
     def test_image_get_all_page(self):
         print("Image Api GET ALL PAGE Running...")
 
         # given
+        post_id = Post.objects.all()[0].post_id_pk
         query_parameters = {
-            'post_id': 10001,
+            'post_id': post_id,
         }
 
         # when
         respons: Response = self.client.get(self.url, data=query_parameters)
 
         # then
-        instance = Image.objects.all().filter(post_post_id_pk=10001).order_by('image_id_pk')
+        instance = Image.objects.all().filter(post_post_id_pk=post_id).order_by('image_id_pk')
 
         return_data = {
-            'count': 0,
+            'count': instance.count(),
             'next': None,
             'previous': None,
             'results': [{
                 'image_id_pk': i.image_id_pk,
                 'image_name': i.image_name,
                 'image_url': i.image_url,
-                'post_post_id_pk': i.post_post_id_pk
+                'post_post_id_pk': i.post_post_id_pk.post_id_pk,
+                'member_member_pk': i.member_member_pk.member_pk if i.member_member_pk else None
             } for i in instance]
         }
 
@@ -144,7 +154,7 @@ class ImageApiTestOK(APITestCase):
 
         # when
         image_instance = Image.objects.all()[random.randint(0, 19)]
-        key = image_instance.post_post_id_pk
+        key = image_instance.image_id_pk
         responses: Response = self.client.get(f"{self.url}{key}/")
 
         # then
@@ -152,7 +162,8 @@ class ImageApiTestOK(APITestCase):
             'image_id_pk': image_instance.image_id_pk,
             'image_name': image_instance.image_name,
             'image_url': image_instance.image_url,
-            'post_post_id_pk': image_instance.post_post_id_pk
+            'post_post_id_pk': image_instance.post_post_id_pk,
+            'member_member_pk': image_instance.member_member_pk.member_pk if image_instance.member_member_pk else None
         }
 
         self.assertEqual(responses.status_code, status.HTTP_200_OK)
