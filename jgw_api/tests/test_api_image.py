@@ -162,7 +162,7 @@ class ImageApiTestOK(APITestCase):
             'image_id_pk': image_instance.image_id_pk,
             'image_name': image_instance.image_name,
             'image_url': image_instance.image_url,
-            'post_post_id_pk': image_instance.post_post_id_pk,
+            'post_post_id_pk': image_instance.post_post_id_pk.post_id_pk if image_instance.post_post_id_pk else None,
             'member_member_pk': image_instance.member_member_pk.member_pk if image_instance.member_member_pk else None
         }
 
