@@ -34,6 +34,7 @@ class ImageApiTestOK(APITestCase):
         Role.objects.create(role_nm='ROLE_GUEST')
 
         Config.objects.create(config_nm='admin_role_pk', config_val='4')
+        Config.objects.create(config_nm='min_upload_role_pk', config_val='0')
 
         Major.objects.create(major_nm='인공지능학과')
 
@@ -99,7 +100,8 @@ class ImageApiTestOK(APITestCase):
             Image.objects.create(
                 image_name=i['image_name'],
                 image_url=i['image_url'],
-                post_post_id_pk=Post.objects.get(post_id_pk=int(i['post_post_id_pk']))
+                post_post_id_pk=Post.objects.get(post_id_pk=int(i['post_post_id_pk'])),
+                member_member_pk=Member.objects.all()[0]
             )
 
         imgs = []
@@ -113,7 +115,8 @@ class ImageApiTestOK(APITestCase):
                 image_name=i['image_name'],
                 image_url=i['image_url'],
                 post_post_id_pk=Post.objects.get(post_id_pk=int(i['post_post_id_pk']))
-                    if i['post_post_id_pk'] is not None else None
+                    if i['post_post_id_pk'] is not None else None,
+                member_member_pk=Member.objects.all()[0]
             )
 
     def test_image_get_all_page(self):
@@ -168,3 +171,55 @@ class ImageApiTestOK(APITestCase):
 
         self.assertEqual(responses.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(responses.content, responses_data)
+
+    def test_image_delete_by_id(self):
+        print("Image Api DELETE BY ID Running...")
+        # given
+
+        # when
+        target = Image.objects.all().order_by('image_id_pk')[Image.objects.count() - 1]
+        key = target.image_id_pk
+        header_data = {
+            'user_pk': target.member_member_pk.member_pk,
+            'user_role_pk': target.member_member_pk.role_role_pk.role_pk
+        }
+        respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_image_post(self):
+        print("Image Api POST Running...")
+
+        test_files_root_url = './test/file_upload_test'
+        # given
+        target_member = Member.objects.all()[0]
+        header_data = {
+            'user_pk': target_member.member_pk,
+            'user_role_pk': target_member.role_role_pk.role_pk
+        }
+
+        data = '['
+        for idx, i in enumerate(os.listdir(os.path.join(test_files_root_url, 'img'))[25:]):
+            with open(os.path.join(test_files_root_url, 'img', i), 'rb') as f:
+                encoded_img = base64.b64encode(f.read())
+            if idx:
+                data += ','
+            data += '{' + f'"image_name": "{i}", "image_data": "' + encoded_img.decode("utf-8") + '", "post_post_id_pk": null' + '}'
+        data += ']'
+
+        # when
+        response: Response = self.client.post(self.url, data=data, content_type='application/json', **header_data)
+
+        # then
+        responses_data = [
+            {
+                'image_id_pk': i.image_id_pk,
+                'image_name': i.image_name,
+                'image_url': i.image_url,
+                'member_member_pk': i.member_member_pk.member_pk if i.member_member_pk else None,
+                'post_post_id_pk': i.post_post_id_pk.post_id_pk if i.post_post_id_pk else None
+            } for i in Image.objects.all()[20:]
+        ]
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(response.content, responses_data)

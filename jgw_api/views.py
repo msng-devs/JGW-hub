@@ -142,7 +142,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all().order_by('category_id_pk')
     pagination_class = CategoryPageNumberPagination
-    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
@@ -209,7 +209,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     queryset = Board.objects.all().order_by('board_id_pk')
     pagination_class = BoardPageNumberPagination
-    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
@@ -310,7 +310,7 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostGetSerializer
     queryset = Post.objects.all()
     pagination_class = PostPageNumberPagination
-    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
@@ -441,8 +441,9 @@ class PostViewSet(viewsets.ModelViewSet):
 class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     queryset = Image.objects.all()
-    http_method_names = ['get', 'post', 'head', 'delete']
+    http_method_names = ['get', 'post', 'delete']
 
+    # post
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_upload_role(request)
         if isinstance(checked, Response):
@@ -458,6 +459,7 @@ class ImageViewSet(viewsets.ModelViewSet):
                 self.perform_create(img_serializer)
                 return Response(img_serializer.data, status=status.HTTP_201_CREATED)
             except:
+                traceback.print_exc()
                 detail = {
                     'detail': 'Error uploading image.'
                 }
@@ -468,15 +470,11 @@ class ImageViewSet(viewsets.ModelViewSet):
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
+    # get
     def list(self, request, *args, **kwargs):
         queryset = Image.objects.all()
         if 'post_id' in request.query_params:
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
-        else:
-            error_responses = {
-                'detail': "post_id required."
-            }
-            return Response(error_responses, status=status.HTTP_400_BAD_REQUEST)
 
         queryset = queryset.order_by('image_id_pk')
 
@@ -494,20 +492,21 @@ class ImageViewSet(viewsets.ModelViewSet):
             }
             return Response(response_data)
 
+    # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
+    # delete
     def destroy(self, request, *args, **kwargs):
-        checked = request_check_admin_upload_role(request)
+        checked = request_check_admin_role(request)
         if isinstance(checked, Response):
             return checked
-        user_uid, user_role_id, admin_role_pk, min_upload_role_pk = checked
+        user_uid, user_role_id, admin_role_pk = checked
 
         instance = self.get_object()
-
-        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk:
+        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
             self.perform_destroy(instance)
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
