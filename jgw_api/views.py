@@ -334,30 +334,34 @@ class PostViewSet(viewsets.ModelViewSet):
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        post_serializer = self.get_serializer(instance)
-        response_data = post_serializer.data
-        return Response(response_data)
+
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
+        if user_role_id >= admin_role_pk or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+            post_serializer = self.get_serializer(instance)
+            response_data = post_serializer.data
+            return Response(response_data)
+        else:
+            detail = {
+                'detail': 'read post not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
     # patch
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
-        user_header = get_user_header(request)
-        if user_header is None:
-            responses_data = {
-                'detail': 'User Header not Exist.'
-            }
-            return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        admin_role_pk = get_admin_role_pk()
-        if admin_role_pk is None:
-            responses_data = {
-                'detail': 'Admin Role not Exist.'
-            }
-            return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
         try:
             serializer = PostPatchSerializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
-            user_uid, user_role_id = user_header
-            if admin_role_pk <= user_role_id or user_uid == instance.member_member_pk.member_pk:
+            if user_uid == instance.member_member_pk.member_pk:
                 self.perform_update(serializer)
 
                 if getattr(instance, '_prefetched_objects_cache', None):
@@ -381,21 +385,33 @@ class PostViewSet(viewsets.ModelViewSet):
 
     # post
     def create(self, request, *args, **kwargs):
-        try:
-            post_serializer = PostSerializer(data=request.data)
-            post_serializer.is_valid(raise_exception=True)
-            self.perform_create(post_serializer)
+        post_serializer = PostSerializer(data=request.data)
+        post_serializer.is_valid(raise_exception=True)
 
-            post_pk = post_serializer.data['post_id_pk']
-            serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+        board_instance = post_serializer.validated_data['board_boadr_id_pk']
+        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
+            try:
+                self.perform_create(post_serializer)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as err:
-            traceback.print_exc()
-            error_responses_data = {
-                'detail': 'board with this board name already exists.'
+                post_pk = post_serializer.data['post_id_pk']
+                serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as err:
+                traceback.print_exc()
+                error_responses_data = {
+                    'detail': 'board with this board name already exists.'
+                }
+                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            responses_data = {
+                'detail': 'Not Allowed.'
             }
-            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # put
     def update(self, request, *args, **kwargs):
@@ -403,6 +419,24 @@ class PostViewSet(viewsets.ModelViewSet):
             "detail": "Use patch."
         }
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+
+    # delete
+    def destroy(self, request, *args, **kwargs):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk, = checked
+
+        instance = self.get_object()
+
+        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            detail = {
+                'detail': 'Image delete not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
 class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer

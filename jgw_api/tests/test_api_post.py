@@ -420,7 +420,11 @@ class PostApiTestOK(APITestCase):
         }
 
         # when
-        response: Response = self.client.post(self.url, data=data)
+        header_data = {
+            'user_pk': member_instance.member_pk,
+            'user_role_pk': member_instance.role_role_pk.role_pk
+        }
+        response: Response = self.client.post(self.url, data=data, **header_data)
 
         post_instance = Post.objects.get(post_title='html test')
         # then
@@ -459,7 +463,12 @@ class PostApiTestOK(APITestCase):
         # when
         post_instance = Post.objects.all()[random.randint(0, self.post_count - 1)]
         key = post_instance.post_id_pk
-        respons: Response = self.client.get(f"{self.url}{key}/")
+
+        header_data = {
+            'user_pk': post_instance.member_member_pk.member_pk,
+            'user_role_pk': post_instance.member_member_pk.role_role_pk.role_pk
+        }
+        respons: Response = self.client.get(f"{self.url}{key}/", **header_data)
 
         thumbnail_image = post_instance.image_image_id_pk
 
@@ -519,3 +528,19 @@ class PostApiTestOK(APITestCase):
         return_data = self.__get_response_data(target)
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
+
+    def test_post_delete_by_id(self):
+        print("Post Api DELETE BY ID Running...")
+        # given
+
+        # when
+        target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
+        key = target.post_id_pk
+        header_data = {
+            'user_pk': target.member_member_pk.member_pk,
+            'user_role_pk': target.member_member_pk.role_role_pk.role_pk
+        }
+        respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
