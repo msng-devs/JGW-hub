@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from jgw_api.models import (
     Board,
     Role,
+    Config
 )
 import random
 
@@ -19,6 +20,15 @@ class BoardApiTestOK(APITestCase):
         Role.objects.create(role_nm='ROLE_ADMIN')
         Role.objects.create(role_nm='ROLE_DEV')
 
+        Config.objects.create(config_nm='admin_role_pk', config_val='4')
+
+    def __make_header(self):
+        header_data = {
+            'user_pk': 'pkpkpkpkpkpkpkpkpkpkpk',
+            'user_role_pk': 5
+        }
+        return header_data
+
     def test_board_get(self):
         print("Board Api GET ALL Pagination Running...")
 
@@ -33,7 +43,7 @@ class BoardApiTestOK(APITestCase):
             )
 
         # when
-        respons: Response = self.client.get(self.url, data={'page': 1})
+        respons: Response = self.client.get(self.url, data={'page': 1}, **self.__make_header())
 
         # then
         return_data = {
@@ -82,7 +92,7 @@ class BoardApiTestOK(APITestCase):
         # when
         target = '공지사항1'
         ins = Board.objects.filter(board_name=target)[0]
-        respons: Response = self.client.get(f"{self.url}{ins.board_id_pk}/")
+        respons: Response = self.client.get(f"{self.url}{ins.board_id_pk}/", **self.__make_header())
 
         # then
         return_data = {
@@ -115,7 +125,7 @@ class BoardApiTestOK(APITestCase):
                '"role_role_pk_read_level": 1, "role_role_pk_comment_write_level": 2}]'
 
         # when
-        respons: Response = self.client.post(self.url, data=data, content_type='application/json')
+        respons: Response = self.client.post(self.url, data=data, content_type='application/json', **self.__make_header())
 
         # then
         responses_data = [{"board_id_pk": i.board_id_pk,
@@ -154,7 +164,7 @@ class BoardApiTestOK(APITestCase):
         target = '공지사항1'
         instance = Board.objects.filter(board_name=target)[0]
         key = instance.board_id_pk
-        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data)
+        respons: Response = self.client.patch(f"{self.url}{key}/", data=patch_data, **self.__make_header())
 
         # then
         return_data = {
@@ -190,7 +200,7 @@ class BoardApiTestOK(APITestCase):
         target = '공지사항1'
         instance = Board.objects.filter(board_name=target)[0]
         key = instance.board_id_pk
-        respons: Response = self.client.delete(f"{self.url}{key}/")
+        respons: Response = self.client.delete(f"{self.url}{key}/", **self.__make_header())
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
