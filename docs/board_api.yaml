@@ -92,7 +92,7 @@
       schema:
         type: string
       required: true
-      description: 가져올 게시판 데이터의 pk
+      description: 가져올 게시판의 pk
     tags:
     - board
     responses:
@@ -113,7 +113,7 @@
     operationId: board_partial_update
     description: |
       지정한 게시판의 데이터를 수정합니다. Admin만 수정이 가능합니다.<br>
-      변경 가능한 데이터: 게시판 이름, 게시판 읽기/쓰기 레벨 레벨
+      변경 가능한 데이터: 게시판 이름, 게시판/댓글 읽기/쓰기 레벨
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -126,7 +126,7 @@
         schema:
           type: string
         required: true
-        description: 수정할 게시판 데이터의 pk
+        description: 수정할 게시판의 pk
     tags:
       - board
     requestBody:
@@ -170,7 +170,7 @@
         schema:
           type: string
         required: true
-        description: 삭제할 게시판 데이터의 pk
+        description: 삭제할 게시판의 pk
     tags:
       - board
     responses:
