@@ -33,7 +33,7 @@
   post:
     operationId: board_create
     description: |
-      게시판 목록을 생성합니다.
+      게시판을 생성합니다. Admin만 생성이 가능합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -69,7 +69,7 @@
   get:
     operationId: board_retrieve
     description: |
-      특정 게시판 데이터를 가져옵니다.
+      지정한 게시판의 데이터를 가져옵니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -102,7 +102,7 @@
   patch:
     operationId: board_partial_update
     description: |
-      특정 게시판의 데이터를 수정합니다.<br>
+      지정한 게시판의 데이터를 수정합니다. Admin만 수정이 가능합니다.<br>
       변경 가능한 데이터: 게시판 이름, 게시판 읽기/쓰기 레벨 레벨
       ## Router Option
       | option | value |
@@ -147,7 +147,7 @@
   delete:
     operationId: board_destroy
     description: |
-      특정 게시판 데이터를 삭제합니다.
+      지정한 게시판을 삭제합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|

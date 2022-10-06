@@ -8,10 +8,15 @@ paths:
     $ref: './board_api.yaml#/\hubapi\board\'
   /hubapi/board/{board_id_pk}/:
     $ref: './board_api.yaml#/\hubapi\board\{board_id_pk}\'
+  /hubapi/post/:
+    $ref: './post_api.yaml#/\hubapi\post\'
+  /hubapi/post/{post_id_pk}/:
+    $ref: './post_api.yaml#/\hubapi\post\{post_id_pk}\'
 x-tagGroups:
   - name: Apis
     tags:
       - board
+      - post
 #  - name: Models
 #    tags:
 #      - category_model
