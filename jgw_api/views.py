@@ -145,9 +145,6 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
-        checked = request_check(request)
-        if isinstance(checked, Response):
-            return checked
         queryset = self.filter_queryset(self.get_queryset())
         if 'page' not in request.query_params:
             request.query_params['page'] = 15
@@ -164,9 +161,6 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
-        checked = request_check(request)
-        if isinstance(checked, Response):
-            return checked
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
@@ -222,6 +216,7 @@ class BoardViewSet(viewsets.ModelViewSet):
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
+    # delete
     def destroy(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
