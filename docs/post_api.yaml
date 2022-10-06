@@ -1,8 +1,8 @@
 \hubapi\post\:
   get:
-    operationId: board_list
+    operationId: post_list
     description: |
-      게시판 목록을 가져옵니다.
+      게시글 목록을 가져옵니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -10,11 +10,21 @@
       | Role | x |
       | add user info | false |
     parameters:
-    - in: query
-      name: page
-      schema:
-        type: integer
-      description: 게시판 목록을 10개씩 끊어서 가져올 때 페이지 번호입니다.
+      - name: page
+        required: false
+        in: query
+        description: 몇번째 페이지를 가져올지 지정합니다.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: 한 페이지에 몇개의 데이터를 가져올지 지정합니다.
+        schema:
+          type: integer
+          minimum: 15
+          maximum: 150
+          default: 15
     tags:
     - post
     responses:
