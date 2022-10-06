@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.response import Response
 from jgw_api.models import (
-    Category,
     Board,
     Role,
     Member,
@@ -40,8 +39,6 @@ class ImageApiTestOK(APITestCase):
 
         Rank.objects.create(rank_nm='none')
 
-        Category.objects.create(category_name='test')
-
         Board.objects.create(
             board_name='test',
             board_layout=random.randint(1, 3),
@@ -74,7 +71,6 @@ class ImageApiTestOK(APITestCase):
             post_content='content',
             post_write_time=now,
             post_update_time=now,
-            category_category_id_pk=Category.objects.get(category_name='test'),
             board_boadr_id_pk=Board.objects.get(board_name='test'),
             member_member_pk=Member.objects.get(member_nm='test1')
         )
@@ -83,7 +79,6 @@ class ImageApiTestOK(APITestCase):
             post_content='content',
             post_write_time=now,
             post_update_time=now,
-            category_category_id_pk=Category.objects.get(category_name='test'),
             board_boadr_id_pk=Board.objects.get(board_name='test'),
             member_member_pk=Member.objects.get(member_nm='test1')
         )

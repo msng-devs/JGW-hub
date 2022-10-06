@@ -61,15 +61,6 @@ class Board(models.Model):
         db_table = 'BOARD'
 
 
-class Category(models.Model):
-    category_id_pk = models.AutoField(db_column='CATEGORY_ID_PK', primary_key=True)  # Field name made lowercase.
-    category_name = models.CharField(db_column='CATEGORY_NAME', unique=True, max_length=20)  # Field name made lowercase.
-
-    class Meta:
-        managed = True
-        db_table = 'CATEGORY'
-
-
 class Comment(models.Model):
     comment_id = models.AutoField(db_column='COMMENT_ID', primary_key=True)  # Field name made lowercase.
     comment_ref_id = models.IntegerField(db_column='COMMENT_REF_ID')  # Field name made lowercase.
@@ -200,7 +191,6 @@ class Post(models.Model):
     post_content = models.TextField(db_column='POST_CONTENT')  # Field name made lowercase.
     post_write_time = models.DateTimeField(db_column='POST_WRITE_TIME')  # Field name made lowercase.
     post_update_time = models.DateTimeField(db_column='POST_UPDATE_TIME')  # Field name made lowercase.
-    category_category_id_pk = models.ForeignKey(Category, models.DO_NOTHING, db_column='CATEGORY_CATEGORY_ID_PK', blank=True, null=True)  # Field name made lowercase.
     image_image_id_pk = models.ForeignKey(Image, models.DO_NOTHING, db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True)  # Field name made lowercase.
     board_boadr_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOADR_ID_PK')  # Field name made lowercase.
     member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.

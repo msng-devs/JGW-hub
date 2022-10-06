@@ -2,7 +2,6 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.response import Response
 from jgw_api.models import (
-    Category,
     Board,
     Role,
     Member,
@@ -51,9 +50,6 @@ class PostApiTestOK(APITestCase):
         Rank.objects.create(rank_nm='준OB')
         Rank.objects.create(rank_nm='OB')
 
-        for i in range(10):
-            Category.objects.create(category_name=get_random_string(length=random.randint(1, 10)) + str(i))
-
         for i in range(5):
             Board.objects.create(
                 board_name=get_random_string(length=random.randint(1, 5)) + str(i),
@@ -85,7 +81,6 @@ class PostApiTestOK(APITestCase):
 
         for i in range(cls.post_count):
             now += datetime.timedelta(days=1)
-            category_instance = random.choice(Category.objects.all())
             board_instance = random.choice(Board.objects.all())
             member_instance = random.choice(Member.objects.all())
             Post.objects.create(
@@ -93,7 +88,6 @@ class PostApiTestOK(APITestCase):
                 post_content=get_random_string(length=500) + str(i),
                 post_write_time=now,
                 post_update_time=now,
-                category_category_id_pk=category_instance,
                 board_boadr_id_pk=board_instance,
                 member_member_pk=member_instance
             )
@@ -124,10 +118,6 @@ class PostApiTestOK(APITestCase):
             'post_content': instance.post_content,
             'post_write_time': instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            'category_category_id_pk': {
-                'category_id_pk': instance.category_category_id_pk.category_id_pk,
-                'category_name': instance.category_category_id_pk.category_name
-            },
             "image_image_id_pk": instance.image_image_id_pk,
             'board_boadr_id_pk': {
                 'board_id_pk': instance.board_boadr_id_pk.board_id_pk,
@@ -209,30 +199,6 @@ class PostApiTestOK(APITestCase):
         # given
         query_parameters = {
             'board': board.board_id_pk,
-            'order': random.choice(post._meta.fields).name,
-            'desc': random.randint(0, 1),
-        }
-
-        # when
-        respons: Response = self.client.get(self.url, data=query_parameters)
-
-        # then
-        instance = post_get_all_query(query_parameters, Post.objects.all())
-
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters)
-
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(respons.content, return_data)
-
-    def test_post_get_all_category(self):
-        print("Post Api GET ALL CATEGORY Running...")
-
-        post = random.choice(Post.objects.all())
-        category = random.choice(Category.objects.all())
-
-        # given
-        query_parameters = {
-            'category': category.category_id_pk,
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
         }
@@ -405,7 +371,6 @@ class PostApiTestOK(APITestCase):
         content_data = '<!DOCTYPE html><html><head></head><body><h1>TEST</h1></body></html>'
 
         now = datetime.datetime.now()
-        category_instance = Category.objects.all()[random.randint(0, Category.objects.count() - 1)]
         board_instance = Board.objects.all()[random.randint(0, Board.objects.count() - 1)]
         member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
 
@@ -414,7 +379,6 @@ class PostApiTestOK(APITestCase):
             'post_content': content_data,
             'post_write_time': now,
             'post_update_time': now,
-            'category_category_id_pk': category_instance.category_id_pk,
             'board_boadr_id_pk': board_instance.board_id_pk,
             'member_member_pk': member_instance.member_pk
         }
@@ -434,10 +398,6 @@ class PostApiTestOK(APITestCase):
             'post_content': post_instance.post_content,
             'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            'category_category_id_pk': {
-                'category_id_pk': category_instance.category_id_pk,
-                'category_name': category_instance.category_name
-            },
             "image_image_id_pk": post_instance.image_image_id_pk,
             'board_boadr_id_pk': {
                 'board_id_pk': board_instance.board_id_pk,
@@ -479,10 +439,6 @@ class PostApiTestOK(APITestCase):
             'post_content': post_instance.post_content,
             'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            'category_category_id_pk': {
-                'category_id_pk': post_instance.category_category_id_pk.category_id_pk,
-                'category_name': post_instance.category_category_id_pk.category_name
-            },
             "image_image_id_pk":
                 None if thumbnail_image is None else {
                 'image_id_pk': thumbnail_image.image_id_pk,

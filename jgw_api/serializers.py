@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .models import (
-    Category,
     Board,
     Role,
     Image,
@@ -17,10 +16,10 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
+# class CategorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Category
+#         fields = '__all__'
 
 
 
@@ -71,7 +70,6 @@ class PostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PostGetSerializer(serializers.ModelSerializer):
-    category_category_id_pk = CategorySerializer(read_only=True)
     board_boadr_id_pk = BoardWriteSerializer(read_only=True)
     member_member_pk = MemberNestedPostSerializer(read_only=True)
     image_image_id_pk = ImageNestedPostSerializer(read_only=True)
@@ -79,7 +77,7 @@ class PostGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['post_id_pk', 'post_title', 'post_content', 'post_write_time', 'post_update_time',
-                  'category_category_id_pk', 'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
+                  'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
 
 class PostPatchSerializer(serializers.ModelSerializer):
     class Meta:
