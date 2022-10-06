@@ -135,6 +135,8 @@ def save_images_storge(images_data, member_pk):
         })
     return img_urls
 
+
+
 class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
     queryset = Board.objects.all().order_by('board_id_pk')
@@ -201,6 +203,8 @@ class BoardViewSet(viewsets.ModelViewSet):
             "detail": "Use patch."
         }
         return Response(response_data, status=status.HTTP_403_FORBIDDEN)
+
+
 
 def post_get_all_query(query_params, queryset):
     start_date = datetime.datetime.min
@@ -364,6 +368,8 @@ class PostViewSet(viewsets.ModelViewSet):
                 'detail': 'Image delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+
 
 class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer

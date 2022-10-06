@@ -1,73 +1,12 @@
-tags:
-  - name: category_model
-    x-displayName: 기본 카테고리 모델
-    description: <SchemaDefinition schemaRef="#/components/schemas/Category" />
-  - name: category_pagination_model
-    x-displayName: 페이지 카테고리 모델
-    description: <SchemaDefinition schemaRef="#/components/schemas/PaginatedCategoryList" />
+#tags:
+#  - name: category_model
+#    x-displayName: 기본 카테고리 모델
+#    description: <SchemaDefinition schemaRef="#/components/schemas/Category" />
+#  - name: category_pagination_model
+#    x-displayName: 페이지 카테고리 모델
+#    description: <SchemaDefinition schemaRef="#/components/schemas/PaginatedCategoryList" />
 components:
   schemas:
-    Category:
-      type: object
-      properties:
-        category_id_pk:
-          type: integer
-          readOnly: true
-          description: '카테고리 pk'
-        category_name:
-          type: string
-          maxLength: 20
-          description: '카테고리 이름'
-      required:
-        - category_id_pk
-        - category_name
-    CategoryList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Category'
-      example:
-        - category_id_pk: 0
-          category_name: 'string'
-    PaginatedCategoryList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-          description: 가져온 카테고리의 개수
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/hubapi/category/?page=4
-          description: 다음 페이지 uri. 다음 페이지가 없으면 null
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/hubapi/category/?page=2
-          description: 이전 페이지 uri. 이전 페이지가 없으면 null
-        results:
-          type: array
-          description: 카테고리 데이터 리스트
-          items:
-            $ref: '#/components/schemas/Category'
-    PatchedCategory:
-      type: object
-      properties:
-        category_id_pk:
-          type: integer
-          readOnly: true
-        category_name:
-          type: string
-          maxLength: 20
-    CategoryError:
-      type: object
-      properties:
-        detail:
-          type: string
-          description: 에러 메세지
-
     Board:
       type: object
       properties:
@@ -198,6 +137,123 @@ components:
         detail:
           type: string
           description: 에러 메세지
+
+
+    ImageNestedPost:
+      type: object
+      properties:
+        image_id_pk:
+          type: integer
+          readOnly: true
+        image_name:
+          type: string
+          nullable: true
+          maxLength: 45
+        image_url:
+          type: string
+          maxLength: 45
+      required:
+      - image_id_pk
+      - image_url
+    MemberNestedPost:
+      type: object
+      properties:
+        member_pk:
+          type: string
+          maxLength: 30
+        member_nm:
+          type: string
+          maxLength: 45
+      required:
+      - member_nm
+      - member_pk
+    PaginatedPostGetList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostGet'
+    PatchedPostGet:
+      type: object
+      properties:
+        post_id_pk:
+          type: integer
+          readOnly: true
+        post_title:
+          type: string
+          maxLength: 100
+        post_content:
+          type: string
+        post_write_time:
+          type: string
+          format: date-time
+        post_update_time:
+          type: string
+          format: date-time
+        image_image_id_pk:
+          allOf:
+          - $ref: '#/components/schemas/ImageNestedPost'
+          readOnly: true
+        board_boadr_id_pk:
+          allOf:
+          - $ref: '#/components/schemas/BoardWrite'
+          readOnly: true
+        member_member_pk:
+          allOf:
+          - $ref: '#/components/schemas/MemberNestedPost'
+          readOnly: true
+    PostGet:
+      type: object
+      properties:
+        post_id_pk:
+          type: integer
+          readOnly: true
+        post_title:
+          type: string
+          maxLength: 100
+        post_content:
+          type: string
+        post_write_time:
+          type: string
+          format: date-time
+        post_update_time:
+          type: string
+          format: date-time
+        image_image_id_pk:
+          allOf:
+          - $ref: '#/components/schemas/ImageNestedPost'
+          readOnly: true
+        board_boadr_id_pk:
+          allOf:
+          - $ref: '#/components/schemas/BoardWrite'
+          readOnly: true
+        member_member_pk:
+          allOf:
+          - $ref: '#/components/schemas/MemberNestedPost'
+          readOnly: true
+      required:
+      - board_boadr_id_pk
+      - image_image_id_pk
+      - member_member_pk
+      - post_content
+      - post_id_pk
+      - post_title
+      - post_update_time
+      - post_write_time
 
     Role:
       type: object

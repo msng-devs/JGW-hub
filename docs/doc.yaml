@@ -4,10 +4,6 @@ info:
   version: 1.0.0
 $ref: './schemas/schemas.yaml'
 paths:
-  /hubapi/category/:
-    $ref: './category_api.yaml#/\hubapi\category\'
-  /hubapi/category/{category_id_pk}/:
-    $ref: './category_api.yaml#/\hubapi\category\{category_id_pk}\'
   /hubapi/board/:
     $ref: './board_api.yaml#/\hubapi\board\'
   /hubapi/board/{board_id_pk}/:
@@ -15,9 +11,8 @@ paths:
 x-tagGroups:
   - name: Apis
     tags:
-      - category
       - board
-  - name: Models
-    tags:
-      - category_model
-      - category_pagination_model
+#  - name: Models
+#    tags:
+#      - category_model
+#      - category_pagination_model
