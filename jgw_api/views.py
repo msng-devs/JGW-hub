@@ -146,19 +146,18 @@ class BoardViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        if 'page' in request.query_params:
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
+        if 'page' not in request.query_params:
+            request.query_params['page'] = 15
         else:
-            serializer = self.get_serializer(queryset, many=True)
-            response_data = {
-                'count': Board.objects.count(),
-                'next': None,
-                'previous': None,
-                'results': serializer.data
-            }
-            return Response(response_data)
+            request.query_params._mutable = True
+            request.query_params['page'] = int(request.query_params['page'])
+            if request.query_params['page'] < 1:
+                request.query_params['page'] = 1
+            elif request.query_params['page'] > 150:
+                request.query_params['page'] = 150
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # get by id
     def retrieve(self, request, *args, **kwargs):

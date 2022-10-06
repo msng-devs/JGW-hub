@@ -19,48 +19,7 @@ class BoardApiTestOK(APITestCase):
         Role.objects.create(role_nm='ROLE_ADMIN')
         Role.objects.create(role_nm='ROLE_DEV')
 
-    def test_board_get_all(self):
-        print("Board Api GET ALL Running...")
-
-        # given
-        for i in range(20):
-            Board.objects.create(
-                board_name=f'공지사항{i}',
-                board_layout=0,
-                role_role_pk_write_level=Role.objects.get(role_pk=random.randint(1, 5)),
-                role_role_pk_read_level=Role.objects.get(role_pk=random.randint(1, 5)),
-                role_role_pk_comment_write_level=Role.objects.get(role_pk=random.randint(1, 5))
-            )
-
-        # when
-        respons: Response = self.client.get(self.url)
-
-        # then
-        return_data = {
-                'count': Board.objects.count(),
-                'next': None,
-                'previous': None,
-                'results': [{"board_id_pk": i.board_id_pk,
-                             "board_name": i.board_name,
-                             'board_layout': i.board_layout,
-                             "role_role_pk_write_level": {
-                                 'role_pk': i.role_role_pk_write_level.role_pk,
-                                 'role_nm': i.role_role_pk_write_level.role_nm
-                             },
-                             "role_role_pk_read_level": {
-                                 'role_pk': i.role_role_pk_read_level.role_pk,
-                                 'role_nm': i.role_role_pk_read_level.role_nm
-                             },
-                             "role_role_pk_comment_write_level": {
-                                 'role_pk': i.role_role_pk_comment_write_level.role_pk,
-                                 'role_nm': i.role_role_pk_comment_write_level.role_nm
-                             }}
-                            for i in Board.objects.all().order_by('board_id_pk')]
-            }
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(respons.content, return_data)
-
-    def test_board_get_pagination(self):
+    def test_board_get(self):
         print("Board Api GET ALL Pagination Running...")
 
         # given
