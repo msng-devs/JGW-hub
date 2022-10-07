@@ -307,6 +307,7 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        len_all_queryset = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
@@ -315,7 +316,7 @@ class PostApiTestOK(APITestCase):
             if len(results['post_content']) > 500:
                 results['post_content'] = results['post_content'][:500]
 
-        if len(instance) <= page_size:
+        if len_all_queryset <= page_size:
             return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
