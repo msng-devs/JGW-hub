@@ -541,8 +541,17 @@ class PostApiTestOK(APITestCase):
         target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
         key = target.post_id_pk
 
+        Board.objects.create(
+            board_name='admin_test',
+            board_layout=1,
+            role_role_pk_write_level=Role.objects.get(role_nm='ROLE_USER0'),
+            role_role_pk_read_level=Role.objects.get(role_nm='ROLE_USER0'),
+            role_role_pk_comment_write_level=Role.objects.get(role_nm='ROLE_USER0')
+        )
+
         patch_data = {
-            "post_title": "Test" * 10
+            "post_title": "Test" * 10,
+            'board_boadr_id_pk': Board.objects.get(board_name='admin_test').board_id_pk
         }
         header_data = {
             'user_pk': target.member_member_pk.member_pk,

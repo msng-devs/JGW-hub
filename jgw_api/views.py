@@ -332,9 +332,16 @@ class PostViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_pk = checked
 
         try:
-            serializer = PostPatchSerializer(instance, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
             if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+                request_data = request.data
+                if 'board_boadr_id_pk' in request_data:
+                    board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
+                    if board_instance.role_role_pk_write_level.role_pk > user_role_id:
+                        request_data._mutable = True
+                        del request_data['board_boadr_id_pk']
+                print(request_data)
+                serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
                 self.perform_update(serializer)
 
                 if getattr(instance, '_prefetched_objects_cache', None):

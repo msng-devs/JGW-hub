@@ -175,6 +175,17 @@
         type: string
         format: date-time
       description: 게시글이 수정된 시각
+    - in: query
+      name: image_image_id_pk
+      schema:
+        type: integer
+        nullable: true
+      description: 게시글의 썸네일 pk (Image)
+    - in: query
+      name: board_boadr_id_pk
+      schema:
+        type: integer
+      description: 게시글의 게시판 pk (Image)
     tags:
       - post
     responses:
