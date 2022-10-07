@@ -145,9 +145,8 @@
   patch:
     operationId: post_partial_update
     description: |
-      지정한 게시글의 데이터를 수정합니다. 요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기  레벨과 같거나 더 높아야 글 읽기가 가능합니다.<br>
-      admin은 게시판의 읽기 권한과 상관 없이 글 읽기가 가능합니다.<br>
-      post_list api와 다르게 post_retrieve api는 모든 content를 리턴합니다.
+      지정한 게시글의 데이터를 수정합니다. 요청한 유저가 글을 작성한 본인이면서 요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.<br>
+      admin도 본인이 아니면 글 수정이 불가능합니다.<br>
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -159,20 +158,31 @@
       schema:
         type: string
       required: true
-      description: 가져올 게시글 pk
+      description: 수정할 게시글 pk
+    - in: query
+      name: post_title
+      schema:
+        type: string
+      description: 게시글 제목
+    - in: query
+      name: post_content
+      schema:
+        type: string
+      description: 게시글 내용 (마크다운)
+    - in: query
+      name: post_update_time
+      schema:
+        type: string
+        format: date-time
+      description: 게시글이 수정된 시각
     tags:
       - post
-    requestBody:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PatchedBoard'
     responses:
       '200':
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardCreate'
+              $ref: '#/components/schemas/PatchedPostGet'
       '403':
         description: Forbidden
         content:

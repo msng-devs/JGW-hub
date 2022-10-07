@@ -83,4 +83,4 @@ class PostPatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
-        read_only_fields = ('post_write_time', 'member_member_pk', 'image_image_id_pk')
+        read_only_fields = ('post_write_time', 'member_member_pk')

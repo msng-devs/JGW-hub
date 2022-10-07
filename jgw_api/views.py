@@ -336,7 +336,7 @@ class PostViewSet(viewsets.ModelViewSet):
         try:
             serializer = PostPatchSerializer(instance, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
-            if user_uid == instance.member_member_pk.member_pk:
+            if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
                 self.perform_update(serializer)
 
                 if getattr(instance, '_prefetched_objects_cache', None):
