@@ -35,8 +35,6 @@ import traceback
 import ast
 from urllib import parse
 
-RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
     user_role_id = request.META.get('user_role_pk')
@@ -123,9 +121,9 @@ def save_images_storge(images_data, member_pk):
                 settings.MEDIA_ROOT, 'imgs',
                 str(folder_pk) if folder_pk is not None else 'common')
         os.makedirs(img_path, exist_ok=True)
-        save_name = get_random_string(length=random.randint(10, 15), allowed_chars=RANDOM_STRING_CHARS)
+        save_name = get_random_string(length=random.randint(10, 15), allowed_chars=constant.RANDOM_STRING_CHARS)
         while os.path.isfile(os.path.join(img_path, save_name)):
-            save_name = get_random_string(length=random.randint(10, 15), allowed_chars=RANDOM_STRING_CHARS)
+            save_name = get_random_string(length=random.randint(10, 15), allowed_chars=constant.RANDOM_STRING_CHARS)
         with open(os.path.join(img_path, save_name), 'wb') as f:
             f.write(decoded_data)
         url = os.path.join(img_path, save_name).replace('\\', '/').split(settings.MEDIA_URL)[1]
