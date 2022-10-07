@@ -26,6 +26,8 @@ from .custom_pagination import (
     PostPageNumberPagination
 )
 
+import jgw_api.constant as constant
+
 import base64
 import os
 import shutil
@@ -146,15 +148,15 @@ class BoardViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
+        request.query_params._mutable = True
         if 'page' not in request.query_params:
-            request.query_params['page'] = 15
-        else:
-            request.query_params._mutable = True
-            request.query_params['page'] = int(request.query_params['page'])
-            if request.query_params['page'] < 1:
-                request.query_params['page'] = 1
-            elif request.query_params['page'] > 150:
-                request.query_params['page'] = 150
+            request.query_params['page'] = 1
+        if 'page_size' in request.query_params:
+            request.query_params['page_size'] = int(request.query_params['page_size'])
+            if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
+                request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
+            elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
+                request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)

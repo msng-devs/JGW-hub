@@ -3,10 +3,12 @@ from collections import OrderedDict
 
 from rest_framework.response import Response
 
+import jgw_api.constant as constant
+
 class BoardPageNumberPagination(PageNumberPagination):
-    page_size = 10
+    page_size = constant.BOARD_DEFAULT_PAGE_SIZE
     page_size_query_param = 'page_size'
-    max_page_size = 150
+    max_page_size = constant.BOARD_MAX_PAGE_SIZE
 
     def get_paginated_response(self, data):
         previous = self.get_previous_link()
