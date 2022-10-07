@@ -118,7 +118,7 @@ class Event(models.Model):
 
 class Image(models.Model):
     image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
-    image_name = models.CharField(db_column='IMAGE_NAME', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    image_name = models.CharField(db_column='IMAGE_NAME', max_length=45)  # Field name made lowercase.
     image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
     post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK', blank=True, null=True)  # Field name made lowercase.
     member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
