@@ -34,6 +34,7 @@
             schema:
               $ref: '#/components/schemas/PaginatedBoardList'
       '404':
+        description: Not found
         content:
           application/json:
             schema:
@@ -43,25 +44,23 @@
   post:
     operationId: board_create
     description: |
-      게시판을 생성합니다. Admin만 생성이 가능합니다.
+      게시판을 생성합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | true |
-      | Role | admin |
-      | add user info | false |
+      | 인증필요 | o |
+      | 권한필요 | Admin |
     tags:
       - board
     requestBody:
       content:
         application/json:
           schema:
-            anyOf:
-              - $ref: '#/components/schemas/BoardCreate'
-              - $ref: '#/components/schemas/BoardCreateList'
+            $ref: '#/components/schemas/BoardCreate'
       required: true
     responses:
       '201':
+        description: Created
         content:
           application/json:
             schema:
@@ -69,12 +68,29 @@
                 - $ref: '#/components/schemas/BoardCreate'
                 - $ref: '#/components/schemas/BoardCreateList'
       '400':
+        description: Bad request
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BoardError'
             example:
               detail: board with this category name already exists.
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Not allowed.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: User header not found.
 \hubapi\board\{board_id_pk}\:
   get:
     operationId: board_retrieve
@@ -83,9 +99,8 @@
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | false |
-      | Role | x |
-      | add user info | false |
+      | 인증필요 | x |
+      | 권한필요 | x |
     parameters:
     - in: path
       name: board_id_pk
@@ -103,6 +118,7 @@
               $ref: '#/components/schemas/Board'
         description: ''
       '404':
+        description: Not found
         content:
           application/json:
             schema:
@@ -117,9 +133,8 @@
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | true |
-      | Role | admin |
-      | add user info | false |
+      | 인증필요 | o |
+      | 권한필요 | Admin |
     parameters:
       - in: path
         name: board_id_pk
@@ -141,19 +156,37 @@
             schema:
               $ref: '#/components/schemas/BoardCreate'
       '400':
+        description: Bad request
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BoardError'
             example:
               detail: board with this board name already exists.
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Not allowed.
       '404':
+        description: Not found
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BoardError'
             example:
               detail: Not found.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: User header not found.
   delete:
     operationId: board_destroy
     description: |
@@ -161,9 +194,8 @@
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | true |
-      | Role | admin |
-      | add user info | false |
+      | 인증필요 | o |
+      | 권한필요 | Admin |
     parameters:
       - in: path
         name: board_id_pk
@@ -176,10 +208,27 @@
     responses:
       '204':
         description: No response body
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Not allowed.
       '404':
+        description: Not found
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BoardError'
             example:
               detail: Not found.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: User header not found.
