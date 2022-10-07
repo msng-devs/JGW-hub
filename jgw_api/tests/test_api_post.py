@@ -167,6 +167,8 @@ class PostApiTestOK(APITestCase):
         if len(instance) < page_size:
             return_data['next'] = None
 
+        print(return_data)
+
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
 
