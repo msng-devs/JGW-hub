@@ -139,18 +139,52 @@ components:
           description: 에러 메세지
 
 
+
+
+
+    PaginatedPostGetList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+          description: 가져온 게시글 개수
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+          description: 다음 페이지 uri. 다음 페이지가 없으면 null
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+          description: 이전 페이지 uri. 이전 페이지가 없으면 null
+        results:
+          type: array
+          description: 게시글 데이터 리스트
+          items:
+            $ref: '#/components/schemas/PostGet'
+
+
     ImageNestedPost:
       type: object
       properties:
         image_id_pk:
+          example: 1
+          description: 이미지 pk
           type: integer
           readOnly: true
         image_name:
           type: string
-          nullable: true
+          example: image.jpg
+          description: 이미지 이름
           maxLength: 45
         image_url:
           type: string
+          example: http://api.example.org/image/jfiiHUJDmkkdjK332
+          description: 이미지의 실제 url
           maxLength: 45
       required:
       - image_id_pk
@@ -161,32 +195,17 @@ components:
         member_pk:
           type: string
           maxLength: 30
+          minLength: 30
+          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+          description: 사용자 pk
         member_nm:
           type: string
+          example: 이름이름
+          description: 사용자 이름
           maxLength: 45
       required:
       - member_nm
       - member_pk
-    PaginatedPostGetList:
-      type: object
-      properties:
-        count:
-          type: integer
-          example: 123
-        next:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=4
-        previous:
-          type: string
-          nullable: true
-          format: uri
-          example: http://api.example.org/accounts/?page=2
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/PostGet'
     PatchedPostGet:
       type: object
       properties:
@@ -222,26 +241,37 @@ components:
         post_id_pk:
           type: integer
           readOnly: true
+          example: 1
+          description: 게시글 pk
         post_title:
           type: string
           maxLength: 100
+          example: 언제끝내지
+          description: 게시글 제목
         post_content:
           type: string
+          example: 게시글게시글~~~
+          description: 게시글 내용 (마크다운)
         post_write_time:
           type: string
           format: date-time
+          description: 최초로 글이 작성된 시각
         post_update_time:
           type: string
           format: date-time
+          description: 게시글이 마지막으로 수정된 시각
         image_image_id_pk:
+          description: 게시글의 썸네일 이미지 정보
           allOf:
           - $ref: '#/components/schemas/ImageNestedPost'
           readOnly: true
         board_boadr_id_pk:
+          description: 게시글이 속한 게시판 정보
           allOf:
           - $ref: '#/components/schemas/BoardWrite'
           readOnly: true
         member_member_pk:
+          description: 게시글을 작성한 유저 정보
           allOf:
           - $ref: '#/components/schemas/MemberNestedPost'
           readOnly: true
@@ -254,6 +284,40 @@ components:
       - post_title
       - post_update_time
       - post_write_time
+
+    BoardWrite:
+      type: object
+      properties:
+        board_id_pk:
+          type: integer
+          readOnly: true
+          example: 1
+          description: 게시판 pk
+        board_name:
+          type: string
+          maxLength: 45
+          example: 게시판1
+          description: 게시판 이름
+        board_layout:
+          type: integer
+          example: 0
+          description: 게시판 레이아웃 번호
+        role_role_pk_write_level:
+          type: integer
+          example: 1
+          description: 게시판 쓰기 권한 레벨
+        role_role_pk_read_level:
+          type: integer
+          example: 1
+          description: 게시판 읽기 권한 레벨
+        role_role_pk_comment_write_level:
+          type: integer
+          example: 1
+          description: 게시판댓글 쓰기 권한 레벨
+      required:
+        - board_id_pk
+        - board_layout
+        - board_name
 
     Role:
       type: object
