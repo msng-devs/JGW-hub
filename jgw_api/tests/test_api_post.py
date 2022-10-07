@@ -22,6 +22,8 @@ import random
 import datetime
 import traceback
 
+import jgw_api.constant as constant
+
 class PostApiTestOK(APITestCase):
     now = datetime.datetime.now()
     post_count = 100
@@ -158,8 +160,12 @@ class PostApiTestOK(APITestCase):
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
 
-        # print(respons.content.decode('utf-8'))
-        # print(return_data)
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -168,6 +174,8 @@ class PostApiTestOK(APITestCase):
         print("Post Api GET ALL TITLE Running...")
 
         post = random.choice(Post.objects.all())
+        page_size = constant.POST_DEFAULT_PAGE_SIZE
+        page = 1
 
         # given
         query_parameters = {
@@ -175,6 +183,8 @@ class PostApiTestOK(APITestCase):
                 length=1,
                 allowed_chars=''.join([chr(i) for i in range(ord('A'), ord('z') + 1) if not (ord('Z') < i < ord('a'))])
             ),
+            'page_size': page_size,
+            'page': page,
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
         }
@@ -184,8 +194,16 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
+
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -196,11 +214,16 @@ class PostApiTestOK(APITestCase):
         post = random.choice(Post.objects.all())
         board = random.choice(Board.objects.all())
 
+        page_size = constant.POST_DEFAULT_PAGE_SIZE
+        page = 1
+
         # given
         query_parameters = {
             'board': board.board_id_pk,
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
+            'page_size': page_size,
+            'page': page,
         }
 
         # when
@@ -208,8 +231,16 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
+
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -219,6 +250,9 @@ class PostApiTestOK(APITestCase):
 
         post = random.choice(Post.objects.all())
 
+        page_size = constant.POST_DEFAULT_PAGE_SIZE
+        page = 1
+
         # given
         query_parameters = {
             'writer_name': get_random_string(
@@ -227,6 +261,8 @@ class PostApiTestOK(APITestCase):
             ),
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
+            'page_size': page_size,
+            'page': page,
         }
 
         # when
@@ -234,8 +270,16 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
+
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -246,11 +290,16 @@ class PostApiTestOK(APITestCase):
         member = random.choice(Member.objects.all())
         post = random.choice(Post.objects.all())
 
+        page_size = constant.POST_DEFAULT_PAGE_SIZE
+        page = 1
+
         # given
         query_parameters = {
             'writer_uid': member.member_pk,
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
+            'page_size': page_size,
+            'page': page,
         }
 
         # when
@@ -258,8 +307,16 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
+
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
@@ -273,12 +330,17 @@ class PostApiTestOK(APITestCase):
 
         post = random.choice(Post.objects.all())
 
+        page_size = constant.POST_DEFAULT_PAGE_SIZE
+        page = 1
+
         # given
         query_parameters = {
             'start_date': start.strftime('%Y-%m-%dT%H-%M-%S'),
             'end_date': end.strftime('%Y-%m-%dT%H-%M-%S'),
             'order': random.choice(post._meta.fields).name,
             'desc': random.randint(0, 1),
+            'page_size': page_size,
+            'page': page,
         }
 
         # when
@@ -286,8 +348,16 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        instance = instance[page_size * (page - 1):page_size * page]
 
         return_data = self.__get_responses_data_pagenation(instance, query_parameters)
+
+        for results in return_data['results']:
+            if len(results['post_content']) > 500:
+                results['post_content'] = results['post_content'][:500]
+
+        if len(instance) < page_size:
+            return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)

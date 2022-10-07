@@ -253,6 +253,13 @@ def post_get_all_query(query_params, queryset):
         queryset = queryset.filter(member_member_pk__member_nm__contains=query_params['writer_name'])
 
     if 'board' in query_params:
+        # if is_admin:
+        #     queryset = queryset.filter(board_boadr_id_pk=query_params['board'])
+        # else:
+        #     queryset = queryset.filter(
+        #         board_boadr_id_pk=query_params['board'],
+        #         board_boadr_id_pk__role_role_pk_read_level__role_pk__gte=user_role_id
+        #     )
         queryset = queryset.filter(board_boadr_id_pk=query_params['board'])
 
     if 'title' in query_params:
@@ -278,36 +285,43 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         queryset = post_get_all_query(request.query_params, queryset)
 
-        if 'page' in request.query_params and queryset.count():
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        else:
-            serializer = self.get_serializer(queryset, many=True)
-            response_data = {
-                'count': queryset.count(),
-                'next': None,
-                'previous': None,
-                'results': serializer.data
-            }
-            return Response(response_data)
+        request.query_params._mutable = True
+        if 'page' not in request.query_params:
+            request.query_params['page'] = 1
+        if 'page_size' in request.query_params:
+            request.query_params['page_size'] = int(request.query_params['page_size'])
+            if request.query_params['page_size'] < constant.POST_MIN_PAGE_SIZE:
+                request.query_params['page_size'] = constant.POST_MIN_PAGE_SIZE
+            elif request.query_params['page_size'] > constant.POST_MAX_PAGE_SIZE:
+                request.query_params['page_size'] = constant.POST_MAX_PAGE_SIZE
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        data = serializer.data
+        for i in data:
+            if len(i['post_content']) > 500:
+                i['post_content'] = i['post_content'][:500]
+        return self.get_paginated_response(data)
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
+        checked = request_check(request)
+        if isinstance(checked, Response):
+            user_role_id = -1
+        else:
+            user_uid, user_role_id = checked
+        admin_role_checked = get_admin_role_pk()
+        if isinstance(admin_role_checked, Response):
+            return admin_role_checked
+
         instance = self.get_object()
 
-        checked = request_check_admin_role(request)
-        if isinstance(checked, Response):
-            return checked
-        user_uid, user_role_id, admin_role_pk = checked
-
-        if user_role_id >= admin_role_pk or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+        if user_role_id >= admin_role_checked or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
             post_serializer = self.get_serializer(instance)
             response_data = post_serializer.data
             return Response(response_data)
         else:
             detail = {
-                'detail': 'read post not allowed.'
+                'detail': 'Not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
@@ -373,13 +387,6 @@ class PostViewSet(viewsets.ModelViewSet):
                 'detail': 'Not Allowed.'
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
-
-    # put
-    def update(self, request, *args, **kwargs):
-        response_data = {
-            "detail": "Use patch."
-        }
-        return Response(response_data, status=status.HTTP_403_FORBIDDEN)
 
     # delete
     def destroy(self, request, *args, **kwargs):
