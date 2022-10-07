@@ -2,7 +2,8 @@
   get:
     operationId: post_list
     description: |
-      게시글 목록을 가져옵니다.
+      게시글 목록을 가져옵니다.<br>
+      post_list api는 content를 500자로 잘라서 리턴합니다. (게시글 미리보기 용도) 모든 내용을 가져오려면 post_retrieve api를 사용해야 합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
@@ -91,22 +92,23 @@
               detail: User header not found.
 \hubapi\post\{post_id_pk}\:
   get:
-    operationId: board_retrieve
+    operationId: post_retrieve
     description: |
-      지정한 게시판의 데이터를 가져옵니다.
+      지정한 게시글의 데이터를 가져옵니다. 요청한 유저의 권한이 가져오려는 게시글이 속한 게시판의 읽기 레벨과 같거나 더 높아야 글 읽기가 가능합니다.<br>
+      admin은 게시판의 읽기 권한과 상관 없이 글 읽기가 가능합니다.<br>
+      post_list api와 다르게 post_retrieve api는 모든 content를 리턴합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | false |
-      | Role | x |
-      | add user info | false |
+      | 인증필요 | o |
+      | 권한필요 | 게시판의 권한 이상 |
     parameters:
     - in: path
-      name: board_id_pk
+      name: post_id_pk
       schema:
         type: string
       required: true
-      description: 가져올 게시판 데이터의 pk
+      description: 가져올 게시글 pk
     tags:
     - post
     responses:
@@ -114,15 +116,32 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Board'
+              $ref: '#/components/schemas/PostGet'
         description: ''
-      '404':
+      '403':
+        description: Forbidden
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not allowed.
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
             example:
               detail: Not found.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: User header not found.
   patch:
     operationId: board_partial_update
     description: |
