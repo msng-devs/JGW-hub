@@ -315,7 +315,7 @@ class PostApiTestOK(APITestCase):
             if len(results['post_content']) > 500:
                 results['post_content'] = results['post_content'][:500]
 
-        if len(instance) < page_size:
+        if len(instance) <= page_size:
             return_data['next'] = None
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
