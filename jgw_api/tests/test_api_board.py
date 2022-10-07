@@ -119,22 +119,27 @@ class BoardApiTestOK(APITestCase):
         print("Board Api POST Running...")
 
         # given
-        data = '[{"board_name": "test1", "board_layout": 0, "role_role_pk_write_level": 1,' \
-               '"role_role_pk_read_level": 1, "role_role_pk_comment_write_level": 1},' \
-               '{"board_name": "test2", "board_layout": 0, "role_role_pk_write_level": 2,' \
-               '"role_role_pk_read_level": 1, "role_role_pk_comment_write_level": 2}]'
+        data = {
+                   "board_name": "test1",
+                   "board_layout": 0,
+                   "role_role_pk_write_level": 1,
+                   "role_role_pk_read_level": 1,
+                   "role_role_pk_comment_write_level": 1
+               }
 
         # when
-        respons: Response = self.client.post(self.url, data=data, content_type='application/json', **self.__make_header())
+        respons: Response = self.client.post(self.url, data=data, **self.__make_header())
 
         # then
-        responses_data = [{"board_id_pk": i.board_id_pk,
-                           "board_name": i.board_name,
-                            'board_layout': i.board_layout,
-                            "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-                            "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
-                           'role_role_pk_comment_write_level': i.role_role_pk_comment_write_level.role_pk}
-                          for i in Board.objects.all().order_by('board_id_pk')]
+        i = Board.objects.get(board_name='test1')
+        responses_data = {
+            "board_id_pk": i.board_id_pk,
+            "board_name": i.board_name,
+            'board_layout': i.board_layout,
+            "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
+            "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
+            'role_role_pk_comment_write_level': i.role_role_pk_comment_write_level.role_pk
+        }
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(respons.content, responses_data)
 

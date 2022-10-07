@@ -175,7 +175,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
             try:
-                serializer = BoardWriteSerializer(data=request.data, many=isinstance(request.data, list))
+                serializer = BoardWriteSerializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 self.perform_create(serializer)
                 headers = self.get_success_headers(serializer.data)
