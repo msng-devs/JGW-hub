@@ -211,22 +211,21 @@
             example:
               detail: User header not found.
   delete:
-    operationId: board_destroy
+    operationId: post_destroy
     description: |
-      지정한 게시판을 삭제합니다.
+      지정한 게시글을 삭제합니다. 글을 쓴 본인 또는 관리자만 삭제가 가능합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
-      | authorization | true |
-      | Role | admin |
-      | add user info | false |
+      | 인증필요 | o |
+      | 권한필요 | 글 작성 본인 |
     parameters:
-      - in: path
-        name: board_id_pk
-        schema:
-          type: string
-        required: true
-        description: 삭제할 게시판 데이터의 pk
+    - in: path
+      name: post_id_pk
+      schema:
+        type: string
+      required: true
+      description: 삭제할 게시글 pk
     tags:
       - post
     responses:
@@ -236,6 +235,6 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/PostError'
             example:
               detail: Not found.
