@@ -192,13 +192,13 @@ components:
           format: date-time
           description: 게시글이 마지막으로 수정된 시각
         image_image_id_pk:
-          description: 게시글의 썸네일 이미지 정보
+          description: 게시글의 썸네일 이미지 정보. 게시글에 이미지가 하나도 없다면 null.
           nullable: true
           allOf:
           - $ref: '#/components/schemas/ImageNestedPost'
           readOnly: true
         board_boadr_id_pk:
-          description: 게시글이 속한 게시판 정보. 게시글에 이미지가 하나도 없다면 null.
+          description: 게시글이 속한 게시판 정보.
           allOf:
           - $ref: '#/components/schemas/BoardWrite'
           readOnly: true
@@ -216,6 +216,52 @@ components:
       - post_title
       - post_update_time
       - post_write_time
+    PostCreate:
+      type: object
+      properties:
+        post_title:
+          type: string
+          maxLength: 100
+          example: 언제끝내지
+          description: 게시글 제목
+        post_content:
+          type: string
+          example: 게시글게시글~~~
+          description: 게시글 내용 (마크다운)
+        post_write_time:
+          type: string
+          format: date-time
+          description: 최초로 글이 작성된 시각
+        post_update_time:
+          type: string
+          format: date-time
+          description: 게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.
+        image_image_id_pk:
+          type: int
+          description: 게시글의 썸네일 pk (Image)
+          example: 1
+          nullable: true
+        board_boadr_id_pk:
+          type: int
+          description: 게시글이 속한 게시판 pk (Board)
+          example: 1
+        member_member_pk:
+          type: string
+          description: 게시글을 작성한 유저 정보
+          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+      required:
+        - board_boadr_id_pk
+        - member_member_pk
+        - post_content
+        - post_title
+        - post_update_time
+        - post_write_time
+    PostError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: 에러 메세지
 
 
     ImageNestedPost:
