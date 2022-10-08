@@ -2,9 +2,8 @@ name: JGW-hub Test
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    branches:
+      - master
 
 jobs:
   build:
