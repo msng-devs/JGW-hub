@@ -10,4 +10,6 @@ ENV TEST_DB_NAME docker_test
 RUN python manage.py test
 
 EXPOSE 50003
-ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW-hub.wsgi
+
+RUN pkill -f gunicorn
+ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW_hub.wsgi
