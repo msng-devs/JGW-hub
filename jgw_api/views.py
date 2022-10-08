@@ -23,7 +23,8 @@ from .serializers import (
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
-    PostPageNumberPagination
+    PostPageNumberPagination,
+    ImagePageNumberPagination
 )
 
 import jgw_api.constant as constant
@@ -417,6 +418,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     queryset = Image.objects.all()
     http_method_names = ['get', 'post', 'delete']
+    pagination_class = ImagePageNumberPagination
 
     # post
     def create(self, request, *args, **kwargs):
@@ -453,19 +455,18 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         queryset = queryset.order_by('image_id_pk')
 
-        if 'page' in request.query_params and queryset.count():
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        else:
-            serializer = self.get_serializer(queryset, many=True)
-            response_data = {
-                'count': queryset.count(),
-                'next': None,
-                'previous': None,
-                'results': serializer.data
-            }
-            return Response(response_data)
+        request.query_params._mutable = True
+        if 'page' not in request.query_params:
+            request.query_params['page'] = 1
+        if 'page_size' in request.query_params:
+            request.query_params['page_size'] = int(request.query_params['page_size'])
+            if request.query_params['page_size'] < constant.IMAGE_MIN_PAGE_SIZE:
+                request.query_params['page_size'] = constant.IMAGE_MIN_PAGE_SIZE
+            elif request.query_params['page_size'] > constant.IMAGE_MAX_PAGE_SIZE:
+                request.query_params['page_size'] = constant.IMAGE_MAX_PAGE_SIZE
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
