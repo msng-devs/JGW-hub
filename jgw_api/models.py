@@ -127,7 +127,6 @@ class Image(models.Model):
         managed = True
         db_table = 'IMAGE'
 
-
 class Major(models.Model):
     major_pk = models.AutoField(db_column='MAJOR_PK', primary_key=True)  # Field name made lowercase.
     major_nm = models.CharField(db_column='MAJOR_NM', unique=True, max_length=45)  # Field name made lowercase.
