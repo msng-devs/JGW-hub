@@ -1,6 +1,7 @@
 FROM python:3.9.14
 
-RUN pwd
+RUN pwd \
+    ls
 
 RUN \
   echo "install packages" \
