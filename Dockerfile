@@ -9,4 +9,6 @@ RUN \
 ENV TEST_DB_NAME docker_test
 RUN \
   echo "django test start" \
-  python manage.py test
+  python manage.py test \
+
+EXPOSE 50003
