@@ -1,5 +1,6 @@
 FROM python:3.9.14
-MAINTAINER k1a2 <jckim0307@gmail.com>
+
+RUN pwd
 
 RUN \
   echo "install packages" \
