@@ -11,5 +11,4 @@ RUN python manage.py test
 
 EXPOSE 50003
 
-RUN pkill -f gunicorn
-ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW_hub.wsgi
+ENTRYPOINT gunicorn --bind=0.0.0.0:8000 JGW_hub.wsgi:application
