@@ -27,12 +27,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = MY_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
-ALLOWED_HOSTS = [
-    'ubuntu.hrabit64.xyz'
-]
+ALLOWED_HOSTS = []
+if not DEBUG:
+    ALLOWED_HOSTS = [
+        'ubuntu.hrabit64.xyz',
+        # '0.0.0.0'
+    ]
 
 
 # Application definition
@@ -151,4 +154,13 @@ SPECTACULAR_SETTINGS = {
     'SERVE_AUTHENTICATION': None,
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+DEFAULT_RENDERER_CLASSES = (
+    'rest_framework.renderers.JSONRenderer',
+)
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
 
