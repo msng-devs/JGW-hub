@@ -1,7 +1,7 @@
 import datetime
 import random
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
 
 from django.conf import settings
@@ -35,6 +35,21 @@ import shutil
 import traceback
 import ast
 from urllib import parse
+
+class StaffBrowsableMixin(object):
+    def get_renderers(self):
+        """
+        Add Browsable API renderer if user is staff.
+        """
+        rends = self.renderer_classes
+        if settings.DEBUG:
+            rends.append(renderers.BrowsableAPIRenderer)
+        return [renderer() for renderer in rends]
+
+class CustomListApiView(StaffBrowsableMixin, generics.ListAPIView):
+    """
+    List view.
+    """
 
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
