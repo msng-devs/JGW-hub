@@ -1,7 +1,7 @@
 FROM python:3.9.14
 
-RUN pwd \
-    ls
+RUN pwd
+COPY . .
 
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
