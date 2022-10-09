@@ -2,7 +2,7 @@ FROM python:3.9.14
 
 COPY . .
 WORKDIR /JGW_hub
-RUN echo "is_debug = False" > debug.py
+RUN echo "is_debug = 0" > debug.py
 
 WORKDIR ..
 RUN python -m pip install --upgrade pip

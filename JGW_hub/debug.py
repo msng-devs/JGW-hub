@@ -1,1 +1,1 @@
-is_debug = True
+is_debug = 1
