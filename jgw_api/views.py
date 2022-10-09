@@ -51,6 +51,9 @@ class CustomListApiView(StaffBrowsableMixin, generics.ListAPIView):
     List view.
     """
 
+
+
+
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
     user_role_id = request.META.get('user_role_pk')
