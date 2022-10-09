@@ -1,8 +1,10 @@
 FROM python:3.9.14
 
 COPY . .
-RUN ls
+WORKDIR /JGW_hub
+RUN ehco "is_debug = False" > debug.py
 
+WORKDIR ..
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
