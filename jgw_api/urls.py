@@ -12,7 +12,8 @@ router.register(r'post', views.PostViewSet, basename='post')
 router.register(r'image', views.ImageViewSet, basename='image')
 
 urlpatterns = [
-    path('', include(router.urls))
+    path('', include(router.urls)),
+    path('ping/', views.ping_pong)
 ]
 
 if settings.DEBUG:
