@@ -120,7 +120,7 @@ class Image(models.Model):
     image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
     image_name = models.CharField(db_column='IMAGE_NAME', max_length=45)  # Field name made lowercase.
     image_url = models.CharField(db_column='IMAGE_URL', max_length=45)  # Field name made lowercase.
-    post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK')  # Field name made lowercase.
+    post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK', blank=True, null=True)  # Field name made lowercase.
     member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -140,7 +140,7 @@ class Major(models.Model):
 class Member(models.Model):
     member_pk = models.CharField(db_column='MEMBER_PK', primary_key=True, max_length=25)  # Field name made lowercase.
     member_nm = models.CharField(db_column='MEMBER_NM', max_length=45)  # Field name made lowercase.
-    member_email = models.CharField(db_column='MEMBER_EMAIL', unique=True, max_length=256)  # Field name made lowercase.
+    member_email = models.CharField(db_column='MEMBER_EMAIL', unique=True, max_length=255)  # Field name made lowercase.
     member_cell_phone_number = models.CharField(db_column='MEMBER_CELL_PHONE_NUMBER', max_length=15, blank=True, null=True)  # Field name made lowercase.
     member_student_id = models.CharField(db_column='MEMBER_STUDENT_ID', unique=True, max_length=45)  # Field name made lowercase.
     member_year = models.SmallIntegerField(db_column='MEMBER_YEAR')  # Field name made lowercase.
