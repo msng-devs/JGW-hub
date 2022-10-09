@@ -150,12 +150,11 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-DEFAULT_RENDERER_CLASSES = []
+DEFAULT_RENDERER_CLASSES = ['rest_framework.renderers.JSONRenderer']
 
 if DEBUG:
-    DEFAULT_RENDERER_CLASSES = [
-        'rest_framework.renderers.BrowsableAPIRenderer',
-        'rest_framework.renderers.JSONRenderer',
+    DEFAULT_RENDERER_CLASSES += [
+        'rest_framework.renderers.BrowsableAPIRenderer'
     ]
 
 REST_FRAMEWORK = {
