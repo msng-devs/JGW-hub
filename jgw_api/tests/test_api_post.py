@@ -36,21 +36,21 @@ class PostApiTestOK(APITestCase):
     def setUpTestData(cls):
         now = cls.now
 
-        Role.objects.create(role_nm='ROLE_GUEST')
-        Role.objects.create(role_nm='ROLE_USER0')
-        Role.objects.create(role_nm='ROLE_USER1')
-        Role.objects.create(role_nm='ROLE_ADMIN')
-        Role.objects.create(role_nm='ROLE_DEV')
+        Role.objects.create(role_pk=0, role_nm='ROLE_GUEST')
+        Role.objects.create(role_pk=100, role_nm='ROLE_USER0')
+        Role.objects.create(role_pk=101, role_nm='ROLE_USER1')
+        Role.objects.create(role_pk=500, role_nm='ROLE_ADMIN')
+        Role.objects.create(role_pk=501, role_nm='ROLE_DEV')
 
-        Config.objects.create(config_nm='admin_role_pk', config_val='4')
+        Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
 
-        Major.objects.create(major_nm='인공지능학과')
+        Major.objects.create(major_nm='인공지능학과', major_pk=0)
 
-        Rank.objects.create(rank_nm='none')
-        Rank.objects.create(rank_nm='수습회원')
-        Rank.objects.create(rank_nm='정회원')
-        Rank.objects.create(rank_nm='준OB')
-        Rank.objects.create(rank_nm='OB')
+        Rank.objects.create(rank_nm='none', rank_pk=0)
+        Rank.objects.create(rank_nm='수습회원', rank_pk=1)
+        Rank.objects.create(rank_nm='정회원', rank_pk=2)
+        Rank.objects.create(rank_nm='준OB', rank_pk=3)
+        Rank.objects.create(rank_nm='OB', rank_pk=4)
 
         for i in range(5):
             Board.objects.create(
@@ -63,7 +63,7 @@ class PostApiTestOK(APITestCase):
 
         for i in range(10):
             Member.objects.create(
-                member_pk=get_random_string(length=29) + str(i),
+                member_pk=get_random_string(length=24) + str(i),
                 member_nm=get_random_string(length=44) + str(i),
                 member_created_dttm=now,
                 member_modified_dttm=now,
@@ -78,7 +78,6 @@ class PostApiTestOK(APITestCase):
                 member_created_by='system',
                 member_modified_by='system',
                 member_dateofbirth=now,
-                member_status=1
             )
 
         for i in range(cls.post_count):
@@ -541,8 +540,17 @@ class PostApiTestOK(APITestCase):
         target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
         key = target.post_id_pk
 
+        Board.objects.create(
+            board_name='admin_test',
+            board_layout=1,
+            role_role_pk_write_level=Role.objects.get(role_nm='ROLE_USER0'),
+            role_role_pk_read_level=Role.objects.get(role_nm='ROLE_USER0'),
+            role_role_pk_comment_write_level=Role.objects.get(role_nm='ROLE_USER0')
+        )
+
         patch_data = {
-            "post_title": "Test" * 10
+            "post_title": "Test" * 10,
+            'board_boadr_id_pk': Board.objects.get(board_name='admin_test').board_id_pk
         }
         header_data = {
             'user_pk': target.member_member_pk.member_pk,

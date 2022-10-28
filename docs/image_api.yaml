@@ -1,0 +1,164 @@
+\hubapi\image\:
+  get:
+    operationId: image_list
+    description: |
+      이미지 목록을 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | x |
+      | 권한필요 | x |
+    parameters:
+      - name: page
+        required: false
+        in: query
+        description: 몇번째 페이지를 가져올지 지정합니다.
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        required: false
+        in: query
+        description: 한 페이지에 몇개의 데이터를 가져올지 지정합니다.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+          default: 50
+    tags:
+    - image
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaginatedImageList'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageError'
+            example:
+              detail: Invalid page.
+  post:
+    operationId: image_create
+    description: |
+      이미지를 저장합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | 최소업로드 가능레벨 |
+      
+      **최소 업로드 가능 레벨**: 서버에 데이터를 업로드 가능한 최소 권한 레벨. Config 테이블에 저장되어있습니다.
+    tags:
+      - image
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ImageCreateList'
+      required: true
+    responses:
+      '201':
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageCreateGetList'
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: Not allowed.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardError'
+            example:
+              detail: User header not found.
+\hubapi\image\{image_id_pk}\:
+  get:
+    operationId: image_retrieve
+    description: |
+      지정한 이미지의 데이터를 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | x |
+      | 권한필요 | x |
+    parameters:
+    - in: path
+      name: image_id_pk
+      schema:
+        type: string
+      required: true
+      description: 가져올 이미지의 pk
+    tags:
+    - image
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Image'
+        description: ''
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageError'
+            example:
+              detail: Not found.
+  delete:
+    operationId: image_destroy
+    description: |
+      지정한 이미지를 삭제합니다. 이미지를 올린 본인이나 admin만 삭제가 가능합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | 본인 |
+    parameters:
+    - in: path
+      name: image_id_pk
+      schema:
+        type: string
+      required: true
+      description: 가져올 이미지의 pk
+    tags:
+      - image
+    responses:
+      '204':
+        description: No response body
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageError'
+            example:
+              detail: Not allowed.
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageError'
+            example:
+              detail: Not found.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageError'
+            example:
+              detail: User header not found.

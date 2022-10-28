@@ -30,14 +30,14 @@ class ImageApiTestOK(APITestCase):
     def setUpTestData(cls):
         now = datetime.datetime.now()
 
-        Role.objects.create(role_nm='ROLE_GUEST')
+        Role.objects.create(role_pk=0, role_nm='ROLE_GUEST')
 
-        Config.objects.create(config_nm='admin_role_pk', config_val='4')
-        Config.objects.create(config_nm='min_upload_role_pk', config_val='0')
+        Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
+        Config.objects.create(config_nm='min_upload_role_pk', config_val='0', config_pk=501)
 
-        Major.objects.create(major_nm='인공지능학과')
+        Major.objects.create(major_nm='인공지능학과', major_pk=0)
 
-        Rank.objects.create(rank_nm='none')
+        Rank.objects.create(rank_nm='none', rank_pk=0)
 
         Board.objects.create(
             board_name='test',
@@ -48,7 +48,7 @@ class ImageApiTestOK(APITestCase):
         )
 
         Member.objects.create(
-            member_pk='ksjd793JNSO918234OLAKWMDIE049',
+            member_pk='ksjd793JNSO918234OLAKWMD',
             member_nm='test1',
             member_created_dttm=now,
             member_modified_dttm=now,
@@ -63,7 +63,6 @@ class ImageApiTestOK(APITestCase):
             member_created_by='system',
             member_modified_by='system',
             member_dateofbirth=now,
-            member_status=1
         )
 
         Post.objects.create(

@@ -12,11 +12,16 @@ paths:
     $ref: './post_api.yaml#/\hubapi\post\'
   /hubapi/post/{post_id_pk}/:
     $ref: './post_api.yaml#/\hubapi\post\{post_id_pk}\'
+  /hubapi/image/:
+    $ref: './image_api.yaml#/\hubapi\image\'
+  /hubapi/image/{image_id_pk}/:
+    $ref: './image_api.yaml#/\hubapi\image\{image_id_pk}\'
 x-tagGroups:
   - name: Apis
     tags:
       - board
       - post
+      - image
 #  - name: Models
 #    tags:
 #      - category_model

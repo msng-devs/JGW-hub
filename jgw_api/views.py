@@ -1,8 +1,9 @@
 import datetime
 import random
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from django.conf import settings
 from django.utils.crypto import get_random_string
@@ -23,7 +24,8 @@ from .serializers import (
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
-    PostPageNumberPagination
+    PostPageNumberPagination,
+    ImagePageNumberPagination
 )
 
 import jgw_api.constant as constant
@@ -33,8 +35,6 @@ import os
 import shutil
 import traceback
 import ast
-
-RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
@@ -122,9 +122,9 @@ def save_images_storge(images_data, member_pk):
                 settings.MEDIA_ROOT, 'imgs',
                 str(folder_pk) if folder_pk is not None else 'common')
         os.makedirs(img_path, exist_ok=True)
-        save_name = get_random_string(length=random.randint(10, 15), allowed_chars=RANDOM_STRING_CHARS)
+        save_name = get_random_string(length=random.randint(10, 15), allowed_chars=constant.RANDOM_STRING_CHARS)
         while os.path.isfile(os.path.join(img_path, save_name)):
-            save_name = get_random_string(length=random.randint(10, 15), allowed_chars=RANDOM_STRING_CHARS)
+            save_name = get_random_string(length=random.randint(10, 15), allowed_chars=constant.RANDOM_STRING_CHARS)
         with open(os.path.join(img_path, save_name), 'wb') as f:
             f.write(decoded_data)
         url = os.path.join(img_path, save_name).replace('\\', '/').split(settings.MEDIA_URL)[1]
@@ -137,6 +137,12 @@ def save_images_storge(images_data, member_pk):
     return img_urls
 
 
+@api_view(['GET'])
+def ping_pong(request):
+    msg = {
+        'detail': 'pong'
+    }
+    return Response(msg, status.HTTP_200_OK)
 
 class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
@@ -333,9 +339,16 @@ class PostViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_pk = checked
 
         try:
-            serializer = PostPatchSerializer(instance, data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
             if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+                request_data = request.data
+                if 'board_boadr_id_pk' in request_data:
+                    board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
+                    if board_instance.role_role_pk_write_level.role_pk > user_role_id:
+                        request_data._mutable = True
+                        del request_data['board_boadr_id_pk']
+                print(request_data)
+                serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
                 self.perform_update(serializer)
 
                 if getattr(instance, '_prefetched_objects_cache', None):
@@ -411,6 +424,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     serializer_class = ImageSerializer
     queryset = Image.objects.all()
     http_method_names = ['get', 'post', 'delete']
+    pagination_class = ImagePageNumberPagination
 
     # post
     def create(self, request, *args, **kwargs):
@@ -447,19 +461,18 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         queryset = queryset.order_by('image_id_pk')
 
-        if 'page' in request.query_params and queryset.count():
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        else:
-            serializer = self.get_serializer(queryset, many=True)
-            response_data = {
-                'count': queryset.count(),
-                'next': None,
-                'previous': None,
-                'results': serializer.data
-            }
-            return Response(response_data)
+        request.query_params._mutable = True
+        if 'page' not in request.query_params:
+            request.query_params['page'] = 1
+        if 'page_size' in request.query_params:
+            request.query_params['page_size'] = int(request.query_params['page_size'])
+            if request.query_params['page_size'] < constant.IMAGE_MIN_PAGE_SIZE:
+                request.query_params['page_size'] = constant.IMAGE_MIN_PAGE_SIZE
+            elif request.query_params['page_size'] > constant.IMAGE_MAX_PAGE_SIZE:
+                request.query_params['page_size'] = constant.IMAGE_MAX_PAGE_SIZE
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     # get by id
     def retrieve(self, request, *args, **kwargs):

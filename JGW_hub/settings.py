@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import sys
+from JGW_hub import debug
 
 from secrets_content.files.secret_key import MY_SECRET_KEY, MY_DATABASES
 
@@ -27,10 +28,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = MY_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = int(debug.is_debug)
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 
 ALLOWED_HOSTS = []
+if not DEBUG:
+    ALLOWED_HOSTS = [
+        'ubuntu.hrabit64.xyz',
+        # '0.0.0.0'
+    ]
 
 
 # Application definition
@@ -134,12 +140,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_AUTHENTICATION_CLASSES': [],
-    # 'DEFAULT_PERMISSION_CLASSES': [],
-}
-
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Jaram Hub Api 문서',
     'VERSION': '1.0.0',
@@ -148,5 +148,19 @@ SPECTACULAR_SETTINGS = {
     },
     'SERVE_AUTHENTICATION': None,
     'SERVE_INCLUDE_SCHEMA': False,
+}
+
+DEFAULT_RENDERER_CLASSES = ['rest_framework.renderers.JSONRenderer']
+
+if DEBUG:
+    DEFAULT_RENDERER_CLASSES += [
+        'rest_framework.renderers.BrowsableAPIRenderer'
+    ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [],
+    # 'DEFAULT_PERMISSION_CLASSES': [],
 }
 
