@@ -216,13 +216,13 @@ class BoardApiError(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        Role.objects.create(role_nm='ROLE_GUEST')
-        Role.objects.create(role_nm='ROLE_USER0')
-        Role.objects.create(role_nm='ROLE_USER1')
-        Role.objects.create(role_nm='ROLE_ADMIN')
-        Role.objects.create(role_nm='ROLE_DEV')
+        Role.objects.create(role_pk=0, role_nm='ROLE_GUEST')
+        Role.objects.create(role_pk=1, role_nm='ROLE_USER0')
+        Role.objects.create(role_pk=2, role_nm='ROLE_USER1')
+        Role.objects.create(role_pk=3, role_nm='ROLE_ADMIN')
+        Role.objects.create(role_pk=4, role_nm='ROLE_DEV')
 
-        Config.objects.create(config_nm='admin_role_pk', config_val='4')
+        Config.objects.create(config_pk=0, config_nm='admin_role_pk', config_val='4')
 
     def __make_header(self):
         header_data = {
@@ -252,3 +252,69 @@ class BoardApiError(APITestCase):
         }
         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, return_data)
+
+    def test_board_post_already_exist(self):
+        print("Board Api POST already exist Running...")
+
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            board_layout=0,
+            role_role_pk_write_level=Role.objects.get(role_pk=0),
+            role_role_pk_read_level=Role.objects.get(role_pk=0),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=0)
+        )
+
+        data = {
+            "board_name": "공지사항1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 0,
+            "role_role_pk_read_level": 20,
+            "role_role_pk_comment_write_level": 0
+        }
+
+        # when
+        respons: Response = self.client.post(self.url, data=data, **self.__make_header())
+
+        print(respons.content)
+
+        # then
+        responses_data = {
+            "board_name":["board with this board name already exists."],
+            "role_role_pk_read_level":["Invalid pk \"20\" - object does not exist."]
+        }
+        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertJSONEqual(respons.content, responses_data)
+
+    def test_board_post_required(self):
+        print("Board Api POST already exist not found Running...")
+
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            board_layout=0,
+            role_role_pk_write_level=Role.objects.get(role_pk=0),
+            role_role_pk_read_level=Role.objects.get(role_pk=0),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=0)
+        )
+
+        data = {
+            "board_name": "공지사항1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 0,
+            "role_role_pk_read_level": 20,
+            "role_role_pk_comment_write_level": 0
+        }
+
+        # when
+        respons: Response = self.client.post(self.url, data=data, **self.__make_header())
+
+        print(respons.content)
+
+        # then
+        responses_data = {
+            "board_name": ["board with this board name already exists."],
+            "role_role_pk_read_level": ["Invalid pk \"20\" - object does not exist."]
+        }
+        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertJSONEqual(respons.content, responses_data)

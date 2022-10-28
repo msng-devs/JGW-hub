@@ -179,17 +179,11 @@ class BoardViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
-            try:
-                serializer = BoardWriteSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
-                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            except Exception as err:
-                error_responses_data = {
-                    'detail': 'board with this board name already exists.'
-                }
-                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            serializer = BoardWriteSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
             detail = {
                 'detail': 'Not Allowed.'
