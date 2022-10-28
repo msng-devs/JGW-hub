@@ -33,7 +33,6 @@ import os
 import shutil
 import traceback
 import ast
-from urllib import parse
 
 RANDOM_STRING_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
 

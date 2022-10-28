@@ -209,3 +209,46 @@ class BoardApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+class BoardApiError(APITestCase):
+    def setUp(self):
+        self.url = '/hubapi/board/'
+
+    @classmethod
+    def setUpTestData(cls):
+        Role.objects.create(role_nm='ROLE_GUEST')
+        Role.objects.create(role_nm='ROLE_USER0')
+        Role.objects.create(role_nm='ROLE_USER1')
+        Role.objects.create(role_nm='ROLE_ADMIN')
+        Role.objects.create(role_nm='ROLE_DEV')
+
+        Config.objects.create(config_nm='admin_role_pk', config_val='4')
+
+    def __make_header(self):
+        header_data = {
+            'user_pk': 'pkpkpkpkpkpkpkpkpkpkpk',
+            'user_role_pk': 5
+        }
+        return header_data
+
+    def test_board_get_by_id_not_found(self):
+        print("Board Api GET BY ID not found Running...")
+
+        # given
+        Board.objects.create(
+            board_name='공지사항1',
+            board_layout=0,
+            role_role_pk_write_level=Role.objects.get(role_pk=1),
+            role_role_pk_read_level=Role.objects.get(role_pk=1),
+            role_role_pk_comment_write_level=Role.objects.get(role_pk=1)
+        )
+
+        # when
+        respons: Response = self.client.get(f"{self.url}1000/", **self.__make_header())
+
+        # then
+        return_data = {
+            'detail': 'Not found.'
+        }
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertJSONEqual(respons.content, return_data)
