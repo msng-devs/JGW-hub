@@ -12,7 +12,8 @@ from .models import (
     Board,
     Post,
     Image,
-    Config
+    Config,
+    Comment
 )
 from .serializers import (
     BoardSerializer,
@@ -20,12 +21,14 @@ from .serializers import (
     PostSerializer,
     ImageSerializer,
     PostGetSerializer,
-    PostPatchSerializer
+    PostPatchSerializer,
+    CommentGetSerializer
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
     PostPageNumberPagination,
-    ImagePageNumberPagination
+    ImagePageNumberPagination,
+    CommentPageNumberPagination
 )
 
 import jgw_api.constant as constant
@@ -490,3 +493,11 @@ class ImageViewSet(viewsets.ModelViewSet):
                 'detail': 'Image delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentGetSerializer
+    queryset = Comment.objects.all()
+    http_method_names = ['get', 'post', 'patch', 'delete']
+    pagination_class = CommentPageNumberPagination
