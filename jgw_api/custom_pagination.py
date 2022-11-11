@@ -65,7 +65,7 @@ class ImagePageNumberPagination(PageNumberPagination):
         ]))
 
 class CommentPageNumberPagination(PageNumberPagination):
-    page_size = constant.COMMENT_MAX_PAGE_SIZE
+    page_size = constant.COMMENT_DEFAULT_PAGE_SIZE
     page_size_query_param = 'page_size'
     max_page_size = constant.COMMENT_MAX_PAGE_SIZE
 
