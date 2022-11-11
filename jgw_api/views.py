@@ -3,6 +3,7 @@ import random
 
 from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from django.conf import settings
 from django.utils.crypto import get_random_string
@@ -34,7 +35,6 @@ import os
 import shutil
 import traceback
 import ast
-from urllib import parse
 
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
@@ -137,6 +137,12 @@ def save_images_storge(images_data, member_pk):
     return img_urls
 
 
+@api_view(['GET'])
+def ping_pong(request):
+    msg = {
+        'detail': 'pong'
+    }
+    return Response(msg, status.HTTP_200_OK)
 
 class BoardViewSet(viewsets.ModelViewSet):
     serializer_class = BoardSerializer
@@ -173,17 +179,11 @@ class BoardViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
-            try:
-                serializer = BoardWriteSerializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                self.perform_create(serializer)
-                headers = self.get_success_headers(serializer.data)
-                return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-            except Exception as err:
-                error_responses_data = {
-                    'detail': 'board with this board name already exists.'
-                }
-                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            serializer = BoardWriteSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         else:
             detail = {
                 'detail': 'Not Allowed.'

@@ -15,7 +15,7 @@ import os
 import sys
 from JGW_hub import debug
 
-from secrets_content.files.secret_key import MY_SECRET_KEY, MY_DATABASES
+from secrets_content.files.secret_key import MY_SECRET_KEY, MY_DATABASES, MY_ALLOWED_HOSTS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,14 +30,7 @@ SECRET_KEY = MY_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(debug.is_debug)
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
-
-ALLOWED_HOSTS = []
-if not DEBUG:
-    ALLOWED_HOSTS = [
-        'ubuntu.hrabit64.xyz',
-        # '0.0.0.0'
-    ]
-
+ALLOWED_HOSTS = [] if DEBUG else MY_ALLOWED_HOSTS
 
 # Application definition
 
