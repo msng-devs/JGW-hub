@@ -222,7 +222,7 @@ class BoardApiError(APITestCase):
         Role.objects.create(role_pk=3, role_nm='ROLE_ADMIN')
         Role.objects.create(role_pk=4, role_nm='ROLE_DEV')
 
-        Config.objects.create(config_pk=0, config_nm='admin_role_pk', config_val='4')
+        Config.objects.create(config_nm='admin_role_pk', config_val='4')
 
     def __make_header(self):
         header_data = {
