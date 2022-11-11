@@ -11,6 +11,6 @@ RUN pip install -r requirements.txt
 ENV TEST_DB_NAME docker_test
 RUN python manage.py test
 
-EXPOSE 8000
+#EXPOSE 8000
 
-ENTRYPOINT gunicorn --bind=127.0.0.1:8000 JGW_hub.wsgi:application
+ENTRYPOINT gunicorn --bind=127.0.0.1:50003 JGW_hub.wsgi:application
