@@ -501,3 +501,19 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
+
+    # get
+    def list(self, request, *args, **kwargs):
+        queryset = Comment.objects.all()
+        request.query_params._mutable = True
+        if 'page' not in request.query_params:
+            request.query_params['page'] = 1
+        if 'page_size' in request.query_params:
+            request.query_params['page_size'] = int(request.query_params['page_size'])
+            if request.query_params['page_size'] < constant.COMMENT_MIN_PAGE_SIZE:
+                request.query_params['page_size'] = constant.COMMENT_MIN_PAGE_SIZE
+            elif request.query_params['page_size'] > constant.COMMENT_MAX_PAGE_SIZE:
+                request.query_params['page_size'] = constant.COMMENT_MAX_PAGE_SIZE
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
