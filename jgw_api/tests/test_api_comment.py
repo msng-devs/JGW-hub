@@ -117,36 +117,36 @@ class CommentApiTestOK(APITestCase):
                     comment_comment_id_ref=None
                 )
 
-    def test_comment_get(self):
-        print("Comment Api GET ALL Running...")
-
-        # given
-
-        # when
-        respons: Response = self.client.get(self.url, data={'post_id': 2, 'page': 1})
-
-        print(respons.content)
-
-        # # then
-        return_data = {
-                'count': 15,
-                'next': 'http://testserver/hubapi/comment/?page=2',
-                'previous': None,
-                'results': [{
-                    'comment_id': i.comment_id,
-                    'comment_depth': i.comment_depth,
-                    'comment_content': i.comment_content,
-                    'comment_write_time': i.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                    'comment_update_time': i.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-                    'comment_delete': i.comment_delete,
-                    'post_post_id_pk': i.post_post_id_pk.post_id_pk,
-                    'member_member_pk': {
-                        'member_pk': i.member_member_pk.member_pk,
-                        'member_nm': i.member_member_pk.member_nm
-                    },
-                    'comment_comment_id_ref': i.comment_comment_id_ref
-                } for i in Comment.objects.all().order_by('comment_id')[:15]]
-            }
-
-        self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(respons.content, return_data)
+    # def test_comment_get(self):
+    #     print("Comment Api GET ALL Running...")
+    #
+    #     # given
+    #
+    #     # when
+    #     respons: Response = self.client.get(self.url, data={'post_id': 2, 'page': 1})
+    #
+    #     print(respons.content)
+    #
+    #     # # then
+    #     return_data = {
+    #             'count': 15,
+    #             'next': 'http://testserver/hubapi/comment/?page=2',
+    #             'previous': None,
+    #             'results': [{
+    #                 'comment_id': i.comment_id,
+    #                 'comment_depth': i.comment_depth,
+    #                 'comment_content': i.comment_content,
+    #                 'comment_write_time': i.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+    #                 'comment_update_time': i.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+    #                 'comment_delete': i.comment_delete,
+    #                 'post_post_id_pk': i.post_post_id_pk.post_id_pk,
+    #                 'member_member_pk': {
+    #                     'member_pk': i.member_member_pk.member_pk,
+    #                     'member_nm': i.member_member_pk.member_nm
+    #                 },
+    #                 'comment_comment_id_ref': i.comment_comment_id_ref
+    #             } for i in Comment.objects.all().order_by('comment_id')[:15]]
+    #         }
+    #
+    #     self.assertEqual(respons.status_code, status.HTTP_200_OK)
+    #     self.assertJSONEqual(respons.content, return_data)
