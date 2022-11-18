@@ -123,7 +123,9 @@ class CommentApiTestOK(APITestCase):
         # given
 
         # when
-        respons: Response = self.client.get(self.url, data={'page': 1})
+        respons: Response = self.client.get(self.url, data={'post_id': 2, 'page': 1})
+
+        print(respons.content)
 
         # # then
         return_data = {

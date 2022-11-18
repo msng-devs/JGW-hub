@@ -6,14 +6,19 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
 from django.conf import settings
+from django.db import connection
 from django.utils.crypto import get_random_string
+from django.db import models
+
+from typing import List, Dict
 
 from .models import (
     Board,
     Post,
     Image,
     Config,
-    Comment
+    Comment,
+    Member,
 )
 from .serializers import (
     BoardSerializer,
@@ -138,6 +143,73 @@ def save_images_storge(images_data, member_pk):
             'member_member_pk': member_pk
         })
     return img_urls
+
+def __fetchall(cursor) -> List[models.Model]:
+    desc = cursor.description
+    ret: List[models.Model] = []
+    columns = [info[0] for info in desc]
+
+    for data in cursor.fetchall():
+        row = {}
+        for i, column in enumerate(columns):
+            d = data[i]
+            if column == 'post_post_id_pk':
+                d = Post.objects.get(post_id_pk=d)
+            elif column == 'member_member_pk':
+                d = Member.objects.get(member_pk=d)
+            elif column == 'comment_comment_id_ref' and d is not None:
+                d = Comment.objects.get(comment_id=d)
+            row[column] = d
+        ret.append(Comment(**row))
+    return ret
+
+def get_comment_tree(post_id):
+    cursor = connection.cursor()
+    cursor.execute(f'''
+                WITH RECURSIVE TREE_QUERY
+                    AS (
+                        SELECT comment_id,
+                            comment_depth,
+                            comment_content,
+                            comment_write_time,
+                            comment_update_time,
+                            comment_delete,
+                            post_post_id_pk,
+                            member_member_pk,
+                            comment_comment_id_ref,
+                            CONVERT(comment_id, CHAR) sort,
+                            CONVERT(member_member_pk, CHAR) depth_fullname
+                        FROM COMMENT
+                        WHERE  comment_comment_id_ref is null and post_post_id_pk = {post_id}
+                        UNION ALL
+                        SELECT B.comment_id,
+                            B.comment_depth,
+                            B.comment_content,
+                            B.comment_write_time,
+                            B.comment_update_time,
+                            B.comment_delete,
+                            B.post_post_id_pk,
+                            B.member_member_pk,
+                            B.comment_comment_id_ref,
+                            CONVERT(CONVERT(C.sort, CHAR) + ' > ' + CONVERT(B.comment_id, CHAR), CHAR) sort,
+                            CONVERT(CONVERT(C.depth_fullname, CHAR) + ' > ' + CONVERT(B.member_member_pk, CHAR), CHAR) depth_fullname
+                        FROM COMMENT B, TREE_QUERY C
+                        WHERE  B.comment_comment_id_ref = C.comment_id and C.post_post_id_pk = {post_id}
+                    )
+
+                SELECT comment_id,
+                       comment_depth,
+                       comment_content,
+                       comment_write_time,
+                       comment_update_time,
+                       comment_delete,
+                       post_post_id_pk,
+                       member_member_pk,
+                       comment_comment_id_ref
+                FROM   TREE_QUERY
+                ORDER  BY sort''')
+    queryset: List[models.Model] = __fetchall(cursor)
+    return queryset
 
 
 @api_view(['GET'])
@@ -494,8 +566,6 @@ class ImageViewSet(viewsets.ModelViewSet):
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
-
-
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentGetSerializer
     queryset = Comment.objects.all()
@@ -504,8 +574,14 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
-        queryset = Comment.objects.all()
         request.query_params._mutable = True
+        if 'post_id' not in request.query_params:
+            return Response(data={
+                'detail': 'post_id request'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            queryset = get_comment_tree(int(request.query_params['post_id']))
+
         if 'page' not in request.query_params:
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
