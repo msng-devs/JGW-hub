@@ -15,7 +15,7 @@ import os
 import sys
 from JGW_hub import debug
 
-from secrets_content.files.secret_key import MY_SECRET_KEY, MY_DATABASES, MY_ALLOWED_HOSTS
+from secrets_content.files.secret_key import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,9 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jgw_api',
     'rest_framework',
-    'drf_spectacular'
+    'drf_spectacular',
+    'jgw_api',
 ]
 
 MIDDLEWARE = [
@@ -158,3 +158,5 @@ REST_FRAMEWORK = {
     # 'DEFAULT_PERMISSION_CLASSES': [],
 }
 
+CORS_ORIGIN_ALLOW_ALL = MY_CORS_ORIGIN_ALLOW_ALL
+CORS_ALLOW_CREDENTIALS = MY_CORS_ALLOW_CREDENTIALS
