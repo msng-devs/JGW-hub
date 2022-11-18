@@ -6,7 +6,7 @@ from .models import (
     Image,
     Post,
     Member,
-
+    Comment
 )
 
 class RoleSerializer(serializers.ModelSerializer):
@@ -84,3 +84,13 @@ class PostPatchSerializer(serializers.ModelSerializer):
         model = Post
         fields = '__all__'
         read_only_fields = ('post_write_time', 'member_member_pk')
+
+
+
+class CommentGetSerializer(serializers.ModelSerializer):
+    member_member_pk = MemberNestedPostSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
+                  'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref']

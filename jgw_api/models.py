@@ -9,14 +9,15 @@ from django.db import models
 
 
 class ApiRoute(models.Model):
-    api_route_pk = models.IntegerField(db_column='API_ROUTE_PK', primary_key=True)  # Field name made lowercase.
-    api_route_path = models.CharField(db_column='API_ROUTE_PATH', unique=True, max_length=45)  # Field name made lowercase.
+    api_route_pk = models.AutoField(db_column='API_ROUTE_PK', primary_key=True)  # Field name made lowercase.
+    api_route_path = models.CharField(db_column='API_ROUTE_PATH', max_length=45)  # Field name made lowercase.
     method_method_pk = models.ForeignKey('Method', models.DO_NOTHING, db_column='METHOD_METHOD_PK')  # Field name made lowercase.
-    role_role_pk = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK')  # Field name made lowercase.
+    role_role_pk = models.ForeignKey('Role', models.DO_NOTHING, db_column='ROLE_ROLE_PK', blank=True, null=True)  # Field name made lowercase.
     service_service_pk = models.ForeignKey('Service', models.DO_NOTHING, db_column='SERVICE_SERVICE_PK')  # Field name made lowercase.
     api_route_gateway_refresh = models.IntegerField(db_column='API_ROUTE_GATEWAY_REFRESH', blank=True, null=True)  # Field name made lowercase.
     api_route_only_token = models.IntegerField(db_column='API_ROUTE_ONLY_TOKEN', blank=True, null=True)  # Field name made lowercase.
     api_route_optional = models.IntegerField(db_column='API_ROUTE_OPTIONAL', blank=True, null=True)  # Field name made lowercase.
+    api_route_authorization = models.IntegerField(db_column='API_ROUTE_AUTHORIZATION', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True
@@ -24,8 +25,8 @@ class ApiRoute(models.Model):
 
 
 class Attendance(models.Model):
-    member_member_pk = models.OneToOneField('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', primary_key=True)  # Field name made lowercase.
-    timetable_timetable_pk = models.ForeignKey('Timetable', models.DO_NOTHING, db_column='TIMETABLE_TIMETABLE_PK')  # Field name made lowercase.
+    member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK')  # Field name made lowercase.
+    timetable_timetable_pk = models.OneToOneField('Timetable', models.DO_NOTHING, db_column='TIMETABLE_TIMETABLE_PK', primary_key=True)  # Field name made lowercase.
     attendance_type_attendance_type_pk = models.ForeignKey('AttendanceType', models.DO_NOTHING, db_column='ATTENDANCE_TYPE_ATTENDANCE_TYPE_PK')  # Field name made lowercase.
     attendance_modified_dttm = models.DateTimeField(db_column='ATTENDANCE_MODIFIED_DTTM')  # Field name made lowercase.
     attendance_created_dttm = models.CharField(db_column='ATTENDANCE_CREATED_DTTM', max_length=45)  # Field name made lowercase.
@@ -36,7 +37,7 @@ class Attendance(models.Model):
     class Meta:
         managed = True
         db_table = 'ATTENDANCE'
-        unique_together = (('member_member_pk', 'timetable_timetable_pk'),)
+        unique_together = (('timetable_timetable_pk', 'member_member_pk'),)
 
 
 class AttendanceType(models.Model):
@@ -63,12 +64,11 @@ class Board(models.Model):
 
 class Comment(models.Model):
     comment_id = models.AutoField(db_column='COMMENT_ID', primary_key=True)  # Field name made lowercase.
-    comment_ref_id = models.IntegerField(db_column='COMMENT_REF_ID')  # Field name made lowercase.
     comment_depth = models.IntegerField(db_column='COMMENT_DEPTH')  # Field name made lowercase.
     comment_content = models.TextField(db_column='COMMENT_CONTENT')  # Field name made lowercase.
     comment_write_time = models.DateTimeField(db_column='COMMENT_WRITE_TIME')  # Field name made lowercase.
     comment_update_time = models.DateTimeField(db_column='COMMENT_UPDATE_TIME')  # Field name made lowercase.
-    comment_delete = models.CharField(db_column='COMMENT_DELETE', max_length=1)  # Field name made lowercase.
+    comment_delete = models.IntegerField(db_column='COMMENT_DELETE')  # Field name made lowercase.
     post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK')  # Field name made lowercase.
     member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
     comment_comment_id_ref = models.ForeignKey('self', models.DO_NOTHING, db_column='COMMENT_COMMENT_ID_REF', blank=True, null=True)  # Field name made lowercase.
@@ -79,7 +79,7 @@ class Comment(models.Model):
 
 
 class Config(models.Model):
-    config_pk = models.IntegerField(db_column='CONFIG_PK', primary_key=True)  # Field name made lowercase.
+    config_pk = models.AutoField(db_column='CONFIG_PK', primary_key=True)  # Field name made lowercase.
     config_nm = models.CharField(db_column='CONFIG_NM', max_length=50)  # Field name made lowercase.
     config_val = models.CharField(db_column='CONFIG_VAL', max_length=50)  # Field name made lowercase.
 
@@ -89,7 +89,7 @@ class Config(models.Model):
 
 
 class Error(models.Model):
-    error_pk = models.IntegerField(db_column='ERROR_PK', primary_key=True)  # Field name made lowercase.
+    error_pk = models.AutoField(db_column='ERROR_PK', primary_key=True)  # Field name made lowercase.
     error_nm = models.CharField(db_column='ERROR_NM', max_length=50)  # Field name made lowercase.
     error_title = models.CharField(db_column='ERROR_TITLE', max_length=50, blank=True, null=True)  # Field name made lowercase.
     error_http_code = models.CharField(db_column='ERROR_HTTP_CODE', max_length=3, blank=True, null=True)  # Field name made lowercase.
@@ -138,7 +138,7 @@ class Major(models.Model):
 
 
 class Member(models.Model):
-    member_pk = models.CharField(db_column='MEMBER_PK', primary_key=True, max_length=25)  # Field name made lowercase.
+    member_pk = models.CharField(db_column='MEMBER_PK', primary_key=True, max_length=28)  # Field name made lowercase.
     member_nm = models.CharField(db_column='MEMBER_NM', max_length=45)  # Field name made lowercase.
     member_email = models.CharField(db_column='MEMBER_EMAIL', unique=True, max_length=255)  # Field name made lowercase.
     member_cell_phone_number = models.CharField(db_column='MEMBER_CELL_PHONE_NUMBER', max_length=15, blank=True, null=True)  # Field name made lowercase.
@@ -220,7 +220,7 @@ class Service(models.Model):
     service_pk = models.IntegerField(db_column='SERVICE_PK', primary_key=True)  # Field name made lowercase.
     service_nm = models.CharField(db_column='SERVICE_NM', unique=True, max_length=45)  # Field name made lowercase.
     service_domain = models.CharField(db_column='SERVICE_DOMAIN', unique=True, max_length=45)  # Field name made lowercase.
-    service_domain_index = models.TextField(db_column='SERVICE_DOMAIN_INDEX', blank=True, null=True)  # Field name made lowercase.
+    service_index = models.TextField(db_column='SERVICE_INDEX', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = True

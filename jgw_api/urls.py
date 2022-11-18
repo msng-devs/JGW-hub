@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 router.register(r'board', views.BoardViewSet, basename='board')
 router.register(r'post', views.PostViewSet, basename='post')
 router.register(r'image', views.ImageViewSet, basename='image')
+router.register(r'comment', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),
