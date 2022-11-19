@@ -13,4 +13,4 @@ RUN python manage.py test
 
 EXPOSE 50003
 
-ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW_hub.wsgi:application
+ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW_hub.wsgi:application --enable-stdio-inheritance
