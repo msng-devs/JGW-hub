@@ -25,7 +25,7 @@ class BoardApiTestOK(APITestCase):
     def __make_header(self):
         header_data = {
             'user_pk': 'pkpkpkpkpkpkpkpkpkpkpk',
-            'user_role_pk': 500
+            'role_pk': 500
         }
         return header_data
 
@@ -227,7 +227,7 @@ class BoardApiError(APITestCase):
     def __make_header(self):
         header_data = {
             'user_pk': 'pkpkpkpkpkpkpkpkpkpkpk',
-            'user_role_pk': 5
+            'role_pk': 5
         }
         return header_data
 
