@@ -45,12 +45,9 @@ import traceback
 import ast
 import logging
 
-def get_logger():
-    return logging.getLogger('hub')
+logger = logging.getLogger('hub')
 
 def get_user_header(request):
-    logger = get_logger()
-
     user_uid = request.META.get('HTTP_USER_PK', None)
     user_role_id = request.META.get('HTTP_ROLE_PK', None)
 
@@ -64,8 +61,6 @@ def get_user_header(request):
         return user_uid, user_role_id
 
 def get_admin_role_pk():
-    logger = get_logger()
-
     try:
         config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
         logger.debug(f'get admin role success: {config_admin_role}')
@@ -265,11 +260,13 @@ class BoardViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
+            logger.debug(f'{user_uid} Board create approved')
             serializer = BoardWriteSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
+            logger.debug(f'{user_uid} Board data verified')
             self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            logger.debug(f'{user_uid} Board data created')
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             detail = {
                 'detail': 'Not Allowed.'
