@@ -46,8 +46,7 @@ import ast
 import logging
 
 def get_user_header(request):
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    gunicorn_logger.debug(request.META)
+    print(request.META)
 
     user_uid = request.META.get('HTTP_USER-PK', None)
     user_role_id = request.META.get('HTTP_ROLE-PK', None)
