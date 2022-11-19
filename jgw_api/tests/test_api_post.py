@@ -384,7 +384,7 @@ class PostApiTestOK(APITestCase):
         # when
         header_data = {
             'user_pk': member_instance.member_pk,
-            'user_role_pk': member_instance.role_role_pk.role_pk
+            'role_pk': member_instance.role_role_pk.role_pk
         }
         response: Response = self.client.post(self.url, data=data, **header_data)
 
@@ -424,7 +424,7 @@ class PostApiTestOK(APITestCase):
 
         header_data = {
             'user_pk': post_instance.member_member_pk.member_pk,
-            'user_role_pk': post_instance.member_member_pk.role_role_pk.role_pk
+            'role_pk': post_instance.member_member_pk.role_role_pk.role_pk
         }
         respons: Response = self.client.get(f"{self.url}{key}/", **header_data)
 
@@ -480,7 +480,7 @@ class PostApiTestOK(APITestCase):
         }
         header_data = {
             'user_pk': target.member_member_pk.member_pk,
-            'user_role_pk': target.member_member_pk.role_role_pk.role_pk
+            'role_pk': target.member_member_pk.role_role_pk.role_pk
         }
 
         # when
@@ -501,7 +501,7 @@ class PostApiTestOK(APITestCase):
         key = target.post_id_pk
         header_data = {
             'user_pk': target.member_member_pk.member_pk,
-            'user_role_pk': target.member_member_pk.role_role_pk.role_pk
+            'role_pk': target.member_member_pk.role_role_pk.role_pk
         }
         respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
 

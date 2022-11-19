@@ -46,7 +46,7 @@ import ast
 
 def get_user_header(request):
     user_uid = request.META.get('user_pk', None)
-    user_role_id = request.META.get('user_role_pk')
+    user_role_id = request.META.get('role_pk', None)
     if user_uid is None or user_role_id is None:
         responses_data = {
             'detail': 'Header Required.'
