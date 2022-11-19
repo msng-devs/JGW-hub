@@ -47,16 +47,17 @@ import logging
 
 def get_user_header(request):
     logger = logging.getLogger('hub')
-    logger.debug(request.META)
 
-    user_uid = request.META.get('HTTP_USER-PK', None)
-    user_role_id = request.META.get('HTTP_ROLE-PK', None)
+    user_uid = request.META.get('HTTP_USER_PK', None)
+    user_role_id = request.META.get('HTTP_ROLE_PK', None)
+
     if user_uid is None or user_role_id is None:
         responses_data = {
             'detail': 'Header Required.'
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
+        logger.debug('get user information success')
         return user_uid, user_role_id
 
 def get_admin_role_pk():

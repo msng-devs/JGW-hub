@@ -24,8 +24,8 @@ class BoardApiTestOK(APITestCase):
 
     def __make_header(self):
         header_data = {
-            'HTTP_USER-PK': 'pkpkpkpkpkpkpkpkpkpkpk',
-            'HTTP_ROLE-PK': 500
+            'HTTP_USER_PK': 'pkpkpkpkpkpkpkpkpkpkpk',
+            'HTTP_ROLE_PK': 500
         }
         return header_data
 
@@ -226,8 +226,8 @@ class BoardApiError(APITestCase):
 
     def __make_header(self):
         header_data = {
-            'HTTP_USER-PK': 'pkpkpkpkpkpkpkpkpkpkpk',
-            'HTTP_ROLE-PK': 5
+            'HTTP_USER_PK': 'pkpkpkpkpkpkpkpkpkpkpk',
+            'HTTP_ROLE_PK': 5
         }
         return header_data
 
