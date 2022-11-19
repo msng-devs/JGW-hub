@@ -174,8 +174,8 @@ class ImageApiTestOK(APITestCase):
         target = Image.objects.all().order_by('image_id_pk')[Image.objects.count() - 1]
         key = target.image_id_pk
         header_data = {
-            'user_pk': target.member_member_pk.member_pk,
-            'role_pk': target.member_member_pk.role_role_pk.role_pk
+            'HTTP_USER-PK': target.member_member_pk.member_pk,
+            'HTTP_ROLE-PK': target.member_member_pk.role_role_pk.role_pk
         }
         respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
 
@@ -189,8 +189,8 @@ class ImageApiTestOK(APITestCase):
         # given
         target_member = Member.objects.all()[0]
         header_data = {
-            'user_pk': target_member.member_pk,
-            'role_pk': target_member.role_role_pk.role_pk
+            'HTTP_USER-PK': target_member.member_pk,
+            'HTTP_ROLE-PK': target_member.role_role_pk.role_pk
         }
 
         data = '['

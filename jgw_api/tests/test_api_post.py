@@ -383,8 +383,8 @@ class PostApiTestOK(APITestCase):
 
         # when
         header_data = {
-            'user_pk': member_instance.member_pk,
-            'role_pk': member_instance.role_role_pk.role_pk
+            'HTTP_USER-PK': member_instance.member_pk,
+            'HTTP_ROLE-PK': member_instance.role_role_pk.role_pk
         }
         response: Response = self.client.post(self.url, data=data, **header_data)
 
@@ -423,8 +423,8 @@ class PostApiTestOK(APITestCase):
         key = post_instance.post_id_pk
 
         header_data = {
-            'user_pk': post_instance.member_member_pk.member_pk,
-            'role_pk': post_instance.member_member_pk.role_role_pk.role_pk
+            'HTTP_USER-PK': post_instance.member_member_pk.member_pk,
+            'HTTP_ROLE-PK': post_instance.member_member_pk.role_role_pk.role_pk
         }
         respons: Response = self.client.get(f"{self.url}{key}/", **header_data)
 
@@ -479,8 +479,8 @@ class PostApiTestOK(APITestCase):
             'board_boadr_id_pk': Board.objects.get(board_name='admin_test').board_id_pk
         }
         header_data = {
-            'user_pk': target.member_member_pk.member_pk,
-            'role_pk': target.member_member_pk.role_role_pk.role_pk
+            'HTTP_USER-PK': target.member_member_pk.member_pk,
+            'HTTP_ROLE-PK': target.member_member_pk.role_role_pk.role_pk
         }
 
         # when
@@ -500,8 +500,8 @@ class PostApiTestOK(APITestCase):
         target = Post.objects.all().order_by('post_id_pk')[self.post_count - 1]
         key = target.post_id_pk
         header_data = {
-            'user_pk': target.member_member_pk.member_pk,
-            'role_pk': target.member_member_pk.role_role_pk.role_pk
+            'HTTP_USER-PK': target.member_member_pk.member_pk,
+            'HTTP_ROLE-PK': target.member_member_pk.role_role_pk.role_pk
         }
         respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
 
