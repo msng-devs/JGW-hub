@@ -1,7 +1,22 @@
 openapi: 3.0.3
 info:
   title: Jaram Hub Api 문서
+  description: |
+    자람 허브 api 문서입니다.
+    # api 보안 규칙
+    api에 따라서 여러 보안 규칙이 존재합니다.
+    * Role: 접근 가능한 유저의 최소 레벨 (new guest, guest, user0, user1, admin, dev)
+    * 인증 필요: api에 접근하기 위해 로그인이 필요한지 여부. (필요 없음, 필요함, 옵셔널)
+      옵셔널은 같은 api에서 인증이 필요할 수도 없을수도 있는 경우입니다. (ex. 게시글 읽기 api)
+    
+    각 api에는 다음과 같이 표기됩니다.
+    | option | value |
+    |:---:|:---:|
+    | 인증필요 | 필요 |
+    | 권한필요 | Admin |
   version: 1.0.0
+servers:
+  - url: 'https://api.hrabit64.xyz/'
 $ref: './schemas/schemas.yaml'
 paths:
   /hubapi/board/:

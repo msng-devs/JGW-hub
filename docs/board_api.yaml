@@ -49,7 +49,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     tags:
       - board
     requestBody:
@@ -134,7 +134,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     parameters:
       - in: path
         name: board_id_pk
@@ -190,12 +190,12 @@
   delete:
     operationId: board_destroy
     description: |
-      지정한 게시판을 삭제합니다.
+      지정한 게시판을 삭제합니다. admin만 가능합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     parameters:
       - in: path
         name: board_id_pk
