@@ -67,9 +67,9 @@ def get_admin_role_pk():
     logger = get_logger()
 
     try:
-        config_admin_role = Config.objects.get(config_nm='admin_role_pk')
+        config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
         logger.debug(f'get admin role success: {config_admin_role}')
-        return int(config_admin_role.config_val)
+        return int(config_admin_role)
     except:
         responses_data = {
             'detail': 'Admin Role not Exist.'
