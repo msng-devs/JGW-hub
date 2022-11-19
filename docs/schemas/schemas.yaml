@@ -118,13 +118,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/hubapi/board/?page=4
+          example: https://api.hrabit64.xyz/hubapi/board/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/hubapi/board/?page=2
+          example: https://api.hrabit64.xyz/hubapi/board/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -167,13 +167,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=4
+          example: https://api.hrabit64.xyz/hubapi/post/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=2
+          example: https://api.hrabit64.xyz/hubapi/post/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -200,11 +200,17 @@ components:
         post_write_time:
           type: string
           format: date-time
-          description: 최초로 글이 작성된 시각
+          example: 2023-01-04T21:39:20.619843
+          description: |
+            최초로 글이 작성된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
         post_update_time:
           type: string
           format: date-time
-          description: 게시글이 마지막으로 수정된 시각
+          description: |
+            게시글이 마지막으로 수정된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
         image_image_id_pk:
           description: 게시글의 썸네일 이미지 정보. 게시글에 이미지가 하나도 없다면 null.
           nullable: true
@@ -245,19 +251,25 @@ components:
         post_write_time:
           type: string
           format: date-time
-          description: 최초로 글이 작성된 시각
+          description: |
+            최초로 글이 작성된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
         post_update_time:
           type: string
           format: date-time
-          description: 게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.
+          example: 2023-01-04T21:39:20.619843
+          description: |
+            게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.  
+            형식: 년-월-일T시-분-초.밀리초
         image_image_id_pk:
           type: int
-          description: 게시글의 썸네일 pk (Image)
+          description: 게시글의 썸네일 pk (Image). 전달받은 이미지 pk가 Image 테이블에 없다면 오류.
           example: 1
           nullable: true
         board_boadr_id_pk:
           type: int
-          description: 게시글이 속한 게시판 pk (Board)
+          description: 게시글이 속한 게시판 pk (Board). 전달받은 게시판 pk가 Board 테이블에 없다면 오류.
           example: 1
         member_member_pk:
           type: string
@@ -293,7 +305,7 @@ components:
           maxLength: 45
         image_url:
           type: string
-          example: http://api.example.org/image/jfiiHUJDmkkdjK332
+          example: https://api.hrabit64.xyz/image/jfiiHUJDmkkdjK332
           description: 이미지의 실제 url
           maxLength: 45
       required:
@@ -337,11 +349,17 @@ components:
         post_write_time:
           type: string
           format: date-time
-          description: 최초로 글이 작성된 시각
+          description: |
+            최초로 글이 작성된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
         post_update_time:
           type: string
           format: date-time
-          description: 게시글이 마지막으로 수정된 시각
+          description: |
+            게시글이 마지막으로 수정된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
         image_image_id_pk:
           description: 게시글의 썸네일 이미지 정보. 게시글에 이미지가 하나도 없다면 null.
           nullable: true
@@ -418,13 +436,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=4
+          example: https://api.hrabit64.xyz/hubapi/image/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: http://api.example.org/accounts/?page=2
+          example: https://api.hrabit64.xyz/hubapi/image/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -447,7 +465,7 @@ components:
         image_url:
           type: string
           maxLength: 45
-          example: http://api.example.org/image/jfiiHUJDmkkdjK332
+          example: https://api.hrabit64.xyz/image/jfiiHUJDmkkdjK332
           description: 이미지의 실제 url
         post_post_id_pk:
           type: integer

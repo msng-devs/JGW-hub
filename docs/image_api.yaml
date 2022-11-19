@@ -26,7 +26,7 @@
           maximum: 500
           default: 50
     tags:
-    - image
+    - image-v1
     responses:
       '200':
         content:
@@ -53,7 +53,7 @@
       
       **최소 업로드 가능 레벨**: 서버에 데이터를 업로드 가능한 최소 권한 레벨. Config 테이블에 저장되어있습니다.
     tags:
-      - image
+      - image-v1
     requestBody:
       content:
         application/json:
@@ -101,7 +101,7 @@
       required: true
       description: 가져올 이미지의 pk
     tags:
-    - image
+    - image-v1
     responses:
       '200':
         content:
@@ -125,7 +125,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | 본인 |
+      | 권한필요 | 본인 or admin |
     parameters:
     - in: path
       name: image_id_pk
@@ -134,7 +134,7 @@
       required: true
       description: 가져올 이미지의 pk
     tags:
-      - image
+      - image-v1
     responses:
       '204':
         description: No response body

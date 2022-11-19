@@ -26,7 +26,7 @@
           maximum: 150
           default: 15
     tags:
-    - board
+    - board-v1
     responses:
       '200':
         content:
@@ -49,9 +49,9 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     tags:
-      - board
+      - board-v1
     requestBody:
       content:
         application/json:
@@ -109,7 +109,7 @@
       required: true
       description: 가져올 게시판의 pk
     tags:
-    - board
+    - board-v1
     responses:
       '200':
         content:
@@ -134,7 +134,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     parameters:
       - in: path
         name: board_id_pk
@@ -143,7 +143,7 @@
         required: true
         description: 수정할 게시판의 pk
     tags:
-      - board
+      - board-v1
     requestBody:
       content:
         application/json:
@@ -190,12 +190,12 @@
   delete:
     operationId: board_destroy
     description: |
-      지정한 게시판을 삭제합니다.
+      지정한 게시판을 삭제합니다. admin만 가능합니다.
       ## Router Option
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | Admin |
+      | 권한필요 | admin |
     parameters:
       - in: path
         name: board_id_pk
@@ -204,7 +204,7 @@
         required: true
         description: 삭제할 게시판의 pk
     tags:
-      - board
+      - board-v1
     responses:
       '204':
         description: No response body
