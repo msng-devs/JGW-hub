@@ -43,11 +43,12 @@ import os
 import shutil
 import traceback
 import ast
-
-from gunicorn.glogging import Logger
+import logging
 
 def get_user_header(request):
-    Logger.debug(request.META)
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    gunicorn_logger.debug(request.META)
+
     user_uid = request.META.get('HTTP_USER-PK', None)
     user_role_id = request.META.get('HTTP_ROLE-PK', None)
     if user_uid is None or user_role_id is None:
