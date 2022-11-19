@@ -46,7 +46,8 @@ import ast
 import logging
 
 def get_user_header(request):
-    print(request.META)
+    logger = logging.getLogger('hub')
+    logger.debug(request.META)
 
     user_uid = request.META.get('HTTP_USER-PK', None)
     user_role_id = request.META.get('HTTP_ROLE-PK', None)
