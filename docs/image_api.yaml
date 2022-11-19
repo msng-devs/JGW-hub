@@ -125,7 +125,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | 본인 |
+      | 권한필요 | 본인 or admin |
     parameters:
     - in: path
       name: image_id_pk
