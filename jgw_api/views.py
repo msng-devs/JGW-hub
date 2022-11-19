@@ -45,8 +45,9 @@ import traceback
 import ast
 
 def get_user_header(request):
-    user_uid = request.META.get('user_pk', None)
-    user_role_id = request.META.get('role_pk', None)
+    print(request.META)
+    user_uid = request.META.get('HTTP_USER-PK', None)
+    user_role_id = request.META.get('HTTP_ROLE-PK', None)
     if user_uid is None or user_role_id is None:
         responses_data = {
             'detail': 'Header Required.'
