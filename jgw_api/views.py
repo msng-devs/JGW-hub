@@ -49,7 +49,7 @@ logger = logging.getLogger('hub')
 
 def get_user_header(request):
     user_uid = request.META.get('HTTP_USER_PK', None)
-    user_role_id = request.META.get('HTTP_ROLE_PK', None)
+    user_role_id = int(request.META.get('HTTP_ROLE_PK', None))
 
     if user_uid is None or user_role_id is None:
         responses_data = {
