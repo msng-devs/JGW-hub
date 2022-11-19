@@ -10,7 +10,7 @@ import random
 
 class BoardApiTestOK(APITestCase):
     def setUp(self):
-        self.url = '/hubapi/board/'
+        self.url = '/hub/api/v1/board/'
 
     @classmethod
     def setUpTestData(cls):
@@ -48,7 +48,7 @@ class BoardApiTestOK(APITestCase):
         # then
         return_data = {
                 'count': 10,
-                'next': 'http://testserver/hubapi/board/?page=2',
+                'next': 'http://testserver/hub/api/v1/board/?page=2',
                 'previous': None,
                 'results': [{"board_id_pk": i.board_id_pk,
                              "board_name": i.board_name,
@@ -212,7 +212,7 @@ class BoardApiTestOK(APITestCase):
 
 class BoardApiError(APITestCase):
     def setUp(self):
-        self.url = '/hubapi/board/'
+        self.url = '/hub/api/v1/board/'
 
     @classmethod
     def setUpTestData(cls):

@@ -24,7 +24,7 @@ class ImageApiTestOK(APITestCase):
     test_files_root_url = './test/file_upload_test'
 
     def setUp(self):
-        self.url = '/hubapi/image/'
+        self.url = '/hub/api/v1/image/'
 
     @classmethod
     def setUpTestData(cls):

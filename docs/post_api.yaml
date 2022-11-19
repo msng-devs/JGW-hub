@@ -1,4 +1,4 @@
-\hubapi\post\:
+\hubapi\post\list\:
   get:
     operationId: post_list
     description: |
@@ -27,7 +27,7 @@
           maximum: 100
           default: 10
     tags:
-    - post
+    - post-v1
     responses:
       '200':
         content:
@@ -42,6 +42,7 @@
               $ref: '#/components/schemas/BoardError'
             example:
               detail: Invalid page.
+\hubapi\post\:
   post:
     operationId: post_create
     description: |
@@ -53,7 +54,7 @@
       | 인증필요 | o |
       | 권한필요 | 게시판의 권한 이상 |
     tags:
-      - post
+      - post-v1
     requestBody:
       content:
         application/json:
@@ -110,7 +111,7 @@
       required: true
       description: 가져올 게시글 pk
     tags:
-    - post
+    - post-v1
     responses:
       '200':
         content:
@@ -187,7 +188,7 @@
         type: integer
       description: 게시글의 게시판 pk (Image)
     tags:
-      - post
+      - post-v1
     responses:
       '200':
         content:
@@ -227,7 +228,7 @@
       required: true
       description: 삭제할 게시글 pk
     tags:
-      - post
+      - post-v1
     responses:
       '204':
         description: No response body

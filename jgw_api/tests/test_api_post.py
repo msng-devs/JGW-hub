@@ -29,7 +29,7 @@ class PostApiTestOK(APITestCase):
     post_count = 100
 
     def setUp(self):
-        self.url = '/hubapi/post/'
+        self.url = '/hub/api/v1/post/'
         # self.now = datetime.datetime.now()
 
     @classmethod
@@ -99,10 +99,10 @@ class PostApiTestOK(APITestCase):
             page = query_parameters['page']
             query = sorted(query_parameters.items(), key=lambda x: x[0])
             if page != 1:
-                previous = 'http://testserver/hubapi/post/' + ('list/' if url else '') + '?' +\
+                previous = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
                            '&'.join([f'{i[0]}={i[1] - 1 if i[0] == "page" else i[1]}' for i in query])
             if page != self.post_count / query_parameters['page_size']:
-                next = 'http://testserver/hubapi/post/' + ('list/' if url else '') + '?' +\
+                next = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
                            '&'.join([f'{i[0]}={i[1] + 1 if i[0] == "page" else i[1]}' for i in query])
         return_data = {
             'count': instance.count(),

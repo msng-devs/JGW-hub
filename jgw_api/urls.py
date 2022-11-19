@@ -8,10 +8,10 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, 
 # app_name = 'jgw_api'
 
 router = routers.DefaultRouter()
-router.register(r'board', views.BoardViewSet, basename='board')
+router.register(r'v1/board', views.BoardViewSet, basename='board')
 # router.register(r'post', views.PostViewSet, basename='post')
-router.register(r'image', views.ImageViewSet, basename='image')
-router.register(r'comment', views.CommentViewSet, basename='comment')
+router.register(r'v1/image', views.ImageViewSet, basename='image')
+router.register(r'v1/comment', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -33,9 +33,9 @@ post_detail = views.PostViewSet.as_view({
 })
 
 urlpatterns += format_suffix_patterns([
-    path('post/list/', post_get_list, name='post-get-list'),
-    path('post/', post_post_list, name='post-post-list'),
-    path('post/<int:pk>/', post_detail, name='post-detail')
+    path('v1/post/list/', post_get_list, name='post-get-list'),
+    path('v1/post/', post_post_list, name='post-post-list'),
+    path('v1/post/<int:pk>/', post_detail, name='post-detail')
 ])
 
 if settings.DEBUG:

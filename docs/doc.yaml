@@ -16,27 +16,29 @@ info:
     | 권한필요 | Admin |
   version: 1.0.0
 servers:
-  - url: 'https://api.hrabit64.xyz/'
+  - url: 'https://api.hrabit64.xyz/hub/api/'
 $ref: './schemas/schemas.yaml'
 paths:
-  /hubapi/board/:
+  /v1/board/:
     $ref: './board_api.yaml#/\hubapi\board\'
-  /hubapi/board/{board_id_pk}/:
+  /v1/board/{board_id_pk}/:
     $ref: './board_api.yaml#/\hubapi\board\{board_id_pk}\'
-  /hubapi/post/:
+  /v1/post/list/:
+    $ref: './post_api.yaml#/\hubapi\post\list\'
+  /v1/post/:
     $ref: './post_api.yaml#/\hubapi\post\'
-  /hubapi/post/{post_id_pk}/:
+  /v1/post/{post_id_pk}/:
     $ref: './post_api.yaml#/\hubapi\post\{post_id_pk}\'
-  /hubapi/image/:
+  /v1/image/:
     $ref: './image_api.yaml#/\hubapi\image\'
-  /hubapi/image/{image_id_pk}/:
+  /v1/image/{image_id_pk}/:
     $ref: './image_api.yaml#/\hubapi\image\{image_id_pk}\'
 x-tagGroups:
-  - name: Apis
+  - name: apis-v1
     tags:
-      - board
-      - post
-      - image
+      - board-v1
+      - post-v1
+      - image-v1
 #  - name: Models
 #    tags:
 #      - category_model

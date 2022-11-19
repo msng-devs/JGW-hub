@@ -20,6 +20,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hubapi/', include('jgw_api.urls'))
+    path('hub/api/', include('jgw_api.urls'))
 ]
 urlpatterns += static(r'uploaded', document_root=settings.MEDIA_ROOT)
