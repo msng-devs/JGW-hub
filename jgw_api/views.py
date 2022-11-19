@@ -45,8 +45,11 @@ import traceback
 import ast
 import logging
 
+def get_logger():
+    return logging.getLogger('hub')
+
 def get_user_header(request):
-    logger = logging.getLogger('hub')
+    logger = get_logger()
 
     user_uid = request.META.get('HTTP_USER_PK', None)
     user_role_id = request.META.get('HTTP_ROLE_PK', None)
@@ -61,10 +64,13 @@ def get_user_header(request):
         return user_uid, user_role_id
 
 def get_admin_role_pk():
-    config_admin_role = Config.objects.filter(config_nm='admin_role_pk')
-    if config_admin_role:
-        return int(config_admin_role[0].config_val)
-    else:
+    logger = get_logger()
+
+    try:
+        config_admin_role = Config.objects.get(config_nm='admin_role_pk')
+        logger.debug(f'get admin role success: {config_admin_role}')
+        return int(config_admin_role.config_val)
+    except:
         responses_data = {
             'detail': 'Admin Role not Exist.'
         }
