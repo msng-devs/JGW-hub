@@ -421,10 +421,19 @@ class PostViewSet(viewsets.ModelViewSet):
                 if 'board_boadr_id_pk' in request_data:
                     board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
                     if board_instance.role_role_pk_write_level.role_pk > user_role_id:
-                        request_data._mutable = True
-                        del request_data['board_boadr_id_pk']
-                print(request_data)
-                serializer = PostPatchSerializer(instance, data=request.data, partial=True)
+                        responses_data = {
+                            'detail': 'This board is not allowed.'
+                        }
+                        return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+
+                if 'post_update_time' not in request_data:
+                    request_data._mutable = True
+                    request_data['post_update_time'] = datetime.datetime.now()
+                if 'post_write_time' in request_data:
+                    request_data._mutable = True
+                    del request_data['post_write_time']
+
+                serializer = PostPatchSerializer(instance, data=request_data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 self.perform_update(serializer)
 
@@ -449,13 +458,19 @@ class PostViewSet(viewsets.ModelViewSet):
 
     # post
     def create(self, request, *args, **kwargs):
-        post_serializer = PostSerializer(data=request.data)
-        post_serializer.is_valid(raise_exception=True)
-
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
+
+        request_data = request.data
+        now = datetime.datetime.now()
+        request_data._mutable = True
+        request_data['post_write_time'] = now
+        request_data['post_update_time'] = now
+
+        post_serializer = PostSerializer(data=request_data)
+        post_serializer.is_valid(raise_exception=True)
         board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
             try:
