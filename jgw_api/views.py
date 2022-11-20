@@ -452,8 +452,9 @@ class PostViewSet(viewsets.ModelViewSet):
             if settings.TESTING:
                 traceback.print_exc()
             error_responses_data = {
-                'detail': 'Test'
+                'detail': 'Error occurred while update post.'
             }
+            logger.debug(traceback.print_exc())
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
 
     # post
