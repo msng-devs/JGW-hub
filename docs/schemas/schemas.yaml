@@ -282,6 +282,36 @@ components:
         - post_title
         - post_update_time
         - post_write_time
+    PostPatch:
+      type: object
+      properties:
+        post_title:
+          type: string
+          maxLength: 100
+          example: 언제끝내지
+          description: 게시글 제목
+        post_content:
+          type: string
+          example: 게시글게시글~~~
+          description: 게시글 내용 (마크다운)
+        post_update_time:
+          type: string
+          format: date-time
+          example: 2023-01-04T21:39:20.619843
+          description: |
+            게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.  
+            형식: 년-월-일T시-분-초.밀리초
+        image_image_id_pk:
+          type: int
+          description: 게시글의 썸네일 pk (Image). 전달받은 이미지 pk가 Image 테이블에 없다면 오류.
+          example: 1
+          nullable: true
+        board_boadr_id_pk:
+          type: int
+          description: 게시글이 속한 게시판 pk (Board). 전달받은 게시판 pk가 Board 테이블에 없다면 오류.
+          example: 1
+      required:
+        - post_update_time
     PostError:
       type: object
       properties:

@@ -153,40 +153,12 @@
       |:---:|:---:|
       | 인증필요 | o |
       | 권한필요 | (수정요청 유저의 권한 == 작성한 본인 and<br>수정요청 유저의 권한 >= 수정하려는 글이 속한 게시판의 쓰기 권한) |
-    parameters:
-    - in: path
-      name: post_id_pk
-      schema:
-        type: string
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostPatch'
       required: true
-      description: 수정할 게시글 pk
-    - in: query
-      name: post_title
-      schema:
-        type: string
-      description: 게시글 제목
-    - in: query
-      name: post_content
-      schema:
-        type: string
-      description: 게시글 내용 (마크다운)
-    - in: query
-      name: post_update_time
-      schema:
-        type: string
-        format: date-time
-      description: 게시글이 수정된 시각
-    - in: query
-      name: image_image_id_pk
-      schema:
-        type: integer
-        nullable: true
-      description: 게시글의 썸네일 pk (Image)
-    - in: query
-      name: board_boadr_id_pk
-      schema:
-        type: integer
-      description: 게시글의 게시판 pk (Image)
     tags:
       - post-v1
     responses:
