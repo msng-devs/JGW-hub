@@ -418,6 +418,7 @@ class PostViewSet(viewsets.ModelViewSet):
         try:
             if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
                 request_data = request.data
+                request_data._mutable = True
                 if 'board_boadr_id_pk' in request_data:
                     board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
                     if board_instance.role_role_pk_write_level.role_pk > user_role_id:
@@ -427,10 +428,8 @@ class PostViewSet(viewsets.ModelViewSet):
                         return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
                 if 'post_update_time' not in request_data:
-                    request_data._mutable = True
                     request_data['post_update_time'] = datetime.datetime.now()
                 if 'post_write_time' in request_data:
-                    request_data._mutable = True
                     del request_data['post_write_time']
 
                 serializer = PostPatchSerializer(instance, data=request_data, partial=True)
@@ -465,8 +464,8 @@ class PostViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_pk = checked
 
         request_data = request.data
-        now = datetime.datetime.now()
         request_data._mutable = True
+        now = datetime.datetime.now()
         request_data['post_write_time'] = now
         request_data['post_update_time'] = now
 
