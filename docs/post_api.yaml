@@ -102,7 +102,9 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | 게시판의 권한 이상 or admin |
+      | 권한필요 | optional |
+      * 사용자가 로그인 한 상태 -> 게시판의 권한 이상 or admin
+      * 사용자가 로그인 하지 않은 상태 -> 유저 토큰 없이 요청
     parameters:
     - in: path
       name: post_id_pk
