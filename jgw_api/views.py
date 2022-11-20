@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import connection
 from django.utils.crypto import get_random_string
 from django.db import models
+from django.http import QueryDict
 
 from typing import List, Dict
 
@@ -418,7 +419,7 @@ class PostViewSet(viewsets.ModelViewSet):
         try:
             if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
                 request_data = request.data
-                if not isinstance(request_data, dict):
+                if isinstance(request_data, QueryDict):
                     request_data._mutable = True
                 if 'board_boadr_id_pk' in request_data:
                     board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
@@ -465,7 +466,7 @@ class PostViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_pk = checked
 
         request_data = request.data
-        if not isinstance(request_data, dict):
+        if isinstance(request_data, QueryDict):
             request_data._mutable = True
         now = datetime.datetime.now()
         request_data['post_write_time'] = now
