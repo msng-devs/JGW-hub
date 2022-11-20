@@ -14,6 +14,10 @@ info:
     |:---:|:---:|
     | 인증필요 | 필요 |
     | 권한필요 | Admin |
+    
+    ## 인증 헤더
+    인증이 필요한 api를 요청할때는 헤더에 유저의 token을 명시해야합니다.  
+    'Authorization': 'Bearer [token]'
   version: 1.0.0
 servers:
   - url: 'https://api.hrabit64.xyz/hub/api/'

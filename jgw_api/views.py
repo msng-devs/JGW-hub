@@ -468,8 +468,9 @@ class PostViewSet(viewsets.ModelViewSet):
             except Exception as err:
                 traceback.print_exc()
                 error_responses_data = {
-                    'detail': 'board with this board name already exists.'
+                    'detail': 'Error occurred while make post.'
                 }
+                logger.debug(traceback.print_exc())
                 return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
         else:
             responses_data = {
