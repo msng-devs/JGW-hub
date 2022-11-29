@@ -49,14 +49,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware'
 ]
 
 ROOT_URLCONF = 'JGW_hub.urls'
@@ -209,3 +209,6 @@ LOGGING = {
 
 CORS_ORIGIN_ALLOW_ALL = MY_CORS_ORIGIN_ALLOW_ALL
 CORS_ALLOW_CREDENTIALS = MY_CORS_ALLOW_CREDENTIALS
+CORS_ALLOW_METHODS = MY_CORS_ALLOW_METHODS
+CORS_ALLOW_HEADERS = MY_CORS_ALLOW_HEADERS
+APPEND_SLASH = MY_APPEND_SLASH
