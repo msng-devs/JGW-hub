@@ -89,11 +89,18 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
 class CommentGetSerializer(serializers.ModelSerializer):
     member_member_pk = MemberNestedPostSerializer(read_only=True)
+    reply = serializers.SerializerMethodField()
+
+    def get_reply(self, instance):
+        # recursive
+        serializer = self.__class__(instance.reply, many=True)
+        serializer.bind('', self)
+        return serializer.data
 
     class Meta:
         model = Comment
         fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
-                  'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref']
+                  'comment_delete', 'post_post_id_pk', 'member_member_pk', 'reply']
 
 class CommentRecursiveGetSerializer(serializers.Serializer):
     member_member_pk = MemberNestedPostSerializer(read_only=True)
