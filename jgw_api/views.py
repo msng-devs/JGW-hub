@@ -528,7 +528,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentGetSerializer
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.all().order_by('-comment_id')
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
 
@@ -540,7 +540,10 @@ class CommentViewSet(viewsets.ModelViewSet):
                 'detail': 'post_id request'
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            queryset = self.get_queryset().filter(post_post_id_pk=int(request.query_params['post_id']))
+            queryset = self.get_queryset().filter(
+                post_post_id_pk=int(request.query_params['post_id']),
+                comment_comment_id_ref=None
+            )
 
         if 'page' not in request.query_params:
             request.query_params['page'] = 1
@@ -553,3 +556,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        pass
