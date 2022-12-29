@@ -28,7 +28,8 @@ from .serializers import (
     ImageSerializer,
     PostGetSerializer,
     PostPatchSerializer,
-    CommentGetSerializer
+    CommentGetSerializer,
+    CommentWriteSerializer
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
@@ -558,4 +559,35 @@ class CommentViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        pass
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
+        request_data = request.data
+        comment_serializer = CommentWriteSerializer(data=request_data)
+        comment_serializer.is_valid(raise_exception=True)
+        post_instance = comment_serializer.validated_data['post_post_id_pk']
+        # logger.debug(f'comment post post instance: {post_instance}')
+
+        board_instance = post_instance.board_boadr_id_pk
+        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
+            try:
+                self.perform_create(comment_serializer)
+
+                # post_pk = post_serializer.data['post_id_pk']
+                # serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+
+                return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as err:
+                traceback.print_exc()
+                error_responses_data = {
+                    'detail': 'Error occurred while make post.'
+                }
+                logger.debug(traceback.print_exc())
+                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            responses_data = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
