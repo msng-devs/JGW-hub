@@ -626,3 +626,21 @@ class CommentViewSet(viewsets.ModelViewSet):
             }
             logger.debug(traceback.print_exc())
             return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
+    # delete
+    def destroy(self, request, *args, **kwargs):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk, = checked
+
+        instance = self.get_object()
+
+        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            detail = {
+                'detail': 'Image delete not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
