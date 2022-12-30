@@ -66,12 +66,12 @@ class Comment(models.Model):
     comment_id = models.AutoField(db_column='COMMENT_ID', primary_key=True)  # Field name made lowercase.
     comment_depth = models.IntegerField(db_column='COMMENT_DEPTH')  # Field name made lowercase.
     comment_content = models.TextField(db_column='COMMENT_CONTENT')  # Field name made lowercase.
-    comment_write_time = models.DateTimeField(db_column='COMMENT_WRITE_TIME')  # Field name made lowercase.
-    comment_update_time = models.DateTimeField(db_column='COMMENT_UPDATE_TIME')  # Field name made lowercase.
+    comment_write_time = models.DateTimeField(db_column='COMMENT_WRITE_TIME', auto_now_add=True)  # Field name made lowercase.
+    comment_update_time = models.DateTimeField(db_column='COMMENT_UPDATE_TIME', auto_now=True)  # Field name made lowercase.
     comment_delete = models.IntegerField(db_column='COMMENT_DELETE')  # Field name made lowercase.
     post_post_id_pk = models.ForeignKey('Post', models.DO_NOTHING, db_column='POST_POST_ID_PK')  # Field name made lowercase.
     member_member_pk = models.ForeignKey('Member', models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
-    comment_comment_id_ref = models.ForeignKey('self', models.DO_NOTHING, db_column='COMMENT_COMMENT_ID_REF', blank=True, null=True)  # Field name made lowercase.
+    comment_comment_id_ref = models.ForeignKey('self', models.DO_NOTHING, db_column='COMMENT_COMMENT_ID_REF', blank=True, null=True, related_name='reply')  # Field name made lowercase.
 
     class Meta:
         managed = True

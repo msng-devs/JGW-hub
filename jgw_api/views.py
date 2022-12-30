@@ -28,7 +28,8 @@ from .serializers import (
     ImageSerializer,
     PostGetSerializer,
     PostPatchSerializer,
-    CommentGetSerializer
+    CommentGetSerializer,
+    CommentWriteSerializer
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
@@ -150,73 +151,6 @@ def save_images_storge(images_data, member_pk):
             'member_member_pk': member_pk
         })
     return img_urls
-
-def __fetchall(cursor) -> List[models.Model]:
-    desc = cursor.description
-    ret: List[models.Model] = []
-    columns = [info[0] for info in desc]
-
-    for data in cursor.fetchall():
-        row = {}
-        for i, column in enumerate(columns):
-            d = data[i]
-            if column == 'post_post_id_pk':
-                d = Post.objects.get(post_id_pk=d)
-            elif column == 'member_member_pk':
-                d = Member.objects.get(member_pk=d)
-            elif column == 'comment_comment_id_ref' and d is not None:
-                d = Comment.objects.get(comment_id=d)
-            row[column] = d
-        ret.append(Comment(**row))
-    return ret
-
-def get_comment_tree(post_id):
-    cursor = connection.cursor()
-    cursor.execute(f'''
-                WITH RECURSIVE TREE_QUERY
-                    AS (
-                        SELECT comment_id,
-                            comment_depth,
-                            comment_content,
-                            comment_write_time,
-                            comment_update_time,
-                            comment_delete,
-                            post_post_id_pk,
-                            member_member_pk,
-                            comment_comment_id_ref,
-                            CONVERT(comment_id, CHAR) sort,
-                            CONVERT(member_member_pk, CHAR) depth_fullname
-                        FROM COMMENT
-                        WHERE  comment_comment_id_ref is null and post_post_id_pk = {post_id}
-                        UNION ALL
-                        SELECT B.comment_id,
-                            B.comment_depth,
-                            B.comment_content,
-                            B.comment_write_time,
-                            B.comment_update_time,
-                            B.comment_delete,
-                            B.post_post_id_pk,
-                            B.member_member_pk,
-                            B.comment_comment_id_ref,
-                            CONVERT(CONVERT(C.sort, CHAR) + ' > ' + CONVERT(B.comment_id, CHAR), CHAR) sort,
-                            CONVERT(CONVERT(C.depth_fullname, CHAR) + ' > ' + CONVERT(B.member_member_pk, CHAR), CHAR) depth_fullname
-                        FROM COMMENT B, TREE_QUERY C
-                        WHERE  B.comment_comment_id_ref = C.comment_id and C.post_post_id_pk = {post_id}
-                    )
-
-                SELECT comment_id,
-                       comment_depth,
-                       comment_content,
-                       comment_write_time,
-                       comment_update_time,
-                       comment_delete,
-                       post_post_id_pk,
-                       member_member_pk,
-                       comment_comment_id_ref
-                FROM   TREE_QUERY
-                ORDER  BY sort''')
-    queryset: List[models.Model] = __fetchall(cursor)
-    return queryset
 
 
 @api_view(['GET'])
@@ -595,7 +529,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentGetSerializer
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.all().order_by('-comment_id')
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
 
@@ -607,7 +541,10 @@ class CommentViewSet(viewsets.ModelViewSet):
                 'detail': 'post_id request'
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
-            queryset = get_comment_tree(int(request.query_params['post_id']))
+            queryset = self.get_queryset().filter(
+                post_post_id_pk=int(request.query_params['post_id']),
+                comment_comment_id_ref=None
+            )
 
         if 'page' not in request.query_params:
             request.query_params['page'] = 1
@@ -620,3 +557,90 @@ class CommentViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    # post
+    def create(self, request, *args, **kwargs):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
+        request_data = request.data
+        comment_serializer = CommentWriteSerializer(data=request_data)
+        comment_serializer.is_valid(raise_exception=True)
+
+        post_instance = comment_serializer.validated_data['post_post_id_pk']
+        board_instance = post_instance.board_boadr_id_pk
+        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
+            try:
+                self.perform_create(comment_serializer)
+
+                # post_pk = post_serializer.data['post_id_pk']
+                # serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+
+                return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as err:
+                traceback.print_exc()
+                error_responses_data = {
+                    'detail': 'Error occurred while make post.'
+                }
+                logger.debug(traceback.print_exc())
+                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            responses_data = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+
+    # patch
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
+        board_instance = instance.post_post_id_pk.board_boadr_id_pk
+        user_instance = instance.member_member_pk
+        try:
+            if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
+                    and user_uid == user_instance.member_pk:
+                request_data = request.data
+                serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+
+                if getattr(instance, '_prefetched_objects_cache', None):
+                    instance._prefetched_objects_cache = {}
+                return Response(serializer.data)
+            else:
+                responses_data = {
+                    'detail': 'Not Allowed.'
+                }
+                return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+        except:
+            if settings.TESTING:
+                traceback.print_exc()
+            error_responses_data = {
+                'detail': 'Error occurred while update post.'
+            }
+            logger.debug(traceback.print_exc())
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+
+    # delete
+    def destroy(self, request, *args, **kwargs):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk, = checked
+
+        instance = self.get_object()
+
+        if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            detail = {
+                'detail': 'Image delete not allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)

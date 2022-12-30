@@ -28,7 +28,7 @@ class CommentApiTestOK(APITestCase):
     now = datetime.datetime.now()
 
     def setUp(self):
-        self.url = '/hubapi/comment/'
+        self.url = '/hub/api/v1/comment/'
         self.now = datetime.datetime.now()
 
     @classmethod
@@ -114,39 +114,141 @@ class CommentApiTestOK(APITestCase):
                     comment_delete=0,
                     post_post_id_pk=Comment.objects.get(comment_id=i + 1).post_post_id_pk,
                     member_member_pk=Comment.objects.get(comment_id=i + 1).member_member_pk,
-                    comment_comment_id_ref=None
+                    comment_comment_id_ref=Comment.objects.get(comment_id=i + 1)
                 )
 
-    # def test_comment_get(self):
-    #     print("Comment Api GET ALL Running...")
-    #
-    #     # given
-    #
-    #     # when
-    #     respons: Response = self.client.get(self.url, data={'post_id': 2, 'page': 1})
-    #
-    #     print(respons.content)
-    #
-    #     # # then
-    #     return_data = {
-    #             'count': 15,
-    #             'next': 'http://testserver/hubapi/comment/?page=2',
-    #             'previous': None,
-    #             'results': [{
-    #                 'comment_id': i.comment_id,
-    #                 'comment_depth': i.comment_depth,
-    #                 'comment_content': i.comment_content,
-    #                 'comment_write_time': i.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-    #                 'comment_update_time': i.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-    #                 'comment_delete': i.comment_delete,
-    #                 'post_post_id_pk': i.post_post_id_pk.post_id_pk,
-    #                 'member_member_pk': {
-    #                     'member_pk': i.member_member_pk.member_pk,
-    #                     'member_nm': i.member_member_pk.member_nm
-    #                 },
-    #                 'comment_comment_id_ref': i.comment_comment_id_ref
-    #             } for i in Comment.objects.all().order_by('comment_id')[:15]]
-    #         }
-    #
-    #     self.assertEqual(respons.status_code, status.HTTP_200_OK)
-    #     self.assertJSONEqual(respons.content, return_data)
+    def __comment_get(self, data):
+        def comment_get_data(ref_comment):
+            instance = Comment.objects.all().order_by(('-' if ref_comment is None else '') + 'comment_id').filter(
+                post_post_id_pk=int(data['post_id']),
+                comment_comment_id_ref=None if ref_comment is None else ref_comment.comment_id
+            )
+
+            if ref_comment is None:
+                instance = instance[:3]
+
+            return [{
+                "comment_id": i.comment_id,
+                "comment_depth": i.comment_depth,
+                "comment_content": i.comment_content,
+                "comment_write_time": i.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                "comment_update_time": i.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+                "comment_delete": i.comment_delete,
+                "post_post_id_pk": i.post_post_id_pk.post_id_pk,
+                "member_member_pk": {
+                    "member_pk": i.member_member_pk.member_pk,
+                    "member_nm": i.member_member_pk.member_nm,
+                },
+                "reply": comment_get_data(i)
+            } for i in instance]
+
+        return {
+            'count': 3,
+            "next": "http://testserver/hub/api/v1/comment/?page=2&page_size=3&post_id=2",
+            "previous": None,
+            "results": comment_get_data(None)
+        }
+
+    def test_comment_get(self):
+        print("Comment Api GET ALL Running...")
+
+        # given
+        data = {'post_id': 2, 'page': 1, 'page_size': 3}
+
+        # when
+        respons: Response = self.client.get(self.url, data=data)
+
+        # # then
+        return_data = self.__comment_get(data)
+
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(respons.content, return_data)
+
+    def test_comment_post(self):
+        print("Comment Api POST Running...")
+
+        # given
+        post_instance = Post.objects.all()[random.randint(0, Post.objects.count() - 1)]
+        member_instance = Member.objects.all()[random.randint(0, Member.objects.count() - 1)]
+
+        data = '{"comment_depth": 0,' \
+               '"comment_content": "content data",' \
+               '"comment_delete": 0,' \
+               '"post_post_id_pk": "' + str(post_instance.post_id_pk) + '",' \
+               '"member_member_pk": "' + member_instance.member_pk + '",' \
+               '"comment_comment_id_ref": null}'
+
+        # when
+        header_data = {
+            'HTTP_USER_PK': member_instance.member_pk,
+            'HTTP_ROLE_PK': member_instance.role_role_pk.role_pk
+        }
+        response: Response = self.client.post(self.url, data=data, content_type="application/json", **header_data)
+        # print(response.content)
+
+        comment_instance = Comment.objects.get(comment_content='content data')
+        # then
+        responses_data = {
+            'comment_id': comment_instance.comment_id,
+            'comment_depth': comment_instance.comment_depth,
+            'comment_content': comment_instance.comment_content,
+            'comment_write_time': comment_instance.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_update_time': comment_instance.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_delete': comment_instance.comment_delete,
+            'post_post_id_pk': comment_instance.post_post_id_pk.post_id_pk,
+            'member_member_pk': comment_instance.member_member_pk.member_pk,
+            'comment_comment_id_ref': comment_instance.comment_comment_id_ref
+        }
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertJSONEqual(response.content, responses_data)
+
+    def test_comment_patch(self):
+        print("Comment Api PATCH Running...")
+
+        # given
+        comment_instance = Comment.objects.get(comment_id=10)
+        member_instance = comment_instance.member_member_pk
+
+        data = {
+            'comment_content': "수정된 사항입니다."
+        }
+
+        # when
+        header_data = {
+            'HTTP_USER_PK': member_instance.member_pk,
+            'HTTP_ROLE_PK': member_instance.role_role_pk.role_pk
+        }
+        response: Response = self.client.patch(f'{self.url}{comment_instance.comment_id}/', data=data, **header_data)
+        # print(response.content)
+
+        comment_instance = Comment.objects.get(comment_id=10)
+        # then
+        responses_data = {
+            'comment_id': comment_instance.comment_id,
+            'comment_depth': comment_instance.comment_depth,
+            'comment_content': comment_instance.comment_content,
+            'comment_write_time': comment_instance.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_update_time': comment_instance.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_delete': comment_instance.comment_delete,
+            'post_post_id_pk': comment_instance.post_post_id_pk.post_id_pk,
+            'member_member_pk': comment_instance.member_member_pk.member_pk,
+            'comment_comment_id_ref': comment_instance.comment_comment_id_ref
+        }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, responses_data)
+
+    def test_comment_delete_by_id(self):
+        print("Comment Api DELETE BY ID Running...")
+        # given
+
+        # when
+        target = Comment.objects.get(comment_id=10)
+        key = target.comment_id
+        header_data = {
+            'HTTP_USER_PK': target.member_member_pk.member_pk,
+            'HTTP_ROLE_PK': target.member_member_pk.role_role_pk.role_pk
+        }
+        respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
