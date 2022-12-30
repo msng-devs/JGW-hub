@@ -558,6 +558,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    # post
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
@@ -567,11 +568,10 @@ class CommentViewSet(viewsets.ModelViewSet):
         request_data = request.data
         comment_serializer = CommentWriteSerializer(data=request_data)
         comment_serializer.is_valid(raise_exception=True)
-        post_instance = comment_serializer.validated_data['post_post_id_pk']
-        # logger.debug(f'comment post post instance: {post_instance}')
 
+        post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
-        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
+        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
             try:
                 self.perform_create(comment_serializer)
 
@@ -591,3 +591,38 @@ class CommentViewSet(viewsets.ModelViewSet):
                 'detail': 'Not Allowed.'
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+
+    # patch
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            return checked
+        user_uid, user_role_id, admin_role_pk = checked
+
+        board_instance = instance.post_post_id_pk.board_boadr_id_pk
+        user_instance = instance.member_member_pk
+        try:
+            if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
+                    and user_uid == user_instance.member_pk:
+                request_data = request.data
+                serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+
+                if getattr(instance, '_prefetched_objects_cache', None):
+                    instance._prefetched_objects_cache = {}
+                return Response(serializer.data)
+            else:
+                responses_data = {
+                    'detail': 'Not Allowed.'
+                }
+                return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+        except:
+            if settings.TESTING:
+                traceback.print_exc()
+            error_responses_data = {
+                'detail': 'Error occurred while update post.'
+            }
+            logger.debug(traceback.print_exc())
+            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
