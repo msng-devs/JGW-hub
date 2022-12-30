@@ -219,7 +219,7 @@ class CommentApiTestOK(APITestCase):
             'HTTP_ROLE_PK': member_instance.role_role_pk.role_pk
         }
         response: Response = self.client.patch(f'{self.url}{comment_instance.comment_id}/', data=data, **header_data)
-        print(response.content)
+        # print(response.content)
 
         comment_instance = Comment.objects.get(comment_id=10)
         # then
@@ -236,3 +236,19 @@ class CommentApiTestOK(APITestCase):
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(response.content, responses_data)
+
+    def test_comment_delete_by_id(self):
+        print("Comment Api DELETE BY ID Running...")
+        # given
+
+        # when
+        target = Comment.objects.get(comment_id=10)
+        key = target.comment_id
+        header_data = {
+            'HTTP_USER_PK': target.member_member_pk.member_pk,
+            'HTTP_ROLE_PK': target.member_member_pk.role_role_pk.role_pk
+        }
+        respons: Response = self.client.delete(f"{self.url}{key}/", **header_data)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
