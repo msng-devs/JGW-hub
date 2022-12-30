@@ -201,3 +201,38 @@ class CommentApiTestOK(APITestCase):
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertJSONEqual(response.content, responses_data)
+
+    def test_comment_patch(self):
+        print("Comment Api PATCH Running...")
+
+        # given
+        comment_instance = Comment.objects.get(comment_id=10)
+        member_instance = comment_instance.member_member_pk
+
+        data = {
+            'comment_content': "수정된 사항입니다."
+        }
+
+        # when
+        header_data = {
+            'HTTP_USER_PK': member_instance.member_pk,
+            'HTTP_ROLE_PK': member_instance.role_role_pk.role_pk
+        }
+        response: Response = self.client.patch(f'{self.url}{comment_instance.comment_id}/', data=data, **header_data)
+        print(response.content)
+
+        comment_instance = Comment.objects.get(comment_id=10)
+        # then
+        responses_data = {
+            'comment_id': comment_instance.comment_id,
+            'comment_depth': comment_instance.comment_depth,
+            'comment_content': comment_instance.comment_content,
+            'comment_write_time': comment_instance.comment_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_update_time': comment_instance.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
+            'comment_delete': comment_instance.comment_delete,
+            'post_post_id_pk': comment_instance.post_post_id_pk.post_id_pk,
+            'member_member_pk': comment_instance.member_member_pk.member_pk,
+            'comment_comment_id_ref': comment_instance.comment_comment_id_ref
+        }
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, responses_data)
