@@ -1,0 +1,222 @@
+\hubapi\comment\:
+  get:
+    operationId: comment_list
+    description: |
+      댓글 목록을 가져옵니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | x |
+      | 권한필요 | x |
+    parameters:
+      - name: page
+        required: false
+        in: query
+        description: 몇번째 페이지를 가져올지 지정합니다.
+        schema:
+          type: integer
+          default: 1
+      - name: page_size
+        required: false
+        in: query
+        description: 한 페이지에 몇개의 데이터를 가져올지 지정합니다.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 25
+          default: 10
+      - name: post_id
+        required: true
+        in: query
+        description: |
+          어떤 게시글에 작성된 댓글을 가져올지 지정합니다.
+          게시글 번호를 지정하지 않으면 400을 응답합니다.
+        schema:
+          type: integer
+    tags:
+    - comment-v1
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaginatedCommentGetList'
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardErrorPost-404'
+            example:
+              detail: Invalid page.
+\hubapi\post\:
+  post:
+    operationId: post_create
+    description: |
+      게시글을 작성합니다. 쓰기 요청한 유저의 권한이 작성하려는 게시판의 쓰기 레벨과 같거나 더 높아야 글 작성이 가능합니다.<br>
+      admin은 게시판의 쓰기 권한과 상관 없이 글 작성이 가능합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | 게시판의 권한 이상 or admin |
+    tags:
+      - post-v1
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostCreate'
+      required: true
+    responses:
+      '201':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostGet'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: board with this category name already exists.
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not allowed.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: User header not found.
+\hubapi\post\{post_id_pk}\:
+  get:
+    operationId: post_retrieve
+    description: |
+      지정한 게시글의 데이터를 가져옵니다. 요청한 유저의 권한이 가져오려는 게시글이 속한 게시판의 읽기 레벨과 같거나 더 높아야 글 읽기가 가능합니다.<br>
+      admin은 게시판의 읽기 권한과 상관 없이 글 읽기가 가능합니다.<br>
+      post_list api와 다르게 post_retrieve api는 모든 content를 리턴합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | optional |
+      * 사용자가 로그인 한 상태 -> 게시판의 권한 이상 or admin
+      * 사용자가 로그인 하지 않은 상태 -> 유저 토큰 없이 요청
+    parameters:
+    - in: path
+      name: post_id_pk
+      schema:
+        type: string
+      required: true
+      description: 가져올 게시글 pk
+    tags:
+    - post-v1
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostGet'
+        description: ''
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not allowed.
+      '404':
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not found.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: User header not found.
+  patch:
+    operationId: post_partial_update
+    description: |
+      지정한 게시글의 데이터를 수정합니다. 요청한 유저가 글을 작성한 본인이면서 요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.<br>
+      admin도 본인이 아니면 글 수정이 불가능합니다.<br>
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | (수정요청 유저의 권한 == 작성한 본인 and<br>수정요청 유저의 권한 >= 수정하려는 글이 속한 게시판의 쓰기 권한) |
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PostPatch'
+      required: true
+    tags:
+      - post-v1
+    responses:
+      '200':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPostGet'
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not allowed.
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: User header not found.
+  delete:
+    operationId: post_destroy
+    description: |
+      지정한 게시글을 삭제합니다. 글을 쓴 본인 또는 관리자만 삭제가 가능합니다.
+      ## Router Option
+      | option | value |
+      |:---:|:---:|
+      | 인증필요 | o |
+      | 권한필요 | 글 작성 본인 or admin |
+    parameters:
+    - in: path
+      name: post_id_pk
+      schema:
+        type: string
+      required: true
+      description: 삭제할 게시글 pk
+    tags:
+      - post-v1
+    responses:
+      '204':
+        description: No response body
+      '404':
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostError'
+            example:
+              detail: Not found.
