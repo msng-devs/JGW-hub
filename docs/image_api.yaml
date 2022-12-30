@@ -38,7 +38,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Invalid page.
   post:
@@ -72,7 +72,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '500':
@@ -80,7 +80,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
 \hubapi\image\{image_id_pk}\:
@@ -114,7 +114,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
   delete:
@@ -143,7 +143,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '404':
@@ -151,7 +151,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
       '500':
@@ -159,6 +159,6 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ImageError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
