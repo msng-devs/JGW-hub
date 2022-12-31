@@ -124,7 +124,16 @@ def request_check(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id
 
-def request_check_admin_role(request):
+def request_check_admin_role(
+        request: rest_framework.request.Request
+    ) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
+    '''
+    user header, admin role 모두가 정상적으로 리턴됐는지 확인하는 함수
+
+    :param request: 게이트웨이로 부터 전달받은 request
+    :return: user header, admin role 모두가 정상적으로 존재한다면 user의 uid, role, admin role이 리턴.
+        user header, admin role 중 하나라도 없다면 500 response 리턴
+    '''
     header_checked = get_user_header(request)
     if isinstance(header_checked, Response):
         return header_checked
