@@ -112,6 +112,9 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
 
 class CommentGetSerializer(serializers.ModelSerializer):
+    '''
+    comment serializer. get method에 사용하는 serializer.
+    '''
     member_member_pk = MemberNestedSerializer(read_only=True)
     reply = serializers.SerializerMethodField()
 
@@ -127,12 +130,18 @@ class CommentGetSerializer(serializers.ModelSerializer):
                   'comment_delete', 'post_post_id_pk', 'member_member_pk', 'reply']
 
 class CommentWriteSerializer(serializers.ModelSerializer):
+    '''
+    comment serializer. post method에 사용하는 serializer.
+    '''
     class Meta:
         model = Comment
         fields = '__all__'
 
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
+    '''
+    comment serializer. post method에 결과값 리턴을 위해 사용하는 serializer.
+    '''
     member_member_pk = MemberNestedSerializer(read_only=True)
 
     class Meta:
