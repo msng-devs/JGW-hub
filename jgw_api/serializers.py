@@ -78,7 +78,7 @@ class BoardGetSerializer(serializers.ModelSerializer):
 
 
 
-class PostPostSerializer(serializers.ModelSerializer):
+class PostWriteSerializer(serializers.ModelSerializer):
     '''
     post serializer. post method에 사용하는 serializer.
     '''

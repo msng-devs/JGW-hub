@@ -24,7 +24,7 @@ from .models import (
 from .serializers import (
     BoardGetSerializer,
     BoardWriteSerializer,
-    PostPostSerializer,
+    PostWriteSerializer,
     ImageSerializer,
     PostGetSerializer,
     PostPatchSerializer,
@@ -483,7 +483,7 @@ class PostViewSet(viewsets.ModelViewSet):
         request_data['post_write_time'] = now
         request_data['post_update_time'] = now
 
-        post_serializer = PostPostSerializer(data=request_data)
+        post_serializer = PostWriteSerializer(data=request_data)
         post_serializer.is_valid(raise_exception=True)
         board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
