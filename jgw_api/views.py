@@ -366,6 +366,9 @@ def post_get_all_query(
     return queryset
 
 class PostViewSet(viewsets.ModelViewSet):
+    '''
+    게시글 api를 담당하는 클래스
+    '''
     serializer_class = PostGetSerializer
     queryset = Post.objects.all()
     pagination_class = PostPageNumberPagination
