@@ -222,6 +222,9 @@ def ping_pong(request):
     return Response(msg, status.HTTP_200_OK)
 
 class BoardViewSet(viewsets.ModelViewSet):
+    '''
+    게시판 api를 담당하는 클래스
+    '''
     serializer_class = BoardSerializer
     queryset = Board.objects.all().order_by('board_id_pk')
     pagination_class = BoardPageNumberPagination
