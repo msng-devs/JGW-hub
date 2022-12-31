@@ -638,8 +638,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
 
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
-            self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            request_data = {"comment_delete": 1}
+            serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+
+            return Response(serializer.data)
         else:
             detail = {
                 'detail': 'Image delete not allowed.'
