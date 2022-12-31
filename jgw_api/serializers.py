@@ -57,13 +57,16 @@ class MemberNestedSerializer(serializers.ModelSerializer):
 
 class BoardWriteSerializer(serializers.ModelSerializer):
     '''
-    board nested serializer. post method에 사용하는 serializer.
+    board serializer. post method에 사용하는 serializer.
     '''
     class Meta:
         model = Board
         fields = '__all__'
 
-class BoardSerializer(serializers.ModelSerializer):
+class BoardGetSerializer(serializers.ModelSerializer):
+    '''
+    board serializer. get method에 사용하는 serializer.
+    '''
     role_role_pk_write_level = RoleNestedSerializer(read_only=True)
     role_role_pk_read_level = RoleNestedSerializer(read_only=True)
     role_role_pk_comment_write_level = RoleNestedSerializer(read_only=True)

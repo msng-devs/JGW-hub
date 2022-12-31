@@ -22,7 +22,7 @@ from .models import (
     Member,
 )
 from .serializers import (
-    BoardSerializer,
+    BoardGetSerializer,
     BoardWriteSerializer,
     PostSerializer,
     ImageSerializer,
@@ -226,7 +226,7 @@ class BoardViewSet(viewsets.ModelViewSet):
     '''
     게시판 api를 담당하는 클래스
     '''
-    serializer_class = BoardSerializer
+    serializer_class = BoardGetSerializer
     queryset = Board.objects.all().order_by('board_id_pk')
     pagination_class = BoardPageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
