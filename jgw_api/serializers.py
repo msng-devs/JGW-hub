@@ -78,12 +78,18 @@ class BoardGetSerializer(serializers.ModelSerializer):
 
 
 
-class PostSerializer(serializers.ModelSerializer):
+class PostPostSerializer(serializers.ModelSerializer):
+    '''
+    post serializer. post method에 사용하는 serializer.
+    '''
     class Meta:
         model = Post
         fields = '__all__'
 
 class PostGetSerializer(serializers.ModelSerializer):
+    '''
+    post serializer. get method에 사용하는 serializer.
+    '''
     board_boadr_id_pk = BoardWriteSerializer(read_only=True)
     member_member_pk = MemberNestedSerializer(read_only=True)
     image_image_id_pk = ImageNestedPostSerializer(read_only=True)
@@ -94,10 +100,14 @@ class PostGetSerializer(serializers.ModelSerializer):
                   'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
 
 class PostPatchSerializer(serializers.ModelSerializer):
+    '''
+    post serializer. patch method에 사용하는 serializer.
+    '''
     class Meta:
         model = Post
         fields = '__all__'
         read_only_fields = ('post_write_time', 'member_member_pk')
+
 
 
 
