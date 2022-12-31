@@ -528,6 +528,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class ImageViewSet(viewsets.ModelViewSet):
+    '''
+    이미지 api를 담당하는 클래스
+    '''
     serializer_class = ImageSerializer
     queryset = Image.objects.all()
     http_method_names = ['get', 'post', 'delete']
