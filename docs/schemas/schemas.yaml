@@ -620,10 +620,11 @@ components:
           type: integer
           example: 1
         member_member_pk:
-          description: 댓글을 작성한 유저 정보
+          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
           allOf:
             - $ref: '#/components/schemas/MemberNestedPost'
           readOnly: true
+          nullable: true
         reply:
           description: 댓글의 대댓글 데이터. 없다면 빈 리스트.
           allOf:
@@ -639,6 +640,190 @@ components:
         - post_post_id_pk
         - member_member_pk
         - reply
+    CommentGet2:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          readOnly: true
+          example: 1
+          description: 댓글 pk
+        comment_depth:
+          type: integer
+          readOnly: true
+          example: 1
+          description: 댓글의 깊이. 몇번째 대댓글인지 나타내는 값. 최상위 댓글은 0.
+        comment_content:
+          type: string
+          example: 댓글댓글~~~
+          description: 댓글 내용 (plainText)
+        comment_write_time:
+          type: string
+          format: date-time
+          example: 2023-01-04T21:39:20.619843
+          description: |
+            최초로 댓글이 작성된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+        comment_update_time:
+          type: string
+          format: date-time
+          description: |
+            댓글이 마지막으로 수정된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
+        comment_delete:
+          type: integer
+          example: 1
+          description: 댓글이 삭제되었는지 여부. 삭제된 댓글은 데이터가 사라지는게 아니라 comment_delete를 1로 변경. 초기에는 0.
+        post_post_id_pk:
+          description: 댓글을 작성한 게시글 pk
+          type: integer
+          example: 1
+        member_member_pk:
+          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
+          allOf:
+            - $ref: '#/components/schemas/MemberNestedPost'
+          readOnly: true
+          nullable: true
+        comment_comment_id_ref:
+          description: 댓글의 부모 댓글 pk. 최상위 댓글이라면 null.
+          type: integer
+          example: 1
+          nullable: true
+      required:
+        - comment_id
+        - comment_depth
+        - comment_content
+        - comment_write_time
+        - comment_update_time
+        - comment_delete
+        - post_post_id_pk
+        - member_member_pk
+        - comment_comment_id_ref
+    CommentCreate:
+      type: object
+      properties:
+        comment_depth:
+          type: integer
+          example: 0
+          description: 댓글 깊이. 생성할 데이터가 몇번째 깊이의 대댓글인지 표현. 최상위 댓글은 0.
+        comment_content:
+          type: string
+          example: 댓글댓글~~~
+          description: 댓글 내용 (plainText)
+        comment_delete:
+          type: integer
+          example: 0
+          description: 댓글 삭제 여부. 초기에는 0으로 설정.
+        post_post_id_pk:
+          type: integer
+          description: 댓글이 작성된 게시들 pk
+          example: 1
+        member_member_pk:
+          type: string
+          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
+          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+          nullable: true
+        comment_comment_id_ref:
+          type: integer
+          description: 작성하려는 댓글의 부모 댓글 pk. 최상위 댓글이라면 null.
+          example: 1
+          nullable: true
+      required:
+        - comment_depth
+        - comment_content
+        - comment_delete
+        - post_post_id_pk
+        - member_member_pk
+        - comment_comment_id_ref
+    CommentPatch:
+      type: object
+      properties:
+        comment_depth:
+          type: integer
+          example: 0
+          description: 댓글 깊이. 생성할 데이터가 몇번째 깊이의 대댓글인지 표현. 최상위 댓글은 0.
+        comment_content:
+          type: string
+          example: 댓글댓글~~~
+          description: 댓글 내용 (plainText)
+        comment_delete:
+          type: integer
+          example: 0
+          description: 댓글 삭제 여부. 초기에는 0으로 설정.
+        post_post_id_pk:
+          type: integer
+          description: 댓글이 작성된 게시들 pk
+          example: 1
+        member_member_pk:
+          type: string
+          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
+          nullable: true
+          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+        comment_comment_id_ref:
+          type: integer
+          description: 작성하려는 댓글의 부모 댓글 pk. 최상위 댓글이라면 null.
+          example: 1
+          nullable: true
+    CommentPatchResult:
+      type: object
+      properties:
+        comment_id:
+          type: integer
+          readOnly: true
+          example: 1
+          description: 댓글 pk
+        comment_depth:
+          type: integer
+          readOnly: true
+          example: 1
+          description: 댓글의 깊이. 몇번째 대댓글인지 나타내는 값. 최상위 댓글은 0.
+        comment_content:
+          type: string
+          example: 댓글댓글~~~
+          description: 댓글 내용 (plainText)
+        comment_write_time:
+          type: string
+          format: date-time
+          example: 2023-01-04T21:39:20.619843
+          description: |
+            최초로 댓글이 작성된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+        comment_update_time:
+          type: string
+          format: date-time
+          description: |
+            댓글이 마지막으로 수정된 시각.  
+            형식: 년-월-일T시-분-초.밀리초
+          example: 2023-01-04T21:39:20.619843
+        comment_delete:
+          type: integer
+          example: 1
+          description: 댓글이 삭제되었는지 여부. 삭제된 댓글은 데이터가 사라지는게 아니라 comment_delete를 1로 변경. 초기에는 0.
+        post_post_id_pk:
+          description: 댓글을 작성한 게시글 pk
+          type: integer
+          example: 1
+        member_member_pk:
+          type: string
+          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
+          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+          nullable: true
+        comment_comment_id_ref:
+          description: 댓글의 부모 댓글 pk. 최상위 댓글이라면 null
+          type: integer
+          example: 1
+          nullable: true
+      required:
+        - comment_id
+        - comment_depth
+        - comment_content
+        - comment_write_time
+        - comment_update_time
+        - comment_delete
+        - post_post_id_pk
+        - member_member_pk
+        - comment_comment_id_ref
 
 
     Role:
