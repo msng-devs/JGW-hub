@@ -29,7 +29,8 @@ from .serializers import (
     PostGetSerializer,
     PostPatchSerializer,
     CommentGetSerializer,
-    CommentWriteSerializer
+    CommentWriteSerializer,
+    CommentWriteResultSerializer
 )
 from .custom_pagination import (
     BoardPageNumberPagination,
@@ -575,10 +576,10 @@ class CommentViewSet(viewsets.ModelViewSet):
             try:
                 self.perform_create(comment_serializer)
 
-                # post_pk = post_serializer.data['post_id_pk']
-                # serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+                comment_pk = comment_serializer.data['comment_id']
+                serializer = CommentWriteResultSerializer(Comment.objects.get(comment_id=comment_pk))
 
-                return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
             except Exception as err:
                 traceback.print_exc()
                 error_responses_data = {

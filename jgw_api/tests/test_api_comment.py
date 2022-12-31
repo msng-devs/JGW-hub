@@ -187,6 +187,7 @@ class CommentApiTestOK(APITestCase):
         # print(response.content)
 
         comment_instance = Comment.objects.get(comment_content='content data')
+
         # then
         responses_data = {
             'comment_id': comment_instance.comment_id,
@@ -196,7 +197,10 @@ class CommentApiTestOK(APITestCase):
             'comment_update_time': comment_instance.comment_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'comment_delete': comment_instance.comment_delete,
             'post_post_id_pk': comment_instance.post_post_id_pk.post_id_pk,
-            'member_member_pk': comment_instance.member_member_pk.member_pk,
+            'member_member_pk': {
+                'member_pk': comment_instance.member_member_pk.member_pk,
+                'member_nm': comment_instance.member_member_pk.member_nm
+            },
             'comment_comment_id_ref': comment_instance.comment_comment_id_ref
         }
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
