@@ -90,7 +90,12 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def get_min_upload_role_pk():
+def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
+    '''
+    Config 테이블에서 서버에 콘텐츠(사진, 동영상 등)를 업로드 할 수 있는 role이 최소 몇 이상이지 가져오는 함수
+    :return: 콘텐츠를 업로드 할 수 있는 최소 role 번호.
+        최소 admin role의 정보가 없다면 500 response 리턴.
+    '''
     config_admin_role = Config.objects.filter(config_nm='min_upload_role_pk')
     if config_admin_role:
         return int(config_admin_role[0].config_val)
