@@ -48,7 +48,7 @@ import traceback
 import ast
 import logging
 
-from typing import Union, Tuple
+from typing import Union, Tuple, Dict
 import rest_framework
 
 logger = logging.getLogger('hub')
@@ -165,7 +165,16 @@ def request_check_admin_upload_role(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked, min_upload_role_checked
 
-def save_images_storge(images_data, member_pk):
+def save_images_storge(
+        images_data: List[str],
+        member_pk: str) -> List[Dict[str, str]]:
+    '''
+    base64로 인코딩된 이미지 데이터를 실제 서버에 저장하는 함수
+
+    :param images_data: 이미지 정보가 담겨있는 리스트. image_name, image_data, post_post_id_pk
+    :param member_pk: 이미지를 추가한 유저의 pk
+    :return: 실제 서버에 추가된 이미지의 정보 리스트. image_name, image_url, post_post_id_pk, member_member_pk
+    '''
     if settings.TESTING:
         img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs')
         if os.path.exists(img_path):
