@@ -51,6 +51,11 @@ import logging
 logger = logging.getLogger('hub')
 
 def get_user_header(request):
+    '''
+    게이트웨이로 부터 전달맏은 request에서 user header를 가져오는 함수
+    :param request: 전달받은 request
+    :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴. 없다면 500 에러 리턴
+    '''
     user_uid = request.META.get('HTTP_USER_PK', None)
     user_role_id = int(request.META.get('HTTP_ROLE_PK', None))
 
