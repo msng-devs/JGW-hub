@@ -38,11 +38,17 @@ class ImageNestedPostSerializer(serializers.ModelSerializer):
 
 
 class MemberSerializer(serializers.ModelSerializer):
+    '''
+    member serializer
+    '''
     class Meta:
         model = Member
         fields = '__all__'
 
-class MemberNestedPostSerializer(serializers.ModelSerializer):
+class MemberNestedSerializer(serializers.ModelSerializer):
+    '''
+    member nested serializer. 다른 시리얼라이저에서 모든 멤버 필드가 필요 없을때 사용.
+    '''
     class Meta:
         model = Member
         fields = ['member_pk', 'member_nm']
@@ -73,7 +79,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 class PostGetSerializer(serializers.ModelSerializer):
     board_boadr_id_pk = BoardWriteSerializer(read_only=True)
-    member_member_pk = MemberNestedPostSerializer(read_only=True)
+    member_member_pk = MemberNestedSerializer(read_only=True)
     image_image_id_pk = ImageNestedPostSerializer(read_only=True)
 
     class Meta:
@@ -90,7 +96,7 @@ class PostPatchSerializer(serializers.ModelSerializer):
 
 
 class CommentGetSerializer(serializers.ModelSerializer):
-    member_member_pk = MemberNestedPostSerializer(read_only=True)
+    member_member_pk = MemberNestedSerializer(read_only=True)
     reply = serializers.SerializerMethodField()
 
     def get_reply(self, instance):
@@ -111,7 +117,7 @@ class CommentWriteSerializer(serializers.ModelSerializer):
 
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
-    member_member_pk = MemberNestedPostSerializer(read_only=True)
+    member_member_pk = MemberNestedSerializer(read_only=True)
 
     class Meta:
         model = Comment
