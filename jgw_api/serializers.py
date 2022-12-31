@@ -29,7 +29,7 @@ class ImageSerializer(serializers.ModelSerializer):
 
 class ImageNestedPostSerializer(serializers.ModelSerializer):
     '''
-    image nested serializer. 다른 시리얼라이저에서 모든 이미지 필드가 필요 없을때 사용.
+    image nested serializer. 다른 serializer에서 모든 이미지 필드가 필요 없을때 사용.
     '''
     class Meta:
         model = Image
@@ -47,7 +47,7 @@ class MemberSerializer(serializers.ModelSerializer):
 
 class MemberNestedSerializer(serializers.ModelSerializer):
     '''
-    member nested serializer. 다른 시리얼라이저에서 모든 멤버 필드가 필요 없을때 사용.
+    member nested serializer. 다른 serializer에서 모든 멤버 필드가 필요 없을때 사용.
     '''
     class Meta:
         model = Member
@@ -56,6 +56,9 @@ class MemberNestedSerializer(serializers.ModelSerializer):
 
 
 class BoardWriteSerializer(serializers.ModelSerializer):
+    '''
+    board nested serializer. post method에 사용하는 serializer.
+    '''
     class Meta:
         model = Board
         fields = '__all__'
