@@ -9,17 +9,13 @@ from .models import (
     Comment
 )
 
-class RoleSerializer(serializers.ModelSerializer):
+class RoleNestedSerializer(serializers.ModelSerializer):
+    '''
+    role nested serializer
+    '''
     class Meta:
         model = Role
         fields = '__all__'
-
-
-
-# class CategorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Category
-#         fields = '__all__'
 
 
 
@@ -53,9 +49,9 @@ class BoardWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class BoardSerializer(serializers.ModelSerializer):
-    role_role_pk_write_level = RoleSerializer(read_only=True)
-    role_role_pk_read_level = RoleSerializer(read_only=True)
-    role_role_pk_comment_write_level = RoleSerializer(read_only=True)
+    role_role_pk_write_level = RoleNestedSerializer(read_only=True)
+    role_role_pk_read_level = RoleNestedSerializer(read_only=True)
+    role_role_pk_comment_write_level = RoleNestedSerializer(read_only=True)
 
     class Meta:
         model = Board
