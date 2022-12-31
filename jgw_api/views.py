@@ -48,13 +48,19 @@ import traceback
 import ast
 import logging
 
+from typing import Union, Tuple
+import rest_framework
+
 logger = logging.getLogger('hub')
 
-def get_user_header(request):
+def get_user_header(
+        request: rest_framework.request.Request
+    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
     게이트웨이로 부터 전달맏은 request에서 user header를 가져오는 함수
-    :param request: 전달받은 request
-    :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴. 없다면 500 에러 리턴
+    :param request: 전달받은 request\
+    :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴.
+        user header가 없다면 500 response 리턴
     '''
     user_uid = request.META.get('HTTP_USER_PK', None)
     user_role_id = int(request.META.get('HTTP_ROLE_PK', None))
@@ -68,7 +74,12 @@ def get_user_header(request):
         logger.debug('get user information success')
         return user_uid, user_role_id
 
-def get_admin_role_pk():
+def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
+    '''
+    Config 테이블에서 admin의 role이 몇 이상이지 가져오는 함수
+    :return: admin의 최소 role 번호.
+        최소 admin role의 정보가 없다면 500 response 리턴.
+    '''
     try:
         config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
         logger.debug(f'get admin role success: {config_admin_role}')
