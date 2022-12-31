@@ -50,6 +50,7 @@ import logging
 
 from typing import Union, Tuple, Dict
 import rest_framework
+import django
 
 logger = logging.getLogger('hub')
 
@@ -317,7 +318,16 @@ class BoardViewSet(viewsets.ModelViewSet):
 
 
 
-def post_get_all_query(query_params, queryset):
+def post_get_all_query(
+        query_params: dict,
+        queryset: django.db.models.query.QuerySet) -> django.db.models.query.QuerySet:
+    '''
+    post api 쿼리 파라미터를 추출하는 함수
+
+    :param query_params: 필터에 적용시킬 쿼리 파라미터
+    :param queryset: 쿼리 파라미터를 적용시킬 post instance
+    :return: 쿼리 파라미터에 맞게 추출된 django orm instance 리턴
+    '''
     start_date = datetime.datetime.min
     end_date = datetime.datetime.max
     time_query = '%Y-%m-%dT%H-%M-%S'
