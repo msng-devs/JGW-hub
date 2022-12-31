@@ -57,8 +57,9 @@ def get_user_header(
         request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
-    게이트웨이로 부터 전달맏은 request에서 user header를 가져오는 함수
-    :param request: 전달받은 request\
+    전달받은 request에서 user header를 가져오는 함수
+
+    :param request: 게이트웨이로 부터 전달받은 request
     :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴.
         user header가 없다면 500 response 리턴
     '''
@@ -77,6 +78,7 @@ def get_user_header(
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     Config 테이블에서 admin의 role이 몇 이상이지 가져오는 함수
+
     :return: admin의 최소 role 번호.
         최소 admin role의 정보가 없다면 500 response 리턴.
     '''
@@ -93,6 +95,7 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
 def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     Config 테이블에서 서버에 콘텐츠(사진, 동영상 등)를 업로드 할 수 있는 role이 최소 몇 이상이지 가져오는 함수
+
     :return: 콘텐츠를 업로드 할 수 있는 최소 role 번호.
         최소 admin role의 정보가 없다면 500 response 리턴.
     '''
@@ -105,7 +108,16 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def request_check(request):
+def request_check(
+        request: rest_framework.request.Request
+    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+    '''
+    user header가 정상적으로 리턴됐는지 확인하는 함수
+
+    :param request: 게이트웨이로 부터 전달받은 request
+    :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴.
+        user header가 없다면 500 response 리턴
+    '''
     header_checked = get_user_header(request)
     if isinstance(header_checked, Response):
         return header_checked
