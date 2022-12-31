@@ -20,11 +20,17 @@ class RoleNestedSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    '''
+    image serializer
+    '''
     class Meta:
         model = Image
         fields = '__all__'
 
 class ImageNestedPostSerializer(serializers.ModelSerializer):
+    '''
+    image nested serializer. 다른 시리얼라이저에서 모든 이미지 필드가 필요 없을때 사용.
+    '''
     class Meta:
         model = Image
         fields = ['image_id_pk', 'image_name', 'image_url']
