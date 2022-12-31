@@ -608,6 +608,9 @@ class ImageViewSet(viewsets.ModelViewSet):
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
 class CommentViewSet(viewsets.ModelViewSet):
+    '''
+    댓글 api를 담당하는 클래스
+    '''
     serializer_class = CommentGetSerializer
     queryset = Comment.objects.all().order_by('-comment_id')
     http_method_names = ['get', 'post', 'patch', 'delete']
