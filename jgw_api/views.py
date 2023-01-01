@@ -496,7 +496,7 @@ class PostViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
-            # user role, 최소 admin role이 없다면 최하위 권한 적용
+            # user role, 최소 admin role이 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
@@ -541,7 +541,12 @@ class PostViewSet(viewsets.ModelViewSet):
             update_log = f'{user_uid} Post data patched' \
                          f'\tkey: {responses_data["post_id_pk"]} change log'
             for k in target_keys:
-                update_log += f'\n\t{k}: {before_change[k]} -> {getattr(instance, k)}'
+                instance_data = getattr(instance, k)
+                before_change = before_change[k]
+                if k in ('post_content', 'post_title'):
+                    instance_data = instance_data[:50]
+                    before_change = before_change[:50]
+                update_log += f'\n\t{k}: {before_change} -> {instance_data}'
             logger.info(update_log)
 
             return Response(responses_data)
@@ -670,6 +675,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = Image.objects.all()
         if 'post_id' in request.query_params:
+            # query parameter에 post_id가 있으면 해당 게시글에 포함된 이미지만 가져옴
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
 
         queryset = queryset.order_by('image_id_pk')
@@ -733,18 +739,22 @@ class CommentViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         request.query_params._mutable = True
         if 'post_id' not in request.query_params:
+            # query parameter에 post_id가 없으면 400 return
             return Response(data={
                 'detail': 'post_id request'
             }, status=status.HTTP_400_BAD_REQUEST)
         else:
+            # query parameter에 post_id가 있으면 해당 게시글에 포함된 댓글만 가져옴
             queryset = self.get_queryset().filter(
                 post_post_id_pk=int(request.query_params['post_id']),
                 comment_comment_id_ref=None
             )
 
         if 'page' not in request.query_params:
+            # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
+            # page size를 최소~최대 범위 안에서 지정
             request.query_params['page_size'] = int(request.query_params['page_size'])
             if request.query_params['page_size'] < constant.COMMENT_MIN_PAGE_SIZE:
                 request.query_params['page_size'] = constant.COMMENT_MIN_PAGE_SIZE
@@ -758,31 +768,38 @@ class CommentViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
         request_data = request.data
         comment_serializer = CommentWriteSerializer(data=request_data)
         comment_serializer.is_valid(raise_exception=True)
+        logger.debug(f'{user_uid} Comment data verified')
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
-            try:
-                self.perform_create(comment_serializer)
+            # 요청한 유저가 admin or 요청한 게시판 댓글 쓰기 레벨 이상이면 승인
+            logger.debug(f'{user_uid} Comment post approved')
+            self.perform_create(comment_serializer)
 
-                comment_pk = comment_serializer.data['comment_id']
-                serializer = CommentWriteResultSerializer(Comment.objects.get(comment_id=comment_pk))
+            comment_pk = comment_serializer.data['comment_id']
+            serializer = CommentWriteResultSerializer(Comment.objects.get(comment_id=comment_pk))
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as err:
-                traceback.print_exc()
-                error_responses_data = {
-                    'detail': 'Error occurred while make post.'
-                }
-                logger.debug(traceback.print_exc())
-                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            responses_data = serializer.data
+            update_log = f'{user_uid} Comment data created' \
+                         f'\tkey: {responses_data["comment_id"]} created log'
+            for k in responses_data.keys():
+                instance_data = responses_data[k]
+                if k in ('comment_content',):
+                    instance_data = instance_data[:50]
+                update_log += f'\n\t{k}: {instance_data}'
+            logger.info(update_log)
+
+            return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
+            logger.info(f"{user_uid} Comment create denied")
             responses_data = {
                 'detail': 'Not Allowed.'
             }
@@ -793,53 +810,73 @@ class CommentViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
         board_instance = instance.post_post_id_pk.board_boadr_id_pk
         user_instance = instance.member_member_pk
-        try:
-            if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
-                    and user_uid == user_instance.member_pk:
-                request_data = request.data
-                serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
-                serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
+        if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
+                and user_uid == user_instance.member_pk:
+            # 요청한 유저의 role이 해당 게시판 댓글 쓰기 레벨 이상이고, 댓글을 작성했던 본인이면 승인
+            logger.debug(f'{user_uid} Comment patch approved')
+            request_data = request.data
+            target_keys = list(request_data.dict().keys())
+            before_change = dict()
+            for k in target_keys:
+                before_change[k] = getattr(instance, k)
 
-                if getattr(instance, '_prefetched_objects_cache', None):
-                    instance._prefetched_objects_cache = {}
-                return Response(serializer.data)
-            else:
-                responses_data = {
-                    'detail': 'Not Allowed.'
-                }
-                return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
-        except:
-            if settings.TESTING:
-                traceback.print_exc()
-            error_responses_data = {
-                'detail': 'Error occurred while update post.'
+            serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            logger.debug(f'{user_uid} Comment data verified')
+
+            self.perform_update(serializer)
+
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+
+            responses_data = serializer.data
+            update_log = f'{user_uid} Comment data patched' \
+                         f'\tkey: {responses_data["comment_id"]} change log'
+            for k in target_keys:
+                instance_data = getattr(instance, k)
+                before_change = before_change[k]
+                if k in ('post_content', 'post_title'):
+                    instance_data = instance_data[:50]
+                    before_change = before_change[:50]
+                update_log += f'\n\t{k}: {before_change} -> {instance_data}'
+            logger.info(update_log)
+            return Response(responses_data)
+        else:
+            logger.info(f"{user_uid} Comment patch denied")
+            responses_data = {
+                'detail': 'Not Allowed.'
             }
-            logger.debug(traceback.print_exc())
-            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # delete
     def destroy(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk, = checked
 
         instance = self.get_object()
 
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            # 요청한 유저가 admin or 댓글을 업로드한 본인이면 승인
+            logger.debug(f'{user_uid} Comment delete approved')
             request_data = {"comment_delete": 1}
             serializer = CommentWriteSerializer(instance, data=request_data, partial=True)
             serializer.is_valid(raise_exception=True)
             self.perform_update(serializer)
 
+            key, name = instance.comment_id, instance.comment_content
+            logger.debug(f'{user_uid} Comment data deleted\tkey: {key}\ttitle: {name[:25]}')
             return Response(serializer.data)
         else:
+            logger.info(f"{user_uid} Comment delete denied")
             detail = {
                 'detail': 'Image delete not allowed.'
             }
