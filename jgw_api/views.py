@@ -442,8 +442,10 @@ class PostViewSet(viewsets.ModelViewSet):
 
         request.query_params._mutable = True
         if 'page' not in request.query_params:
+            # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
+            # page size를 최소~최대 범위 안에서 지정
             request.query_params['page_size'] = int(request.query_params['page_size'])
             if request.query_params['page_size'] < constant.POST_MIN_PAGE_SIZE:
                 request.query_params['page_size'] = constant.POST_MIN_PAGE_SIZE
@@ -461,20 +463,29 @@ class PostViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         checked = request_check(request)
         if isinstance(checked, Response):
+            # user role이 없다면 최하위 권한 적용
             user_role_id = -1
+            user_uid = None
         else:
             user_uid, user_role_id = checked
         admin_role_checked = get_admin_role_pk()
         if isinstance(admin_role_checked, Response):
+            # admin role이 없다면 500 return
             return admin_role_checked
 
         instance = self.get_object()
 
         if user_role_id >= admin_role_checked or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+            # 요청한 유저가 admin or 해당 게시판 게시글 읽기 레벨 이상이면 승인
+            logger.debug(f'{user_uid} Post get retrieve approved')
             post_serializer = self.get_serializer(instance)
             response_data = post_serializer.data
+
+            key, name = instance.post_id_pk, instance.post_title
+            logger.debug(f'{user_uid} Post data get retrieve\tkey: {key}\ttitle: {name}')
             return Response(response_data)
         else:
+            logger.info(f"{user_uid} Post get retrieve denied")
             detail = {
                 'detail': 'Not allowed.'
             }
@@ -485,84 +496,103 @@ class PostViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 최하위 권한 적용
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        try:
-            if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
-                request_data = request.data
-                if isinstance(request_data, QueryDict):
-                    request_data._mutable = True
-                if 'board_boadr_id_pk' in request_data:
-                    board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
-                    if board_instance.role_role_pk_write_level.role_pk > user_role_id:
-                        responses_data = {
-                            'detail': 'This board is not allowed.'
-                        }
-                        return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+        if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_write_level.role_pk:
+            # 요청한 유저가 글을 작성했던 본인이고, 해당 게시판 게시글 쓰기 레벨 이상이면 승인
+            logger.debug(f'{user_uid} Post patch approved')
+            request_data = request.data
+            target_keys = list(request_data.dict().keys())
+            before_change = dict()
+            for k in target_keys:
+                before_change[k] = getattr(instance, k)
 
-                if 'post_update_time' not in request_data:
-                    request_data['post_update_time'] = datetime.datetime.now()
-                if 'post_write_time' in request_data:
-                    del request_data['post_write_time']
+            if isinstance(request_data, QueryDict):
+                request_data._mutable = True
+            if 'board_boadr_id_pk' in request_data:
+                # 변경하려는 데이터가 해당 게시글이 소속된 게시판이라면
+                board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
+                if board_instance.role_role_pk_write_level.role_pk > user_role_id:
+                    # 변경하려는 게시판의 쓰기 레벨보다 요청한 유저의 권한이 낮다면 거부
+                    logger.info(f"{user_uid} Post patch denied - request board not allowed")
+                    responses_data = {
+                        'detail': 'request board is not allowed.'
+                    }
+                    return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
-                serializer = PostPatchSerializer(instance, data=request_data, partial=True)
-                serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
+            # if 'post_update_time' not in request_data:
+            #     request_data['post_update_time'] = datetime.datetime.now()
+            # if 'post_write_time' in request_data:
+            #     del request_data['post_write_time']
 
-                if getattr(instance, '_prefetched_objects_cache', None):
-                    instance._prefetched_objects_cache = {}
-                instance = Post.objects.filter(post_id_pk=instance.post_id_pk)
+            serializer = PostPatchSerializer(instance, data=request_data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            logger.debug(f'{user_uid} Post data verified')
+            self.perform_update(serializer)
 
-                responses_serializer = self.get_serializer(instance[0])
-                return Response(responses_serializer.data)
-            else:
-                responses_data = {
-                    'detail': 'Not Allowed.'
-                }
-                return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
-        except:
-            if settings.TESTING:
-                traceback.print_exc()
-            error_responses_data = {
-                'detail': 'Error occurred while update post.'
+            if getattr(instance, '_prefetched_objects_cache', None):
+                instance._prefetched_objects_cache = {}
+            instance = Post.objects.get(post_id_pk=instance.post_id_pk)
+
+            responses_serializer = self.get_serializer(instance)
+            responses_data = responses_serializer.data
+            update_log = f'{user_uid} Post data patched' \
+                         f'\tkey: {responses_data["post_id_pk"]} change log'
+            for k in target_keys:
+                update_log += f'\n\t{k}: {before_change[k]} -> {getattr(instance, k)}'
+            logger.info(update_log)
+
+            return Response(responses_data)
+        else:
+            logger.info(f"{user_uid} Post patch denied")
+            responses_data = {
+                'detail': 'Not Allowed.'
             }
-            logger.debug(traceback.print_exc())
-            return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # post
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 최하위 권한 적용
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
         request_data = request.data
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
-        now = datetime.datetime.now()
-        request_data['post_write_time'] = now
-        request_data['post_update_time'] = now
+        # now = datetime.datetime.now()
+        # request_data['post_write_time'] = now
+        # request_data['post_update_time'] = now
 
         post_serializer = PostWriteSerializer(data=request_data)
         post_serializer.is_valid(raise_exception=True)
+        logger.debug(f'{user_uid} Post data verified')
+
         board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
-            try:
-                self.perform_create(post_serializer)
+            # 요청한 유저가 admin or 요청한 게시판 게시글 쓰기 레벨 이상이면 승인
+            logger.debug(f'{user_uid} Post post approved')
+            self.perform_create(post_serializer)
 
-                post_pk = post_serializer.data['post_id_pk']
-                serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+            post_pk = post_serializer.data['post_id_pk']
+            serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
 
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            except Exception as err:
-                traceback.print_exc()
-                error_responses_data = {
-                    'detail': 'Error occurred while make post.'
-                }
-                logger.debug(traceback.print_exc())
-                return Response(error_responses_data, status=status.HTTP_400_BAD_REQUEST)
+            responses_data = serializer.data
+            update_log = f'{user_uid} Post data created' \
+                         f'\tkey: {responses_data["post_id_pk"]} created log'
+            for k in responses_data.keys():
+                instance_data = responses_data[k]
+                if k in ('post_content', 'post_title'):
+                    instance_data = instance_data[:50]
+                update_log += f'\n\t{k}: {instance_data}'
+            logger.info(update_log)
+
+            return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
+            logger.info(f"{user_uid} Post create denied")
             responses_data = {
                 'detail': 'Not Allowed.'
             }
@@ -572,15 +602,22 @@ class PostViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 최하위 권한 적용
             return checked
         user_uid, user_role_id, admin_role_pk, = checked
 
         instance = self.get_object()
 
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            # 요청한 유저가 admin or 글을 작성한 본인이면 승인
+            logger.debug(f'{user_uid} Post delete approved')
+            key, name = instance.post_id_pk, instance.post_title
             self.perform_destroy(instance)
+
+            logger.debug(f'{user_uid} Post data deleted\tkey: {key}\ttitle: {name}')
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
+            logger.info(f"{user_uid} Post delete denied")
             detail = {
                 'detail': 'Image delete not allowed.'
             }
