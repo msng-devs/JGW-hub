@@ -37,12 +37,17 @@ paths:
     $ref: './image_api.yaml#/\hubapi\image\'
   /v1/image/{image_id_pk}/:
     $ref: './image_api.yaml#/\hubapi\image\{image_id_pk}\'
+  /v1/comment/:
+    $ref: './comment_api.yaml#/\hubapi\comment\'
+  /v1/comment/{comment_id_pk}/:
+    $ref: './comment_api.yaml#/\hubapi\comment\{comment_id_pk}\'
 x-tagGroups:
   - name: apis-v1
     tags:
       - board-v1
       - post-v1
       - image-v1
+      - comment-v1
 #  - name: Models
 #    tags:
 #      - category_model

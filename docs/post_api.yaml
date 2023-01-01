@@ -102,7 +102,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Invalid page.
 \hubapi\post\:
@@ -135,7 +135,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-400'
             example:
               detail: board with this category name already exists.
       '403':
@@ -143,7 +143,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '500':
@@ -151,7 +151,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
 \hubapi\post\{post_id_pk}\:
@@ -189,7 +189,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '404':
@@ -197,7 +197,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
       '500':
@@ -205,7 +205,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
   patch:
@@ -217,7 +217,7 @@
       | option | value |
       |:---:|:---:|
       | 인증필요 | o |
-      | 권한필요 | (수정요청 유저의 권한 == 작성한 본인 and<br>수정요청 유저의 권한 >= 수정하려는 글이 속한 게시판의 쓰기 권한) |
+      | 권한필요 | (수정요청 유저의 pk == 작성한 본인 and<br>수정요청 유저의 권한 >= 수정하려는 글이 속한 게시판의 쓰기 권한) |
     requestBody:
       content:
         application/json:
@@ -237,7 +237,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '500':
@@ -245,7 +245,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
   delete:
@@ -273,6 +273,6 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.

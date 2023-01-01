@@ -38,7 +38,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Invalid page.
   post:
@@ -122,7 +122,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
   patch:
@@ -160,7 +160,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-400'
             example:
               detail: board with this board name already exists.
       '403':
@@ -168,7 +168,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '404':
@@ -176,7 +176,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
       '500':
@@ -184,7 +184,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
   delete:
@@ -213,7 +213,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-403'
             example:
               detail: Not allowed.
       '404':
@@ -221,7 +221,7 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
       '500':
@@ -229,6 +229,6 @@
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BoardError'
+              $ref: '#/components/schemas/BoardErrorPost-500'
             example:
               detail: User header not found.
