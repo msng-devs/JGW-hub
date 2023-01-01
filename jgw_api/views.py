@@ -542,11 +542,11 @@ class PostViewSet(viewsets.ModelViewSet):
                          f'\tkey: {responses_data["post_id_pk"]} change log'
             for k in target_keys:
                 instance_data = getattr(instance, k)
-                before_change = before_change[k]
+                before_change_data = before_change[k]
                 if k in ('post_content', 'post_title'):
                     instance_data = instance_data[:50]
-                    before_change = before_change[:50]
-                update_log += f'\n\t{k}: {before_change} -> {instance_data}'
+                    before_change_data = before_change_data[:50]
+                update_log += f'\n\t{k}: {before_change_data} -> {instance_data}'
             logger.info(update_log)
 
             return Response(responses_data)
@@ -583,13 +583,14 @@ class PostViewSet(viewsets.ModelViewSet):
             self.perform_create(post_serializer)
 
             post_pk = post_serializer.data['post_id_pk']
-            serializer = self.get_serializer(Post.objects.get(post_id_pk=post_pk))
+            responses_instance = Post.objects.get(post_id_pk=post_pk)
+            serializer = self.get_serializer(responses_instance)
 
             responses_data = serializer.data
             update_log = f'{user_uid} Post data created' \
                          f'\tkey: {responses_data["post_id_pk"]} created log'
             for k in responses_data.keys():
-                instance_data = responses_data[k]
+                instance_data = getattr(responses_instance, k)
                 if k in ('post_content', 'post_title'):
                     instance_data = instance_data[:50]
                 update_log += f'\n\t{k}: {instance_data}'
@@ -785,13 +786,14 @@ class CommentViewSet(viewsets.ModelViewSet):
             self.perform_create(comment_serializer)
 
             comment_pk = comment_serializer.data['comment_id']
-            serializer = CommentWriteResultSerializer(Comment.objects.get(comment_id=comment_pk))
+            responses_instance = Comment.objects.get(comment_id=comment_pk)
+            serializer = CommentWriteResultSerializer(responses_instance)
 
             responses_data = serializer.data
             update_log = f'{user_uid} Comment data created' \
                          f'\tkey: {responses_data["comment_id"]} created log'
             for k in responses_data.keys():
-                instance_data = responses_data[k]
+                instance_data = getattr(responses_instance, k)
                 if k in ('comment_content',):
                     instance_data = instance_data[:50]
                 update_log += f'\n\t{k}: {instance_data}'
