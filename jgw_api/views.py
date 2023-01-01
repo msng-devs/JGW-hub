@@ -52,6 +52,7 @@ from typing import Union, Tuple, Dict
 import rest_framework
 import django
 
+# 자람 허브 로거
 logger = logging.getLogger('hub')
 
 def get_user_header(
@@ -64,16 +65,20 @@ def get_user_header(
     :return: user header가 정상적으로 존재한다면 user의 uid, role이 리턴.
         user header가 없다면 500 response 리턴
     '''
+    # 헤더에서 유저 정보 가져오기
     user_uid = request.META.get('HTTP_USER_PK', None)
     user_role_id = int(request.META.get('HTTP_ROLE_PK', None))
 
     if user_uid is None or user_role_id is None:
+        # 유저 정보가 정상적으로 없다면 500 response 리턴
+        logger.debug('get user information failed.')
         responses_data = {
             'detail': 'Header Required.'
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
-        logger.debug('get user information success')
+        # 유저 정보가 있다면 유저 정보 리턴
+        logger.debug(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
         return user_uid, user_role_id
 
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
