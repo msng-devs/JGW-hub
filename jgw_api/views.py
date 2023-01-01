@@ -556,7 +556,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
-            # user role, 최소 admin role이 없다면 최하위 권한 적용
+            # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
@@ -602,7 +602,7 @@ class PostViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
-            # user role, 최소 admin role이 없다면 최하위 권한 적용
+            # user role, 최소 admin role이 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk, = checked
 
@@ -638,24 +638,29 @@ class ImageViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_upload_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role, 최소 업로드 가능 role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk, min_upload_role_pk = checked
 
         if user_role_id >= admin_role_pk or user_role_id >= min_upload_role_pk:
-            try:
-                data = request.data
-                data = save_images_storge(data, user_uid)
-                img_serializer = ImageSerializer(data=data, many=True)
-                img_serializer.is_valid()
-                self.perform_create(img_serializer)
-                return Response(img_serializer.data, status=status.HTTP_201_CREATED)
-            except:
-                traceback.print_exc()
-                detail = {
-                    'detail': 'Error uploading image.'
-                }
-                return Response(detail, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # 요청한 유저가 admin or 최소 업로드 가능 role 보다 높으면 승인
+            logger.debug(f'{user_uid} Image post approved')
+            data = request.data
+            data = save_images_storge(data, user_uid)
+            img_serializer = ImageSerializer(data=data, many=True)
+            img_serializer.is_valid()
+            logger.debug(f'{user_uid} Image data verified')
+
+            self.perform_create(img_serializer)
+
+            responses_data = img_serializer.data
+            update_log = f'{user_uid} Image data created' \
+                         f'\t{len(responses_data)} images created'
+            logger.info(update_log)
+
+            return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
+            logger.info(f"{user_uid} Image create denied")
             detail = {
                 'detail': 'Image upload not allowed.'
             }
@@ -671,8 +676,10 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         request.query_params._mutable = True
         if 'page' not in request.query_params:
+            # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
+            # page size를 최소~최대 범위 안에서 지정
             request.query_params['page_size'] = int(request.query_params['page_size'])
             if request.query_params['page_size'] < constant.IMAGE_MIN_PAGE_SIZE:
                 request.query_params['page_size'] = constant.IMAGE_MIN_PAGE_SIZE
@@ -686,20 +693,28 @@ class ImageViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        key, name = instance.image_id_pk, instance.image_name
+        logger.debug(f'Image data get retrieve\tkey: {key}\tname: {name}')
         return Response(serializer.data)
 
     # delete
     def destroy(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
+            # user role, 최소 admin role이 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
         instance = self.get_object()
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
+            # 요청한 유저가 admin or 사진을 업로드한 본인이면 승인
+            logger.debug(f'{user_uid} Image delete approved')
+            key, name = instance.image_id_pk, instance.image_name
             self.perform_destroy(instance)
+            logger.debug(f'{user_uid} Image data deleted\tkey: {key}\ttitle: {name}')
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
+            logger.info(f"{user_uid} Image delete denied")
             detail = {
                 'detail': 'Image delete not allowed.'
             }
