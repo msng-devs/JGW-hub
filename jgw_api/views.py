@@ -57,7 +57,7 @@ import django
 logger = logging.getLogger('hub_error')
 
 def get_user_header(
-        request
+        request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
     전달받은 request에서 user header를 가져오는 함수
@@ -93,7 +93,7 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     try:
         # 어드민 롤을 정상적으로 가져오면 최소 어드민 롤 리턴
         config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
-        logger.debug(f'get admin role success\tmin admin role: {config_admin_role}')
+        # logger.debug(f'get admin role success\tmin admin role: {config_admin_role}')
         return int(config_admin_role)
     except:
         # 최소 어드민 롤 정보가 없다면 500 response 리턴
@@ -112,11 +112,14 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     config_admin_role = Config.objects.filter(config_nm='min_upload_role_pk')
     if config_admin_role:
+        # 최소 업로드 롤을 정상적으로 가져오면 최소 업로드 롤 리턴
         return int(config_admin_role[0].config_val)
     else:
+        # 최소 업로드 롤 정보가 없다면 500 response 리턴
         responses_data = {
             'detail': 'Minimum upload role not exist.'
         }
+        logger.error('min upload role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def request_check(
