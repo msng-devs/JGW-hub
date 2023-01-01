@@ -242,10 +242,10 @@ def save_images_storge(
 
 @api_view(['GET'])
 def ping_pong(request):
-    msg = {
-        'detail': 'pong'
-    }
-    return Response(msg, status.HTTP_200_OK)
+    # 서버 health check 용도
+    return Response({
+            'detail': 'pong'
+        }, status.HTTP_200_OK)
 
 class BoardViewSet(viewsets.ModelViewSet):
     '''
