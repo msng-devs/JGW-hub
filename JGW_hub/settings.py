@@ -28,7 +28,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = MY_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(debug.is_debug)
+DEBUG = bool(int(debug.is_debug))
+# DEBUG = False
 TESTING = len(sys.argv) > 1 and sys.argv[1] == 'test'
 ALLOWED_HOSTS = []
 ALLOWED_HOSTS = [] if DEBUG else MY_ALLOWED_HOSTS
@@ -162,14 +163,14 @@ REST_FRAMEWORK = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'format1': {
             'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
             'datefmt': '%d/%b/%Y %H:%M:%S',
         },
         'format2': {
-            'format': '[%(levelname)s] %(message)s',
+            'format': '[%(asctime)s] %(levelname)s [%(pathname)s-%(name)s:%(lineno)s] %(message)s',
         },
     },
     'filters': {
@@ -187,21 +188,35 @@ LOGGING = {
             'formatter': 'format1',
             'filters': ['require_debug_false']
         },
+        'file_error': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'format2',
+            'filters': ['require_debug_false'],
+            'filename': BASE_DIR / 'logs/hub_errors.log',
+            'maxBytes': 1024 * 1024 * 200,
+            'backupCount': 5,
+            'encoding': 'utf-8',
+        },
         'file': {
             'level': 'DEBUG',
-            'encoding': 'utf-8',
-            'filters': ['require_debug_false'],
             'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'format2',
+            'filters': ['require_debug_false'],
             'filename': BASE_DIR / 'logs/hub.log',
-            'maxBytes': 1024*1024*5,  # 5 MB
-            'backupCount': 5,
-            'formatter': 'format1',
+            'maxBytes': 1024 * 1024 * 200,
+            'backupCount': 10,
+            'encoding': 'utf-8',
         },
     },
     # 로거
     'loggers': {
         'hub': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
+        'hub_error': {
+            'handlers': ['console', 'file_error', 'file'],
             'level': 'DEBUG'
         }
     }

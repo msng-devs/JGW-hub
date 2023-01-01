@@ -53,10 +53,11 @@ import rest_framework
 import django
 
 # 자람 허브 로거
-logger = logging.getLogger('hub')
+# logger = logging.getLogger('hub')
+logger = logging.getLogger('hub_error')
 
 def get_user_header(
-        request: rest_framework.request.Request
+        request
     ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
     전달받은 request에서 user header를 가져오는 함수
@@ -67,17 +68,18 @@ def get_user_header(
     '''
     # 헤더에서 유저 정보 가져오기
     user_uid = request.META.get('HTTP_USER_PK', None)
-    user_role_id = int(request.META.get('HTTP_ROLE_PK', None))
+    user_role_id = request.META.get('HTTP_ROLE_PK', None)
 
     if user_uid is None or user_role_id is None:
         # 유저 정보가 정상적으로 없다면 500 response 리턴
-        logger.debug('get user information failed.')
+        logger.error('get user information failed.')
         responses_data = {
             'detail': 'Header Required.'
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         # 유저 정보가 있다면 유저 정보 리턴
+        user_role_id = int(user_role_id)
         logger.debug(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
         return user_uid, user_role_id
 
@@ -90,12 +92,13 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     try:
         config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
-        logger.debug(f'get admin role success: {config_admin_role}')
+        logger.debug(f'get admin role success\tmin admin role: {config_admin_role}')
         return int(config_admin_role)
     except:
         responses_data = {
             'detail': 'Admin Role not Exist.'
         }
+        logger.error('min admin role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
