@@ -80,7 +80,7 @@ def get_user_header(
     else:
         # 유저 정보가 있다면 유저 정보 리턴
         user_role_id = int(user_role_id)
-        logger.debug(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
+        logger.info(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
         return user_uid, user_role_id
 
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
@@ -196,19 +196,24 @@ def save_images_storge(
     :return: 실제 서버에 추가된 이미지의 정보 리스트. image_name, image_url, post_post_id_pk, member_member_pk
     '''
     if settings.TESTING:
+        # unittest시 이전 테스트 기록 지우기
+        logger.debug("recent image upload test file deleted")
         img_path = os.path.join(settings.MEDIA_ROOT, 'test', 'imgs')
         if os.path.exists(img_path):
             shutil.rmtree(img_path)
         os.makedirs(img_path, exist_ok=True)
     img_urls = []
     for img in images_data:
+        # image 목록 순차적으로 가져와 저장 후 저장 정보 리턴
         img = ast.literal_eval(str(img))
         name = img['image_name']
         data = img['image_data']
         folder_pk = img['post_post_id_pk']
 
+        # base64 -> byte 이미지 디코딩
         decoded_data = base64.b64decode(data)
         if settings.TESTING:
+            # unittest시 test path에 저장
             img_path = os.path.join(
                 settings.MEDIA_ROOT, 'test', 'imgs',
                 str(folder_pk) if folder_pk is not None else 'common')
@@ -231,6 +236,7 @@ def save_images_storge(
             'post_post_id_pk': folder_pk,
             'member_member_pk': member_pk
         })
+    logger.info(f"saved image count: {len(img_urls)}")
     return img_urls
 
 
