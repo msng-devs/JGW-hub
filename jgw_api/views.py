@@ -172,12 +172,15 @@ def request_check_admin_upload_role(
     '''
     header_checked = get_user_header(request)
     if isinstance(header_checked, Response):
+        # get_user_header 에서 response 타입이 리턴됐다면 오류
         return header_checked
     admin_role_checked = get_admin_role_pk()
     if isinstance(admin_role_checked, Response):
+        # get_admin_role_pk 에서 response 타입이 리턴됐다면 오류
         return admin_role_checked
     min_upload_role_checked = get_min_upload_role_pk()
     if isinstance(min_upload_role_checked, Response):
+        # get_min_upload_role_pk 에서 response 타입이 리턴됐다면 오류
         return min_upload_role_checked
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked, min_upload_role_checked
