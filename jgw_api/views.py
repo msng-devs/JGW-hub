@@ -258,6 +258,7 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
+        logger.debug(f"Board get request")
         queryset = self.filter_queryset(self.get_queryset())
         request.query_params._mutable = True
         if 'page' not in request.query_params:
@@ -437,6 +438,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
+        logger.debug(f"Post get request")
         queryset = Post.objects.all()
         queryset = post_get_all_query(request.query_params, queryset)
 
@@ -674,6 +676,7 @@ class ImageViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
+        logger.debug(f"Image get request")
         queryset = Image.objects.all()
         if 'post_id' in request.query_params:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 이미지만 가져옴
@@ -738,6 +741,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
+        logger.debug(f"Comment get request")
         request.query_params._mutable = True
         if 'post_id' not in request.query_params:
             # query parameter에 post_id가 없으면 400 return
