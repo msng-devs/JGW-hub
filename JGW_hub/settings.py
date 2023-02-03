@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import sys
+
+import JGW_hub.db_router
 from JGW_hub import debug
 
 from secrets_content.files.secret_key import *
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'corsheaders',
     'jgw_api',
+    'survey'
 ]
 
 MIDDLEWARE = [
@@ -86,6 +89,10 @@ WSGI_APPLICATION = 'JGW_hub.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = MY_DATABASES
+
+DATABASE_ROUTERS = [
+    'JGW_hub.db_router.DatabaseRouter'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
