@@ -19,8 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('hub/api/', include('jgw_api.urls')),
-    path('hub/api/', include('survey.urls'))
+    path('hub/api/', include('jgw_api.urls'))
 ]
 urlpatterns += static(r'uploaded', document_root=settings.MEDIA_ROOT)
 if settings.DEBUG:

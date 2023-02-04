@@ -887,3 +887,48 @@ class CommentViewSet(viewsets.ModelViewSet):
                 'detail': 'Image delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+
+# 설문조사
+from secrets_content.files.secret_key import *
+import pymongo
+client = pymongo.MongoClient(**SURVEY_DATABASES)
+
+survey_post_name = 'survey_post'
+db = client.get_database('survey')
+post_collection = db.get_collection(survey_post_name)
+
+class SurveyViewSet(viewsets.ViewSet):
+
+    def create(self, request):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            # 요청한 유저 정보가 없다면 500 return
+            return checked
+        user_uid, user_role_id, admin_role_checked = checked
+        if user_role_id >= admin_role_checked:
+            post_data = request.data
+
+            try:
+                new_data = {
+                    'title': post_data['title'],
+                    'description': post_data['description'],
+                    'writer': user_uid,
+                    'allow_multiple': post_data['allow_multiple'],
+                    'role_answer': post_data['role_answer'],
+                    'question': [],
+                    'answer': []
+                }
+                post_collection.insert_one(new_data)
+                return Response(new_data, status=status.HTTP_204_NO_CONTENT)
+            except:
+                detail = {
+                    'detail': 'Data is wrong.'
+                }
+                return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            logger.info(f"{user_uid} Survey Post create denied")
+            detail = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
