@@ -894,9 +894,27 @@ from secrets_content.files.secret_key import *
 import pymongo
 client = pymongo.MongoClient(**SURVEY_DATABASES)
 
-survey_post_name = 'survey_post'
-db = client.get_database('survey')
-post_collection = db.get_collection(survey_post_name)
+if not settings.TESTING:
+    db = client.get_database(constant.SURVEY_DB_NAME)
+    try:
+        survey_post_collection = db.create_collection(constant.SURVEY_POST_DB_NME)
+        db.command({
+            'collMod': constant.SURVEY_POST_DB_NME,
+            'validator': constant.SURVEY_POST_DB_VALIDATOR,
+            'validationAction': 'error'
+        })
+    except:
+        survey_post_collection = db.get_collection(constant.SURVEY_POST_DB_NME)
+else:
+    db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
+    for i in db.list_collection_names():
+        db.drop_collection(i)
+    survey_post_collection = db.create_collection(constant.SURVEY_POST_DB_NME)
+    db.command({
+        'collMod': constant.SURVEY_POST_DB_NME,
+        'validator': constant.SURVEY_POST_DB_VALIDATOR,
+        'validationAction': 'error'
+    })
 
 class SurveyViewSet(viewsets.ViewSet):
 
@@ -914,14 +932,15 @@ class SurveyViewSet(viewsets.ViewSet):
                     'title': post_data['title'],
                     'description': post_data['description'],
                     'writer': user_uid,
-                    'allow_multiple': post_data['allow_multiple'],
-                    'role_answer': post_data['role_answer'],
+                    'allow_multiple': bool(post_data['allow_multiple']),
+                    'role_answer': int(post_data['role_answer']),
                     'question': [],
                     'answer': []
                 }
-                post_collection.insert_one(new_data)
-                return Response(new_data, status=status.HTTP_204_NO_CONTENT)
-            except:
+                result = survey_post_collection.insert_one(new_data)
+                new_data['_id'] = str(new_data['_id'])
+                return Response(new_data, status=status.HTTP_201_CREATED)
+            except Exception as e:
                 detail = {
                     'detail': 'Data is wrong.'
                 }
