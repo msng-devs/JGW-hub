@@ -48,8 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
-    'jgw_api',
-    'survey'
+    'jgw_api'
 ]
 
 MIDDLEWARE = [
