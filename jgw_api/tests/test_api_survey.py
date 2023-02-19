@@ -99,16 +99,18 @@ class SurveyApiTestOK(APITestCase):
 
         # given
         member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
-        insert_data = {
-            'title': 'title',
-            'description': 'desriptiopnmdsad',
-            'writer': member_instance.member_pk,
-            'allow_multiple': True,
-            'role_answer': 100,
-        }
+        insert_data = '{"title": "title",' \
+                      '"description": "desriptiopnmdsad",' \
+                      f'"writer": "{member_instance.member_pk}",' \
+                      '"role": 100,' \
+                      '"quizzes": [' \
+                      '{"type": 0, "title": "test1", "description": "test1", "require": true},' \
+                      '{"type": 0, "title": "test2", "description": "test2", "require": false},' \
+                      '{"type": 1, "title": "test3", "description": "test3", "require": true, "options": [' \
+                        '{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}]}'
 
         # when
-        respons: Response = self.client.post(self.url, data=insert_data, **self.__get_header(member_instance))
+        respons: Response = self.client.post(self.url, data=insert_data, content_type='application/json', **self.__get_header(member_instance))
         print(respons.content)
 
         # then

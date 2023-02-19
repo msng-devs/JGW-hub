@@ -51,6 +51,8 @@ import logging
 from typing import Union, Tuple, Dict
 import rest_framework
 import django
+from secrets_content.files.secret_key import *
+import pymongo
 
 # 자람 허브 로거
 # logger = logging.getLogger('hub')
@@ -890,33 +892,56 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 # 설문조사
-from secrets_content.files.secret_key import *
-import pymongo
-client = pymongo.MongoClient(**SURVEY_DATABASES)
-
-if not settings.TESTING:
-    db = client.get_database(constant.SURVEY_DB_NAME)
-    try:
-        survey_post_collection = db.create_collection(constant.SURVEY_POST_DB_NME)
-        db.command({
-            'collMod': constant.SURVEY_POST_DB_NME,
-            'validator': constant.SURVEY_POST_DB_VALIDATOR,
-            'validationAction': 'error'
-        })
-    except:
-        survey_post_collection = db.get_collection(constant.SURVEY_POST_DB_NME)
-else:
-    db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
-    for i in db.list_collection_names():
-        db.drop_collection(i)
-    survey_post_collection = db.create_collection(constant.SURVEY_POST_DB_NME)
-    db.command({
-        'collMod': constant.SURVEY_POST_DB_NME,
-        'validator': constant.SURVEY_POST_DB_VALIDATOR,
-        'validationAction': 'error'
-    })
 
 class SurveyViewSet(viewsets.ViewSet):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        def __create_collection(db, name, validator):
+            try:
+                collection = db.create_collection(name)
+                db.command({
+                    'collMod': name,
+                    'validator': validator,
+                    'validationAction': 'error'
+                })
+            except:
+                collection = db.get_collection(name)
+            return collection
+
+        self.client = pymongo.MongoClient(**SURVEY_DATABASES)
+
+        if not settings.TESTING:
+            self.db = self.client.get_database(constant.SURVEY_DB_NAME)
+        else:
+            self.db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
+            for i in self.db.list_collection_names():
+                self.db.drop_collection(i)
+        self.survey_post_collection = __create_collection(self.db, constant.SURVEY_POST_DB_NME, constant.SURVEY_POST_DB_VALIDATOR)
+        self.text_question_collection = __create_collection(self.db, constant.SURVEY_TEXT_QUIZ, constant.SURVEY_TEXT_QUIZ_VALIDATOR)
+        self.text_answer_collection = __create_collection(self.db, constant.SURVEY_TEXT_ANSWER, constant.SURVEY_TEXT_ANSWER_VALIDATOR)
+        self.select_one_question_collection = __create_collection(self.db, constant.SURVEY_SELECT_ONE_QUIZ, constant.SURVEY_SELECT_ONE_QUIZ_VALIDATOR)
+        self.select_one_answer_collection = __create_collection(self.db, constant.SURVEY_SELECT_ONE_ANSWER, constant.SURVEY_SELECT_ONE_ANSWER_VALIDATOR)
+
+    def __make_question_data(self, data):
+        type = int(data['type'])
+        quiz_data = {
+            'title': data['title'],
+            'description': data['description'],
+            'require': bool(data['require']),
+            'answers': []
+        }
+        if type == 0: # text
+            result = self.text_question_collection.insert_one(quiz_data)
+        elif type == 1: # select one
+            quiz_data['options'] = []
+            for i in data['options']:
+                quiz_data['options'].append({
+                    'text': i['text']
+                })
+            result = self.select_one_question_collection.insert_one(quiz_data)
+        else:
+            return None
+        return result
 
     def create(self, request):
         checked = request_check_admin_role(request)
@@ -932,15 +957,46 @@ class SurveyViewSet(viewsets.ViewSet):
                     'title': post_data['title'],
                     'description': post_data['description'],
                     'writer': user_uid,
-                    'allow_multiple': bool(post_data['allow_multiple']),
-                    'role_answer': int(post_data['role_answer']),
-                    'question': [],
-                    'answer': []
+                    'role': int(post_data['role']),
+                    'quizzes': [],
+                    'answers': []
                 }
-                result = survey_post_collection.insert_one(new_data)
-                new_data['_id'] = str(new_data['_id'])
-                return Response(new_data, status=status.HTTP_201_CREATED)
+
+                try:
+                    assert len(post_data['quizzes'])
+                except:
+                    detail = {
+                        'detail': 'There must be at least 1 quiz.'
+                    }
+                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+                quizzes = []
+                for quiz in post_data['quizzes']:
+                    result = self.__make_question_data(quiz)
+                    if result is not None:
+                        quizzes.append(result)
+
+                if not len(quizzes):
+                    detail = {
+                        'detail': 'There must be at least 1 quiz.'
+                    }
+                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+                post_result = self.survey_post_collection.insert_one(new_data)
+                self.survey_post_collection.update_one(
+                    {'_id': post_result.inserted_id},
+                    {
+                        '$push': {
+                            'quizzes': {
+                                '$each': [{'item': i.inserted_id} for i in quizzes]
+                            }
+                        }
+                    }
+                )
+
+                return Response('{}', status=status.HTTP_201_CREATED)
             except Exception as e:
+                traceback.print_exc()
                 detail = {
                     'detail': 'Data is wrong.'
                 }
