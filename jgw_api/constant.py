@@ -205,3 +205,6 @@ QUIZ_TYPE_S2I = {
   SURVEY_TEXT: 0,
   SURVEY_SELECT_ONE: 1,
 }
+
+SURVEY_QUIZ = 'survey_quiz'
+SURVEY_ANSWER = 'survey_answer'

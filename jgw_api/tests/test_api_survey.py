@@ -96,6 +96,8 @@ class SurveyApiTestOK(APITestCase):
 
     def test_survey_post_post(self):
         print("Survey post Api POST Running...")
+        now = datetime.datetime.now() + datetime.timedelta(days=10)
+        now = now.strftime('%Y-%m-%dT%H-%M-%S')
 
         # given
         member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
@@ -103,6 +105,8 @@ class SurveyApiTestOK(APITestCase):
                       '"description": "desriptiopnmdsad",' \
                       f'"writer": "{member_instance.member_pk}",' \
                       '"role": 100,' \
+                      f'"to_time": "{now}",' \
+                      f'"activate": "true",' \
                       '"quizzes": [' \
                       '{"type": 0, "title": "test1", "description": "test1", "require": true},' \
                       '{"type": 0, "title": "test2", "description": "test2", "require": false},' \
@@ -111,6 +115,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.post(self.url, data=insert_data, content_type='application/json', **self.__get_header(member_instance))
+        print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)

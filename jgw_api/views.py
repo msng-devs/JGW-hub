@@ -52,7 +52,9 @@ from typing import Union, Tuple, Dict
 import rest_framework
 import django
 from secrets_content.files.secret_key import *
+
 import pymongo
+from bson.objectid import ObjectId
 
 # 자람 허브 로거
 # logger = logging.getLogger('hub')
@@ -916,11 +918,9 @@ class SurveyViewSet(viewsets.ViewSet):
             self.db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
             for i in self.db.list_collection_names():
                 self.db.drop_collection(i)
-        self.survey_post_collection = __create_collection(self.db, constant.SURVEY_POST_DB_NME, constant.SURVEY_POST_DB_VALIDATOR)
-        self.text_question_collection = __create_collection(self.db, constant.SURVEY_TEXT_QUIZ, constant.SURVEY_TEXT_QUIZ_VALIDATOR)
-        self.text_answer_collection = __create_collection(self.db, constant.SURVEY_TEXT_ANSWER, constant.SURVEY_TEXT_ANSWER_VALIDATOR)
-        self.select_one_question_collection = __create_collection(self.db, constant.SURVEY_SELECT_ONE_QUIZ, constant.SURVEY_SELECT_ONE_QUIZ_VALIDATOR)
-        self.select_one_answer_collection = __create_collection(self.db, constant.SURVEY_SELECT_ONE_ANSWER, constant.SURVEY_SELECT_ONE_ANSWER_VALIDATOR)
+        self.collection_survey = __create_collection(self.db, constant.SURVEY_POST_DB_NME, None)
+        self.collection_quiz = __create_collection(self.db, constant.SURVEY_QUIZ, None)
+        self.collection_answer = __create_collection(self.db, constant.SURVEY_QUIZ, None)
 
     def __make_question_data(self, data):
         type = int(data['type'])
@@ -974,64 +974,64 @@ class SurveyViewSet(viewsets.ViewSet):
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
             post_data = request.data
-
             try:
-                new_data = {
+                created_time = datetime.datetime.now()
+                to = None
+                if 'to_time' in post_data:
+                    to = datetime.datetime.strptime(post_data['to_time'], '%Y-%m-%dT%H-%M-%S')
+                survey_data = {
+                    '_id': ObjectId(),
                     'title': post_data['title'],
                     'description': post_data['description'],
-                    'writer': user_uid,
                     'role': int(post_data['role']),
-                    'quizzes': [],
-                    'answers': []
+                    'activate': bool(post_data['activate']),
+                    'created_time': datetime.datetime.now()
                 }
+                if to is not None:
+                    assert created_time < to, 'The last day must be later than the start date.'
+                    survey_data['to_time'] = to
 
-                try:
-                    assert len(post_data['quizzes'])
-                except:
-                    detail = {
-                        'detail': 'There must be at least 1 quiz.'
+                quizzes = post_data['quizzes']
+                assert len(quizzes), "There must be at least one question."
+
+                quizzes_data = []
+                for q in quizzes:
+                    type = int(q['type'])
+                    quiz_data = {
+                        '_id': ObjectId(),
+                        'parent_post': survey_data['_id'],
+                        'title': q['title'],
+                        'description': q['description'],
+                        'require': q['require']
                     }
-                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+                    if type == constant.SURVEY_TEXT_CODE:  # text
+                        pass
+                    elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
+                        quiz_data['options'] = []
+                        for i in q['options']:
+                            quiz_data['options'].append({
+                                'text': i['text']
+                            })
+                    else:
+                        assert False, f'{type} is a non-existent question type.'
+                    quizzes_data.append(quiz_data)
 
-                quizzes = []
-                for quiz in post_data['quizzes']:
-                    result = self.__make_question_data(quiz)
-                    if result is not None:
-                        quizzes.append([result, int(quiz['type'])])
+                survey_result = self.collection_survey.insert_one(survey_data)
+                quizzes_result = self.collection_quiz.insert_many(quizzes_data)
 
-                if not len(quizzes):
-                    detail = {
-                        'detail': 'There must be at least 1 quiz.'
-                    }
-                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+                response_data = survey_data
+                response_data['quizzes'] = []
+                response_data['_id'] = str(response_data['_id'])
+                for q in quizzes_data:
+                    q['_id'] = str(q['_id'])
+                    q['parent_post'] = str(q['parent_post'])
+                    response_data['quizzes'].append(q)
 
-                post_result = self.survey_post_collection.insert_one(new_data)
-                self.survey_post_collection.update_one(
-                    {'_id': post_result.inserted_id},
-                    {
-                        '$push': {
-                            'quizzes': {
-                                '$each': [{'item': i[0].inserted_id, 'type': i[1]} for i in quizzes]
-                            }
-                        }
-                    }
-                )
-
-                post_result = self.survey_post_collection.find_one({'_id': post_result.inserted_id})
-                post_quizzes = post_result['quizzes']
-                post_result['quizzes'] = []
-                for q in post_quizzes:
-                    quiz_result = self.__get_question_data(q['item'], q['type'])
-                    if quiz_result is not None:
-                        quiz_result['_id'] = str(quiz_result['_id'])
-                        post_result['quizzes'].append(quiz_result)
-                post_result['_id'] = str(post_result['_id'])
-
-                return Response(post_result, status=status.HTTP_201_CREATED)
+                return Response(response_data, status=status.HTTP_201_CREATED)
             except Exception as e:
                 traceback.print_exc()
                 detail = {
-                    'detail': 'Data is wrong.'
+                    'detail': str(e)
                 }
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
