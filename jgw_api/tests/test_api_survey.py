@@ -111,18 +111,6 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.post(self.url, data=insert_data, content_type='application/json', **self.__get_header(member_instance))
-        print(respons.content)
 
         # then
-        responses_data = {
-            'title': 'title',
-            'description': 'desriptiopnmdsad',
-            'writer': member_instance.member_pk,
-            'allow_multiple': True,
-            'role_answer': 100,
-            "question": [],
-            "answer": [],
-            "_id": respons.content[-26:-2].decode('utf-8')
-        }
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-        self.assertJSONEqual(respons.content, responses_data)

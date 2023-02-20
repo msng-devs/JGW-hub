@@ -930,9 +930,9 @@ class SurveyViewSet(viewsets.ViewSet):
             'require': bool(data['require']),
             'answers': []
         }
-        if type == 0: # text
+        if type == constant.SURVEY_TEXT_CODE: # text
             result = self.text_question_collection.insert_one(quiz_data)
-        elif type == 1: # select one
+        elif type == constant.SURVEY_SELECT_ONE_CODE: # select one
             quiz_data['options'] = []
             for i in data['options']:
                 quiz_data['options'].append({
@@ -942,6 +942,14 @@ class SurveyViewSet(viewsets.ViewSet):
         else:
             return None
         return result
+
+    def __get_question_data(self, id, type):
+        if type == constant.SURVEY_TEXT_CODE:
+            return self.text_question_collection.find_one({'_id': id})
+        elif type == constant.SURVEY_SELECT_ONE_CODE:
+            return self.select_one_question_collection.find_one({'_id': id})
+        else:
+            return None
 
     def create(self, request):
         checked = request_check_admin_role(request)
@@ -974,7 +982,7 @@ class SurveyViewSet(viewsets.ViewSet):
                 for quiz in post_data['quizzes']:
                     result = self.__make_question_data(quiz)
                     if result is not None:
-                        quizzes.append(result)
+                        quizzes.append([result, int(quiz['type'])])
 
                 if not len(quizzes):
                     detail = {
@@ -988,13 +996,22 @@ class SurveyViewSet(viewsets.ViewSet):
                     {
                         '$push': {
                             'quizzes': {
-                                '$each': [{'item': i.inserted_id} for i in quizzes]
+                                '$each': [{'item': i[0].inserted_id, 'type': i[1]} for i in quizzes]
                             }
                         }
                     }
                 )
 
-                return Response('{}', status=status.HTTP_201_CREATED)
+                post_result = self.survey_post_collection.find_one({'_id': post_result.inserted_id})
+                post_quizzes = post_result['quizzes']
+                post_result['quizzes'] = []
+                for q in post_quizzes:
+                    quiz_result = self.__get_question_data(q['item'], q['type'])
+                    if quiz_result is not None:
+                        quiz_result['_id'] = str(quiz_result['_id'])
+                        post_result['quizzes'].append(quiz_result)
+                post_result['_id'] = str(post_result['_id'])
+                return Response(post_result, status=status.HTTP_201_CREATED)
             except Exception as e:
                 traceback.print_exc()
                 detail = {
