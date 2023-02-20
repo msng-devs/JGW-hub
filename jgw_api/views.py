@@ -899,11 +899,11 @@ class SurveyViewSet(viewsets.ViewSet):
         def __create_collection(db, name, validator):
             try:
                 collection = db.create_collection(name)
-                db.command({
-                    'collMod': name,
-                    'validator': validator,
-                    'validationAction': 'error'
-                })
+                # db.command({
+                #     'collMod': name,
+                #     'validator': validator,
+                #     'validationAction': 'error'
+                # })
             except:
                 collection = db.get_collection(name)
             return collection
@@ -950,6 +950,21 @@ class SurveyViewSet(viewsets.ViewSet):
             return self.select_one_question_collection.find_one({'_id': id})
         else:
             return None
+
+    def __make_answer_data(self, data, user_uid):
+        type = int(data['type'])
+        answer_data = {
+            'user': user_uid,
+        }
+        if type == constant.SURVEY_TEXT_CODE:  # text
+            answer_data['text'] = data['text']
+            result = self.text_answer_collection.insert_one(answer_data)
+        elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
+            answer_data['selection'] = int(data['selection'])
+            result = self.select_one_answer_collection.insert_one(answer_data)
+        else:
+            return None
+        return result
 
     def create(self, request):
         checked = request_check_admin_role(request)
@@ -1011,6 +1026,7 @@ class SurveyViewSet(viewsets.ViewSet):
                         quiz_result['_id'] = str(quiz_result['_id'])
                         post_result['quizzes'].append(quiz_result)
                 post_result['_id'] = str(post_result['_id'])
+
                 return Response(post_result, status=status.HTTP_201_CREATED)
             except Exception as e:
                 traceback.print_exc()
@@ -1024,3 +1040,47 @@ class SurveyViewSet(viewsets.ViewSet):
                 'detail': 'Not Allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+    def create_answer(self, request):
+        checked = request_check(request)
+        if isinstance(checked, Response):
+            # user role이 없다면 최하위 권한 적용
+            user_role_id = -1
+            user_uid = None
+        else:
+            user_uid, user_role_id = checked
+        try:
+            request_data = request.data
+            target_survey = request_data['target']
+            post_data = self.survey_post_collection.find_one({'_id': target_survey})
+
+            # Quiz Answer 개수 검사
+            answers_data = request_data['answers']
+            if len(post_data['quizzes']) != len(answers_data):
+                detail = {
+                    'detail': 'The number of answers is different from the number of questions.'
+                }
+                return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+            # Quiz Answer 타입 검사
+            questions = post_data['quizzes']
+            for idx, a in enumerate(answers_data):
+                a_type = int(a['type'])
+                if a_type != questions[idx]['type']:
+                    detail = {
+                        'detail': 'Question and answer types are different.'
+                    }
+                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+            answers = []
+            for idx, ans in enumerate(answers_data):
+                result = self.__make_answer_data(ans, user_uid)
+                if result is not None:
+                    answers.append([result, int(ans['type']), questions[idx]['item']])
+
+        except:
+            traceback.print_exc()
+            detail = {
+                'detail': 'Data is wrong.'
+            }
+            return Response(detail, status=status.HTTP_400_BAD_REQUEST)

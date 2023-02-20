@@ -12,12 +12,20 @@ router.register(r'v1/board', views.BoardViewSet, basename='board')
 # router.register(r'post', views.PostViewSet, basename='post')
 router.register(r'v1/image', views.ImageViewSet, basename='image')
 router.register(r'v1/comment', views.CommentViewSet, basename='comment')
-router.register(r'v1/survey', views.SurveyViewSet, basename='survey')
+# router.register(r'v1/survey', views.SurveyViewSet, basename='survey')
 
 urlpatterns = [
     path('', include(router.urls)),
     path('ping/', views.ping_pong)
 ]
+
+survey_post_post = views.SurveyViewSet.as_view({
+    'post': 'create'
+})
+
+survey_post_answer = views.SurveyViewSet.as_view({
+    'post': 'create_answer'
+})
 
 post_get_list = views.PostViewSet.as_view({
     'get': 'list'
@@ -36,7 +44,10 @@ post_detail = views.PostViewSet.as_view({
 urlpatterns += format_suffix_patterns([
     path('v1/post/list/', post_get_list, name='post-get-list'),
     path('v1/post/', post_post_list, name='post-post-list'),
-    path('v1/post/<int:pk>/', post_detail, name='post-detail')
+    path('v1/post/<int:pk>/', post_detail, name='post-detail'),
+
+    path('v1/survey/', survey_post_post, name='survey-post-post'),
+    path('v1/survey/answer/', survey_post_answer, name='survey-answer-post'),
 ])
 
 if settings.DEBUG:
