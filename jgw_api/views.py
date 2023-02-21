@@ -910,12 +910,12 @@ class SurveyViewSet(viewsets.ViewSet):
                 collection = db.get_collection(name)
             return collection
 
-        self.client = pymongo.MongoClient(**SURVEY_DATABASES)
+        self.client = pymongo.MongoClient(SURVEY_DATABASES)
 
         if not settings.TESTING:
             self.db = self.client.get_database(constant.SURVEY_DB_NAME)
         else:
-            self.db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
+            self.db = self.client.get_database(os.environ.get("TEST_DB_NAME", 'test'))
         self.collection_survey = __create_collection(self.db, constant.SURVEY_POST_DB_NME, None)
         self.collection_quiz = __create_collection(self.db, constant.SURVEY_QUIZ, None)
         self.collection_answer = __create_collection(self.db, constant.SURVEY_ANSWER, None)
