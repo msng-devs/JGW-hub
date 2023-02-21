@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+      - jckim0307
+      - jeno
 
 jobs:
   build:
