@@ -920,30 +920,7 @@ class SurveyViewSet(viewsets.ViewSet):
         self.collection_quiz = __create_collection(self.db, constant.SURVEY_QUIZ, None)
         self.collection_answer = __create_collection(self.db, constant.SURVEY_ANSWER, None)
 
-    def __get_question_data(self, id, type):
-        if type == constant.SURVEY_TEXT_CODE:
-            return self.text_question_collection.find_one({'_id': id})
-        elif type == constant.SURVEY_SELECT_ONE_CODE:
-            return self.select_one_question_collection.find_one({'_id': id})
-        else:
-            return None
-
-    def __make_answer_data(self, data, user_uid):
-        type = int(data['type'])
-        answer_data = {
-            'user': user_uid,
-        }
-        if type == constant.SURVEY_TEXT_CODE:  # text
-            answer_data['text'] = data['text']
-            result = self.text_answer_collection.insert_one(answer_data)
-        elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
-            answer_data['selection'] = int(data['selection'])
-            result = self.select_one_answer_collection.insert_one(answer_data)
-        else:
-            return None
-        return result
-
-    def create(self, request):
+    def create_post(self, request):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
             # 요청한 유저 정보가 없다면 500 return
@@ -1062,10 +1039,18 @@ class SurveyViewSet(viewsets.ViewSet):
             assert len(answer_data['answers']) == len(quizzes_data), "Invalid response data exists."
             print(answer_data)
             self.collection_answer.insert_one(answer_data)
-            return Response({'d':''}, status.HTTP_201_CREATED)
+
+            answer_data['_id'] = str(answer_data['_id'])
+            answer_data['parent_post'] = str(answer_data['parent_post'])
+            for a in answer_data['answers']:
+                a['parent_quiz'] = str(a['parent_quiz'])
+            return Response(answer_data, status.HTTP_201_CREATED)
         except Exception as e:
             traceback.print_exc()
             detail = {
                 'detail': str(e)
             }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+    def list_post(self, request):
+        pass

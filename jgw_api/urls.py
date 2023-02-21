@@ -20,7 +20,7 @@ urlpatterns = [
 ]
 
 survey_post_post = views.SurveyViewSet.as_view({
-    'post': 'create'
+    'post': 'create_post'
 })
 
 survey_post_answer = views.SurveyViewSet.as_view({
