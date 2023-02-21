@@ -27,9 +27,14 @@ import jgw_api.constant as constant
 import pymongo
 from secrets_content.files.secret_key import *
 import os
+from bson.objectid import ObjectId
 
 class SurveyApiTestOK(APITestCase):
     now = datetime.datetime.now()
+    collection_survey = None
+    collection_quiz = None
+    collection_answer = None
+    survey_pks = []
 
     def setUp(self):
         self.url = '/hub/api/v1/survey/'
@@ -88,6 +93,70 @@ class SurveyApiTestOK(APITestCase):
             member_dateofbirth=now,
         )
 
+        def __create_collection(db, name, validator):
+            try:
+                collection = db.create_collection(name)
+                # db.command({
+                #     'collMod': name,
+                #     'validator': validator,
+                #     'validationAction': 'error'
+                # })
+            except:
+                collection = db.get_collection(name)
+            return collection
+
+        client = pymongo.MongoClient(**SURVEY_DATABASES)
+        db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
+        for i in db.list_collection_names():
+            db.drop_collection(i)
+        cls.collection_survey = __create_collection(db, constant.SURVEY_POST_DB_NME, None)
+        cls.collection_quiz = __create_collection(db, constant.SURVEY_QUIZ, None)
+        cls.collection_answer = __create_collection(db, constant.SURVEY_ANSWER, None)
+
+        def __create_post(idx):
+            survey_data = {
+                '_id': ObjectId(),
+                'title': f'title{idx}',
+                'description': f'description{idx}',
+                'role': 100,
+                'activate': True,
+                'created_time': datetime.datetime.now()
+            }
+
+            quizzes = [
+                {"type": 0, "title": "test1", "description": "test1", "require": True},
+                {"type": 0, "title": "test2", "description": "test2", "require": False},
+                {"type": 1, "title": "test3", "description": "test3", "require": True,
+                 "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}
+            ]
+
+            quizzes_data = []
+            for q in quizzes:
+                type = int(q['type'])
+                quiz_data = {
+                    '_id': ObjectId(),
+                    'parent_post': survey_data['_id'],
+                    'title': q['title'],
+                    'description': q['description'],
+                    'require': q['require'],
+                    'type': type
+                }
+                if type == constant.SURVEY_TEXT_CODE:  # text
+                    pass
+                elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
+                    quiz_data['options'] = []
+                    for i in q['options']:
+                        quiz_data['options'].append({
+                            'text': i['text']
+                        })
+                quizzes_data.append(quiz_data)
+
+            cls.collection_survey.insert_one(survey_data)
+            cls.collection_quiz.insert_many(quizzes_data)
+            cls.survey_pks.append(str(survey_data['_id']))
+        for i in range(3):
+            __create_post(i)
+
     def __get_header(self, member_instance):
         return {
             'HTTP_USER_PK': member_instance.member_pk,
@@ -101,8 +170,8 @@ class SurveyApiTestOK(APITestCase):
 
         # given
         member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
-        insert_data = '{"title": "title",' \
-                      '"description": "desriptiopnmdsad",' \
+        insert_data = '{"title": "vgcfhvbjknbhgvcfhvbj",' \
+                      '"description": "cfvgbhugyvftcdrftgvyhuj",' \
                       f'"writer": "{member_instance.member_pk}",' \
                       '"role": 100,' \
                       f'"to_time": "{now}",' \
@@ -119,3 +188,16 @@ class SurveyApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+
+    def test_answer_post(self):
+        print("Answer post Api POST Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+        insert_data = '{"answers": [' \
+                      '{"text": "answer text 11122233 fjf!! ^&*(*&^%$%^&*(*&^%$", "type": 0},' \
+                      '{"text": "mjknbdhvinbuvuyiwhyrehiwubeyihc ncfbuihjfiub cnuegyh", "type": 0},' \
+                      '{"selection": 0, "type": 1}]}'
+        # when
+        respons: Response = self.client.post(self.url + f'{self.survey_pks[0]}/answer/', data=insert_data, content_type='application/json', **self.__get_header(member_instance))
+        print(respons.content)

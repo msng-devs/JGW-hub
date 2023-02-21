@@ -916,32 +916,9 @@ class SurveyViewSet(viewsets.ViewSet):
             self.db = self.client.get_database(constant.SURVEY_DB_NAME)
         else:
             self.db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
-            for i in self.db.list_collection_names():
-                self.db.drop_collection(i)
         self.collection_survey = __create_collection(self.db, constant.SURVEY_POST_DB_NME, None)
         self.collection_quiz = __create_collection(self.db, constant.SURVEY_QUIZ, None)
-        self.collection_answer = __create_collection(self.db, constant.SURVEY_QUIZ, None)
-
-    def __make_question_data(self, data):
-        type = int(data['type'])
-        quiz_data = {
-            'title': data['title'],
-            'description': data['description'],
-            'require': bool(data['require']),
-            'answers': []
-        }
-        if type == constant.SURVEY_TEXT_CODE: # text
-            result = self.text_question_collection.insert_one(quiz_data)
-        elif type == constant.SURVEY_SELECT_ONE_CODE: # select one
-            quiz_data['options'] = []
-            for i in data['options']:
-                quiz_data['options'].append({
-                    'text': i['text']
-                })
-            result = self.select_one_question_collection.insert_one(quiz_data)
-        else:
-            return None
-        return result
+        self.collection_answer = __create_collection(self.db, constant.SURVEY_ANSWER, None)
 
     def __get_question_data(self, id, type):
         if type == constant.SURVEY_TEXT_CODE:
@@ -985,7 +962,7 @@ class SurveyViewSet(viewsets.ViewSet):
                     'description': post_data['description'],
                     'role': int(post_data['role']),
                     'activate': bool(post_data['activate']),
-                    'created_time': datetime.datetime.now()
+                    'created_time': created_time
                 }
                 if to is not None:
                     assert created_time < to, 'The last day must be later than the start date.'
@@ -1002,7 +979,8 @@ class SurveyViewSet(viewsets.ViewSet):
                         'parent_post': survey_data['_id'],
                         'title': q['title'],
                         'description': q['description'],
-                        'require': q['require']
+                        'require': q['require'],
+                        'type': type
                     }
                     if type == constant.SURVEY_TEXT_CODE:  # text
                         pass
@@ -1041,7 +1019,7 @@ class SurveyViewSet(viewsets.ViewSet):
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
-    def create_answer(self, request):
+    def create_answer(self, request, pk):
         checked = request_check(request)
         if isinstance(checked, Response):
             # user role이 없다면 최하위 권한 적용
@@ -1051,36 +1029,43 @@ class SurveyViewSet(viewsets.ViewSet):
             user_uid, user_role_id = checked
         try:
             request_data = request.data
-            target_survey = request_data['target']
-            post_data = self.survey_post_collection.find_one({'_id': target_survey})
+            survey_data = self.collection_survey.find_one({'_id': ObjectId(pk)})
+            assert survey_data['role'] <= int(user_role_id), "User is not a survey participant."
 
-            # Quiz Answer 개수 검사
-            answers_data = request_data['answers']
-            if len(post_data['quizzes']) != len(answers_data):
-                detail = {
-                    'detail': 'The number of answers is different from the number of questions.'
+            quizzes_data = self.collection_quiz.find({'parent_post': ObjectId(pk)})
+            quizzes_data = list(quizzes_data)
+            answers = request_data['answers']
+            assert len(answers) == len(quizzes_data), "The number of responses must equal the number of questions."
+
+            answer_data = {
+                '_id': ObjectId(),
+                'parent_post': ObjectId(pk),
+                'user': user_uid,
+                'answers': []
+            }
+            for idx, q in enumerate(quizzes_data):
+                a = answers[idx]
+                type = int(a['type'])
+                assert q['type'] == a['type'], f'The data format of the response is different from the question. idx" {idx}'
+                answer = {
+                    "parent_quiz": q['_id']
                 }
-                return Response(detail, status=status.HTTP_400_BAD_REQUEST)
-
-            # Quiz Answer 타입 검사
-            questions = post_data['quizzes']
-            for idx, a in enumerate(answers_data):
-                a_type = int(a['type'])
-                if a_type != questions[idx]['type']:
-                    detail = {
-                        'detail': 'Question and answer types are different.'
-                    }
-                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
-
-            answers = []
-            for idx, ans in enumerate(answers_data):
-                result = self.__make_answer_data(ans, user_uid)
-                if result is not None:
-                    answers.append([result, int(ans['type']), questions[idx]['item']])
-
-        except:
+                if type == constant.SURVEY_TEXT_CODE:
+                    answer['text'] = a['text']
+                elif type == constant.SURVEY_SELECT_ONE_CODE:
+                    selection = int(a['selection'])
+                    assert selection < len(q['options']), 'An option that does not exist.'
+                    answer['selection'] = selection
+                else:
+                    assert False, f'{type} is a non-existent answer type.'
+                answer_data['answers'].append(answer)
+            assert len(answer_data['answers']) == len(quizzes_data), "Invalid response data exists."
+            print(answer_data)
+            self.collection_answer.insert_one(answer_data)
+            return Response({'d':''}, status.HTTP_201_CREATED)
+        except Exception as e:
             traceback.print_exc()
             detail = {
-                'detail': 'Data is wrong.'
+                'detail': str(e)
             }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)

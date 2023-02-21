@@ -47,7 +47,7 @@ urlpatterns += format_suffix_patterns([
     path('v1/post/<int:pk>/', post_detail, name='post-detail'),
 
     path('v1/survey/', survey_post_post, name='survey-post-post'),
-    path('v1/survey/answer/', survey_post_answer, name='survey-answer-post'),
+    path('v1/survey/<str:pk>/answer/', survey_post_answer, name='survey-answer-post'),
 ])
 
 if settings.DEBUG:
