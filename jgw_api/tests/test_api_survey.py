@@ -105,8 +105,8 @@ class SurveyApiTestOK(APITestCase):
                 collection = db.get_collection(name)
             return collection
 
-        client = pymongo.MongoClient(**SURVEY_DATABASES)
-        db = pymongo.MongoClient(**SURVEY_DATABASES).get_database(os.environ.get("TEST_DB_NAME", 'test'))
+        client = pymongo.MongoClient(SURVEY_DATABASES)
+        db = client.get_database(os.environ.get("TEST_DB_NAME", 'test'))
         for i in db.list_collection_names():
             db.drop_collection(i)
         cls.collection_survey = __create_collection(db, constant.SURVEY_POST_DB_NME, None)
