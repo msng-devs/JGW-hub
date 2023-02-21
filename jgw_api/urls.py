@@ -4,12 +4,13 @@ from . import views
 from rest_framework import routers, permissions
 from rest_framework.urlpatterns import format_suffix_patterns
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView, SpectacularJSONAPIView
+from rest_framework.routers import DefaultRouter
 
 # app_name = 'jgw_api'
 
-router = routers.DefaultRouter()
+router = DefaultRouter()
 router.register(r'v1/board', views.BoardViewSet, basename='board')
-# router.register(r'post', views.PostViewSet, basename='post')
+router.register(r'v1/post', views.PostViewSet, basename='post')
 router.register(r'v1/image', views.ImageViewSet, basename='image')
 router.register(r'v1/comment', views.CommentViewSet, basename='comment')
 

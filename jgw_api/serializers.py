@@ -53,8 +53,6 @@ class MemberNestedSerializer(serializers.ModelSerializer):
         model = Member
         fields = ['member_pk', 'member_nm']
 
-
-
 class BoardWriteSerializer(serializers.ModelSerializer):
     '''
     board serializer. post method에 사용하는 serializer.
@@ -62,6 +60,7 @@ class BoardWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = '__all__'
+
 
 class BoardGetSerializer(serializers.ModelSerializer):
     '''

@@ -28,7 +28,7 @@ class CommentApiTestOK(APITestCase):
     now = datetime.datetime.now()
 
     def setUp(self):
-        self.url = '/hub/api/v1/comment/'
+        self.url = '/v1/comment/'
         self.now = datetime.datetime.now()
 
     @classmethod

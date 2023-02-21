@@ -29,7 +29,7 @@ class PostApiTestOK(APITestCase):
     post_count = 100
 
     def setUp(self):
-        self.url = '/hub/api/v1/post/'
+        self.url = '/v1/post/'
         # self.now = datetime.datetime.now()
 
     @classmethod

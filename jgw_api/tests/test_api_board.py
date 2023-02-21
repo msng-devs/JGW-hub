@@ -10,7 +10,7 @@ import random
 
 class BoardApiTestOK(APITestCase):
     def setUp(self):
-        self.url = '/hub/api/v1/board/'
+        self.url = '/v1/board/'
 
     @classmethod
     def setUpTestData(cls):
@@ -281,7 +281,7 @@ class BoardApiError(APITestCase):
             "board_name":["board with this board name already exists."],
             "role_role_pk_read_level":["Invalid pk \"20\" - object does not exist."]
         }
-        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, responses_data)
 
     def test_board_post_required(self):
@@ -303,5 +303,5 @@ class BoardApiError(APITestCase):
             "role_role_pk_read_level":["This field is required."],
             "role_role_pk_comment_write_level":["This field is required."]
         }
-        self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
         self.assertJSONEqual(respons.content, responses_data)

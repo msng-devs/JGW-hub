@@ -1,6 +1,7 @@
 import datetime
 import random
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -84,7 +85,7 @@ def get_user_header(
         return user_uid, user_role_id
 
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
-    '''
+    '''ada
     Config 테이블에서 admin의 role이 몇 이상이지 가져오는 함수
 
     :return: admin의 최소 role 번호.
@@ -282,6 +283,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         key, name = instance.board_id_pk, instance.board_name
         logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
+
         return Response(serializer.data)
 
     # post
@@ -297,17 +299,23 @@ class BoardViewSet(viewsets.ModelViewSet):
             logger.debug(f'{user_uid} Board create approved')
             serializer = BoardWriteSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            logger.debug(f'{user_uid} Board data verified')
-            self.perform_create(serializer)
-            responses_data = serializer.data
+            if Board.objects.filter(board_name=request.data['board_name']).exists():
+                error = {
+                    'detail': 'Board name already exists'
+                }
+                return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                logger.debug(f'{user_uid} Board data verified')
+                self.perform_create(serializer)
+                responses_data = serializer.data
 
-            update_log = f'{user_uid} Board data created' \
-                         f'\tkey: {responses_data["board_id_pk"]} created log'
-            for k in responses_data.keys():
-                update_log += f'\n\t{k}: {responses_data[k]}'
-            logger.info(update_log)
+                update_log = f'{user_uid} Board data created' \
+                             f'\tkey: {responses_data["board_id_pk"]} created log'
+                for k in responses_data.keys():
+                    update_log += f'\n\t{k}: {responses_data[k]}'
+                logger.info(update_log)
 
-            return Response(responses_data, status=status.HTTP_201_CREATED)
+                return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f"{user_uid} Board create denied")
             detail = {
@@ -480,6 +488,7 @@ class PostViewSet(viewsets.ModelViewSet):
         if user_role_id >= admin_role_checked or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
             # 요청한 유저가 admin or 해당 게시판 게시글 읽기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post get retrieve approved')
+
             post_serializer = self.get_serializer(instance)
             response_data = post_serializer.data
 
@@ -689,7 +698,7 @@ class ImageViewSet(viewsets.ModelViewSet):
             # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
-            # page size를 최소~최대 범위 안에서 지정
+            # 'page size'를 최소~최대 범위 안에서 지정
             request.query_params['page_size'] = int(request.query_params['page_size'])
             if request.query_params['page_size'] < constant.IMAGE_MIN_PAGE_SIZE:
                 request.query_params['page_size'] = constant.IMAGE_MIN_PAGE_SIZE
