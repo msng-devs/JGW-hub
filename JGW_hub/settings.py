@@ -222,6 +222,14 @@ LOGGING = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379"
+
+    }
+}
+
 CORS_ORIGIN_ALLOW_ALL = MY_CORS_ORIGIN_ALLOW_ALL
 CORS_ALLOW_CREDENTIALS = MY_CORS_ALLOW_CREDENTIALS
 CORS_ALLOW_METHODS = MY_CORS_ALLOW_METHODS

@@ -51,6 +51,7 @@ import logging
 from typing import Union, Tuple, Dict
 import rest_framework
 import django
+from django.core.cache import cache
 
 # 자람 허브 로거
 # logger = logging.getLogger('hub')
