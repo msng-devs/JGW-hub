@@ -1088,10 +1088,12 @@ class SurveyViewSet(viewsets.ViewSet):
 
             response_data = {
                 'count': len(page_now),
-                'next': 1,
+                'next': request.build_absolute_uri().split('?')[0] +
+                        f'page={request.query_params["page"] + 1}&page_size={request.query_params["page_size"]}'
+                        if request.query_params['page'] < max_page else None,
                 'previous': request.build_absolute_uri().split('?')[0] +
                             f'page={request.query_params["page"] - 1}&page_size={request.query_params["page_size"]}'
-                if request.query_params['page'] > 1 else None,
+                            if request.query_params['page'] > 1 else None,
                 'results': []
             }
 
