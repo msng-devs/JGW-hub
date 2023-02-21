@@ -396,11 +396,11 @@ def post_get_all_query(
     '''
     start_date = datetime.datetime.min
     end_date = datetime.datetime.max
-    time_query = '%Y-%m-%dT%H-%M-%S'
+
     if 'start_date' in query_params:
-        start_date = datetime.datetime.strptime(query_params['start_date'], time_query)
+        start_date = datetime.datetime.strptime(query_params['start_date'], constant.TIME_QUERY)
     if 'end_date' in query_params:
-        end_date = datetime.datetime.strptime(query_params['end_date'], time_query)
+        end_date = datetime.datetime.strptime(query_params['end_date'], constant.TIME_QUERY)
     queryset = queryset.filter(post_write_time__range=(start_date, end_date))
 
     if 'writer_uid' in query_params:
@@ -932,7 +932,7 @@ class SurveyViewSet(viewsets.ViewSet):
                 created_time = datetime.datetime.now()
                 to = None
                 if 'to_time' in post_data:
-                    to = datetime.datetime.strptime(post_data['to_time'], '%Y-%m-%dT%H-%M-%S')
+                    to = datetime.datetime.strptime(post_data['to_time'], constant.TIME_QUERY)
                 survey_data = {
                     '_id': ObjectId(),
                     'title': post_data['title'],
@@ -1053,4 +1053,56 @@ class SurveyViewSet(viewsets.ViewSet):
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
 
     def list_post(self, request):
-        pass
+        try:
+            request.query_params._mutable = True
+            total_count = self.collection_survey.estimated_document_count()
+            if 'page_size' in request.query_params:
+                # page size를 최소~최대 범위 안에서 지정
+                request.query_params['page_size'] = int(request.query_params['page_size'])
+                if request.query_params['page_size'] < constant.SURVEY_MIN_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.SURVEY_MIN_PAGE_SIZE
+                elif request.query_params['page_size'] > constant.SURVEY_MAX_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.SURVEY_MAX_PAGE_SIZE
+            else:
+                request.query_params['page_size'] = constant.SURVEY_DEFAULT_PAGE_SIZE
+
+            max_page = total_count // request.query_params['page_size']
+            max_page += 1 if total_count % request.query_params['page_size'] else 0
+            if 'page' not in request.query_params:
+                # page를 지정하지 않으면 1로 지정
+                request.query_params['page'] = 1
+            else:
+                request.query_params['page'] = int(request.query_params['page'])
+                if request.query_params['page'] < 1:
+                    request.query_params['page'] = 1
+                elif max_page < request.query_params['page']:
+                    request.query_params['page'] = max_page
+
+            print(request.query_params['page'], request.query_params['page_size'])
+
+            sort_fields = [('activate', pymongo.DESCENDING), ('created_time', pymongo.DESCENDING)]
+            page_now = self.collection_survey.find().sort(sort_fields)\
+                .skip((request.query_params['page'] - 1) * request.query_params['page_size'])\
+                .limit(request.query_params['page_size'])
+            page_now = list(page_now)
+
+            response_data = {
+                'count': len(page_now),
+                'next': 1,
+                'previous': request.build_absolute_uri().split('?')[0] +
+                            f'page={request.query_params["page"] - 1}&page_size={request.query_params["page_size"]}'
+                if request.query_params['page'] > 1 else None,
+                'results': []
+            }
+
+            for d in page_now:
+                d['_id'] = str(d['_id'])
+                d['created_time'] = d['created_time'].strftime(constant.TIME_QUERY)
+            response_data['results'] = page_now
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            detail = {
+                'detail': str(e)
+            }
+            return Response(detail, status=status.HTTP_400_BAD_REQUEST)

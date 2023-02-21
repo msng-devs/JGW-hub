@@ -113,13 +113,13 @@ class SurveyApiTestOK(APITestCase):
         cls.collection_quiz = __create_collection(db, constant.SURVEY_QUIZ, None)
         cls.collection_answer = __create_collection(db, constant.SURVEY_ANSWER, None)
 
-        def __create_post(idx):
+        def __create_post(idx, is_random=0):
             survey_data = {
                 '_id': ObjectId(),
                 'title': f'title{idx}',
                 'description': f'description{idx}',
                 'role': 100,
-                'activate': True,
+                'activate': True if not is_random else bool(random.choice([0, 1])),
                 'created_time': datetime.datetime.now()
             }
 
@@ -153,9 +153,13 @@ class SurveyApiTestOK(APITestCase):
 
             cls.collection_survey.insert_one(survey_data)
             cls.collection_quiz.insert_many(quizzes_data)
-            cls.survey_pks.append(str(survey_data['_id']))
-        for i in range(3):
-            __create_post(i)
+            if not is_random:
+                cls.survey_pks.append(str(survey_data['_id']))
+
+        for i in range(5):
+            __create_post(i, 0)
+        for i in range(153):
+            __create_post(i, 1)
 
     def __get_header(self, member_instance):
         return {
@@ -201,3 +205,18 @@ class SurveyApiTestOK(APITestCase):
         # when
         respons: Response = self.client.post(self.url + f'{self.survey_pks[0]}/answer/', data=insert_data, content_type='application/json', **self.__get_header(member_instance))
         print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
+
+    def test_survey_list(self):
+        print("Survey Post list Api GET Running...")
+
+        # given
+
+        # when
+        respons: Response = self.client.get(self.url + '?page=0')
+        print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
