@@ -1038,6 +1038,9 @@ class SurveyViewSet(viewsets.ViewSet):
                 answer_data['answers'].append(answer)
             assert len(answer_data['answers']) == len(quizzes_data), "Invalid response data exists."
             print(answer_data)
+
+            if user_uid is not None:
+                self.collection_answer.delete_one({'parent_post': ObjectId(pk), 'user': user_uid})
             self.collection_answer.insert_one(answer_data)
 
             answer_data['_id'] = str(answer_data['_id'])
@@ -1146,3 +1149,78 @@ class SurveyViewSet(viewsets.ViewSet):
                 'detail': str(e)
             }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+    def list_answers(self, request, pk):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            # 요청한 유저 정보가 없다면 500 return
+            return checked
+        user_uid, user_role_id, admin_role_checked = checked
+        if user_role_id >= admin_role_checked:
+            if 'analyze' in request.query_params and int(request.query_params['analyze']) == 0: # 분석 요청
+                pass
+            else: # 사용자별 데이터 요청
+                try:
+                    total_count = list(self.collection_answer.aggregate([
+                        {'$project': {'parent_post': ObjectId(pk)}},
+                        {'$count': 'answers'}
+                    ]))[0]['answers']
+
+                    page_size = constant.ANSWER_DEFAULT_PAGE_SIZE
+                    if 'page_size' in request.query_params:
+                        # page size를 최소~최대 범위 안에서 지정
+                        page_size = int(request.query_params['page_size'])
+                        if page_size < constant.ANSWER_MIN_PAGE_SIZE:
+                            page_size = constant.ANSWER_MIN_PAGE_SIZE
+                        elif page_size > constant.ANSWER_MAX_PAGE_SIZE:
+                            page_size = constant.ANSWER_MAX_PAGE_SIZE
+
+                    max_page = total_count // page_size
+                    max_page += 1 if total_count % page_size else 0
+                    if 'page' not in request.query_params:
+                        # page를 지정하지 않으면 1로 지정
+                        page = 1
+                    else:
+                        page = int(request.query_params['page'])
+                        if page < 1:
+                            page = 1
+                        elif max_page < page:
+                            page = max_page
+
+                    print(page, page_size)
+
+                    target_answers = self.collection_answer.find({'parent_post': ObjectId(pk)}) \
+                        .skip((page - 1) * page_size) \
+                        .limit(page_size)
+                    target_answers = list(target_answers)
+
+                    response_data = {
+                        'count': len(target_answers),
+                        'next': request.build_absolute_uri().split('?')[0] +
+                                f'page={page + 1}&page_size={page_size}'
+                                if page < max_page else None,
+                        'previous': request.build_absolute_uri().split('?')[0] +
+                                    f'page={page - 1}&page_size={page_size}'
+                                    if page > 1 else None,
+                        'results': []
+                    }
+
+                    for d in target_answers:
+                        d['_id'] = str(d['_id'])
+                        d['parent_post'] = str(d['parent_post'])
+                        for a in d['answers']:
+                            a['parent_quiz'] = str(a['parent_quiz'])
+                    response_data['results'] = target_answers
+                    return Response(response_data, status=status.HTTP_200_OK)
+                except Exception as e:
+                    traceback.print_exc()
+                    detail = {
+                        'detail': str(e)
+                    }
+                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # logger.info(f"{user_uid} Survey Post create denied")
+            detail = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)

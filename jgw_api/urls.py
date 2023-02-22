@@ -55,7 +55,8 @@ survey_post_get = views.SurveyViewSet.as_view({
 })
 
 survey_post_answer = views.SurveyViewSet.as_view({
-    'post': 'create_answer'
+    'post': 'create_answer',
+    'get': 'list_answers',
 })
 
 urlpatterns += format_suffix_patterns([

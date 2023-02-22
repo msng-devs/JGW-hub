@@ -14,6 +14,7 @@ from jgw_api.models import (
 
 from django.utils.crypto import get_random_string
 
+
 from jgw_api.views import post_get_all_query
 
 import os
@@ -124,9 +125,9 @@ class SurveyApiTestOK(APITestCase):
             }
 
             quizzes = [
-                {"type": 0, "title": "test1", "description": "test1", "require": True},
-                {"type": 0, "title": "test2", "description": "test2", "require": False},
-                {"type": 1, "title": "test3", "description": "test3", "require": True,
+                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True},
+                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": False},
+                {"type": 1, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True,
                  "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}
             ]
 
@@ -160,6 +161,18 @@ class SurveyApiTestOK(APITestCase):
             __create_post(i, 0)
         for i in range(153):
             __create_post(i, 1)
+
+        quizzes = list(cls.collection_quiz.find({'parent_post': ObjectId(cls.survey_pks[1])}))
+        cls.collection_answer.insert_many([{
+                '_id': ObjectId(),
+                'parent_post': ObjectId(cls.survey_pks[1]),
+                'user': None,
+                'answers': [
+                    {"parent_quiz": quizzes[0]['_id'], "text": get_random_string(length=random.randint(10, 100))},
+                    {"parent_quiz": quizzes[1]['_id'], "text": get_random_string(length=random.randint(10, 100))},
+                    {"parent_quiz": quizzes[2]['_id'], "selection": random.choice([0, 1, 2, 3])}
+                ]
+            } for _ in range(49)])
 
     def __get_header(self, member_instance):
         return {
@@ -229,6 +242,19 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[0]}/', **self.__get_header(member_instance))
+        print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+
+    def test_answer_list(self):
+        print("Answer Api GET Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+
+        # when
+        respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/', **self.__get_header(member_instance))
         print(respons.content)
 
         # then
