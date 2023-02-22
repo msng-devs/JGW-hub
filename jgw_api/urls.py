@@ -50,12 +50,17 @@ survey_post_post = views.SurveyViewSet.as_view({
     'get': 'list_post'
 })
 
+survey_post_get = views.SurveyViewSet.as_view({
+    'get': 'retrieve_post',
+})
+
 survey_post_answer = views.SurveyViewSet.as_view({
     'post': 'create_answer'
 })
 
 urlpatterns += format_suffix_patterns([
     path('v1/survey/', survey_post_post, name='survey-post-post'),
+    path('v1/survey/<str:pk>/', survey_post_get, name='survey-post-get'),
     path('v1/survey/<str:pk>/answer/', survey_post_answer, name='survey-answer-post'),
 ])
 

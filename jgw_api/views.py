@@ -9,7 +9,7 @@ from django.conf import settings
 from django.db import connection
 from django.utils.crypto import get_random_string
 from django.db import models
-from django.http import QueryDict
+from django.http import QueryDict, Http404
 
 from typing import List, Dict
 
@@ -1102,6 +1102,44 @@ class SurveyViewSet(viewsets.ViewSet):
                 d['created_time'] = d['created_time'].strftime(constant.TIME_QUERY)
             response_data['results'] = page_now
             return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            traceback.print_exc()
+            detail = {
+                'detail': str(e)
+            }
+            return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve_post(self, request, pk):
+        checked = request_check(request)
+        if isinstance(checked, Response):
+            # user role이 없다면 최하위 권한 적용
+            user_role_id = -1
+            user_uid = None
+        else:
+            user_uid, user_role_id = checked
+        try:
+            survey_data = self.collection_survey.find_one({'_id': ObjectId(pk)})
+            if survey_data is None: raise Http404('Data does not exist.')
+
+            assert survey_data['role'] <= user_role_id, 'User is not a survey participant.'
+
+            quizzes_data = self.collection_quiz.find(({'parent_post': ObjectId(pk)}))
+            quizzes_data = list(quizzes_data)
+
+            response_data = survey_data
+            response_data['quizzes'] = []
+            response_data['_id'] = str(response_data['_id'])
+            for q in quizzes_data:
+                q['_id'] = str(q['_id'])
+                q['parent_post'] = str(q['parent_post'])
+                response_data['quizzes'].append(q)
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Http404 as e:
+            detail = {
+                'detail': str(e)
+            }
+            return Response(detail, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             traceback.print_exc()
             detail = {

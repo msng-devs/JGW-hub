@@ -220,3 +220,16 @@ class SurveyApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
+
+    def test_survey_get_by_id(self):
+        print("Survey Api GET BY ID Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+
+        # when
+        respons: Response = self.client.get(self.url + f'{self.survey_pks[0]}/', **self.__get_header(member_instance))
+        print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
