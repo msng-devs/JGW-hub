@@ -1220,7 +1220,47 @@ class SurveyViewSet(viewsets.ViewSet):
                         }
                         return Response(response_data, status=status.HTTP_200_OK)
                     elif quiz_type == constant.SURVEY_SELECT_ONE_CODE:
-                        pass
+                        results = self.collection_quiz.aggregate([
+                            {'$match': {'_id': quiz_data['_id']}},
+                            {'$project': {'options': '$options.text'}},
+                            {'$unwind': {'path': '$options', 'includeArrayIndex': 'idx'}},
+                            {'$lookup': {
+                                'from': 'survey_answer',
+                                'let': {
+                                    'quiz_id': '$_id',
+                                    'quiz_idx': '$idx'
+                                },
+                                'pipeline': [
+                                    {'$unwind': '$answers'},
+                                    {'$match': {
+                                            '$expr': {
+                                                '$and': [
+                                                    {'$eq': ['$answers.parent_quiz', '$$quiz_id']},
+                                                    {'$eq': ['$answers.selection', '$$quiz_idx']}
+                                                ]
+                                            }
+                                        }
+                                    }, {
+                                        '$project': {
+                                            '_id': 0,
+                                            'answers': 1
+                                        }
+                                    }, {
+                                        '$count': 'selected'
+                                    }
+                                ],
+                                'as': 'aaa'}},
+                            {'$project': {
+                                '_id': 0,
+                                'text': '$options',
+                                'idx': 1,
+                                'count': {
+                                    '$cond': [{'$anyElementTrue': '$aaa.selected'},
+                                              {'$arrayElemAt': ['$aaa.selected', 0]}, 0]
+                                }}
+                            }
+                        ])
+                        return Response(results, status=status.HTTP_200_OK)
                     else:
                         assert False, 'Error in question data.'
                 except Exception as e:
