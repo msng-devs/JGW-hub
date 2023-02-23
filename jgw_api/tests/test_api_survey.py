@@ -260,6 +260,19 @@ class SurveyApiTestOK(APITestCase):
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
 
+    def test_survey_delete(self):
+        print("Post Api DELETE Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+
+        # when
+        respons: Response = self.client.delete(self.url + f'{self.survey_pks[2]}/', **self.__get_header(member_instance))
+        print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_answer_analyze_text(self):
         print("Answer Analyze TEXT Api GET Running...")
 

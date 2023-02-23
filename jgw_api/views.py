@@ -1334,3 +1334,28 @@ class SurveyViewSet(viewsets.ViewSet):
                 'detail': 'Not Allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+    def delete_post(self, request, pk):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            # 요청한 유저 정보가 없다면 500 return
+            return checked
+        user_uid, user_role_id, admin_role_checked = checked
+        if user_role_id >= admin_role_checked:
+            try:
+                self.collection_survey.delete_one({'_id': ObjectId(pk)})
+                self.collection_quiz.delete_many({'parent_post': ObjectId(pk)})
+                self.collection_answer.delete_many({'parent_post': ObjectId(pk)})
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Exception as e:
+                traceback.print_exc()
+                detail = {
+                    'detail': str(e)
+                }
+                return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # logger.info(f"{user_uid} Survey Post create denied")
+            detail = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
