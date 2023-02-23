@@ -259,3 +259,17 @@ class SurveyApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
+
+    def test_answer_analyze(self):
+        print("Answer Analyze Api GET Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+        answer = list(self.collection_quiz.find({'parent_post': ObjectId(self.survey_pks[1])}))[0]
+
+        # when
+        respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/?analyze=1&answer_id={answer["_id"]}', **self.__get_header(member_instance))
+        print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)

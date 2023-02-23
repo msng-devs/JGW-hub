@@ -1157,8 +1157,78 @@ class SurveyViewSet(viewsets.ViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
-            if 'analyze' in request.query_params and int(request.query_params['analyze']) == 0: # 분석 요청
-                pass
+            if 'analyze' in request.query_params and int(request.query_params['analyze']) == 1: # 분석 요청
+                try:
+                    assert 'answer_id' in request.query_params, 'The id of the response to be analyzed is required.'
+                    answer_id = request.query_params['answer_id']
+
+                    quiz_data = list(self.collection_quiz.aggregate([
+                        {"$match": {'parent_post': ObjectId(pk), '_id': ObjectId(answer_id)}}
+                    ]))
+
+                    assert len(quiz_data) > 0, 'There are no questions.'
+                    quiz_data = quiz_data[0]
+
+                    quiz_type = quiz_data['type']
+                    if quiz_type == constant.SURVEY_TEXT_CODE:
+                        total_count = list(self.collection_answer.aggregate([
+                            {'$unwind': '$answers'},
+                            {'$match': {'answers.parent_quiz': ObjectId(answer_id)}},
+                            {'$count': 'answers'}
+                        ]))[0]['answers']
+
+                        page_size = constant.ANSWER_DEFAULT_PAGE_SIZE
+                        if 'page_size' in request.query_params:
+                            # page size를 최소~최대 범위 안에서 지정
+                            page_size = int(request.query_params['page_size'])
+                            if page_size < constant.ANSWER_MIN_PAGE_SIZE:
+                                page_size = constant.ANSWER_MIN_PAGE_SIZE
+                            elif page_size > constant.ANSWER_MAX_PAGE_SIZE:
+                                page_size = constant.ANSWER_MAX_PAGE_SIZE
+
+                        max_page = total_count // page_size
+                        max_page += 1 if total_count % page_size else 0
+                        if 'page' not in request.query_params:
+                            # page를 지정하지 않으면 1로 지정
+                            page = 1
+                        else:
+                            page = int(request.query_params['page'])
+                            if page < 1:
+                                page = 1
+                            elif max_page < page:
+                                page = max_page
+
+                        print(page, page_size)
+
+                        results = list(self.collection_answer.aggregate([
+                            {'$unwind': '$answers'},
+                            {'$match': {'answers.parent_quiz': ObjectId(answer_id)}},
+                            {'$project': {'_id': 0, 'text': '$answers.text'}},
+                            {'$skip': (page - 1) * page_size},
+                            {'$limit': page_size}
+                        ]))
+
+                        response_data = {
+                            'count': len(results),
+                            'next': request.build_absolute_uri().split('?')[0] +
+                                    f'page={page + 1}&page_size={page_size}'
+                            if page < max_page else None,
+                            'previous': request.build_absolute_uri().split('?')[0] +
+                                        f'page={page - 1}&page_size={page_size}'
+                            if page > 1 else None,
+                            'results': results
+                        }
+                        return Response(response_data, status=status.HTTP_200_OK)
+                    elif quiz_type == constant.SURVEY_SELECT_ONE_CODE:
+                        pass
+                    else:
+                        assert False, 'Error in question data.'
+                except Exception as e:
+                    traceback.print_exc()
+                    detail = {
+                        'detail': str(e)
+                    }
+                    return Response(detail, status=status.HTTP_400_BAD_REQUEST)
             else: # 사용자별 데이터 요청
                 try:
                     total_count = list(self.collection_answer.aggregate([
