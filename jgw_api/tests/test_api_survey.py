@@ -31,6 +31,8 @@ import os
 from bson.objectid import ObjectId
 
 class SurveyApiTestOK(APITestCase):
+    databases = '__all__'
+
     now = datetime.datetime.now()
     collection_survey = None
     collection_quiz = None

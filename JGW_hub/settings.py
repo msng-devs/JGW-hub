@@ -89,9 +89,9 @@ WSGI_APPLICATION = 'JGW_hub.wsgi.application'
 
 DATABASES = MY_DATABASES
 
-# DATABASE_ROUTERS = [
-#     'JGW_hub.db_router.DatabaseRouter'
-# ]
+DATABASE_ROUTERS = [
+    'JGW_hub.db_router.MultiDBRouter'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators

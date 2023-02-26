@@ -21,6 +21,7 @@ import datetime
 import traceback
 
 class ImageApiTestOK(APITestCase):
+    databases = '__all__'
     test_files_root_url = './test/file_upload_test'
 
     def setUp(self):

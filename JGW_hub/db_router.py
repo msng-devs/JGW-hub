@@ -1,23 +1,26 @@
-class DatabaseRouter:
-    def __init__(self):
-        self.__app_name = 'survey'
 
+class MultiDBRouter:
     def db_for_read(self, model, **hints):
-        if model._meta.app_label == self.__app_name:
-            return self.__app_name
+        """ Attempts to read auth models go to auth_db. """
+        if model._meta.app_label == 'jgw_api':
+            return 'jgw_api'
         return None
 
     def db_for_write(self, model, **hints):
-        if model._meta.app_label == self.__app_name:
-            return self.__app_name
+        """ Attempts to write auth models go to auth_db. """
+        if model._meta.app_label == 'jgw_api':
+            return 'jgw_api'
         return None
 
     def allow_relation(self, obj1, obj2, **hints):
-        if obj1._meta.app_label == self.__app_name or obj2._meta.app_label == self.__app_name:
+        """ Allow relations if a model in the auth app is involved. """
+        if obj1._meta.app_label == 'jgw_api' or \
+                obj2._meta.app_label == 'jgw_api':
             return True
         return None
 
     def allow_migrate(self, db, app_label, model_name=None, **hints):
-        if app_label == self.__app_name:
-            return db == self.__app_name
+        """ Make sure the auth app only appears in the 'auth_db' database. """
+        if app_label == 'jgw_api':
+            return db == 'jgw_api'
         return None

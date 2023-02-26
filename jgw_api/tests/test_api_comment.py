@@ -25,6 +25,7 @@ import traceback
 import jgw_api.constant as constant
 
 class CommentApiTestOK(APITestCase):
+    databases = '__all__'
     now = datetime.datetime.now()
 
     def setUp(self):

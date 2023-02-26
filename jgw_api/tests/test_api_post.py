@@ -25,6 +25,7 @@ import traceback
 import jgw_api.constant as constant
 
 class PostApiTestOK(APITestCase):
+    databases = '__all__'
     now = datetime.datetime.now()
     post_count = 100
 

@@ -9,6 +9,7 @@ from jgw_api.models import (
 import random
 
 class BoardApiTestOK(APITestCase):
+    databases = '__all__'
     def setUp(self):
         self.url = '/hub/api/v1/board/'
 
@@ -211,6 +212,7 @@ class BoardApiTestOK(APITestCase):
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
 
 class BoardApiError(APITestCase):
+    databases = '__all__'
     def setUp(self):
         self.url = '/hub/api/v1/board/'
 
