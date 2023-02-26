@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import sys
+
+import JGW_hub.db_router
 from JGW_hub import debug
 
 from secrets_content.files.secret_key import *
@@ -46,7 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
-    'jgw_api',
+    'jgw_api'
 ]
 
 MIDDLEWARE = [
@@ -86,6 +88,10 @@ WSGI_APPLICATION = 'JGW_hub.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = MY_DATABASES
+
+DATABASE_ROUTERS = [
+    'JGW_hub.db_router.MultiDBRouter'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -156,7 +162,7 @@ if DEBUG:
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES,
     # 'DEFAULT_AUTHENTICATION_CLASSES': [],
     # 'DEFAULT_PERMISSION_CLASSES': [],
 }
