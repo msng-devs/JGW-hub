@@ -38,6 +38,7 @@ jobs:
         python manage.py test
       env:
         TEST_DB_NAME: "github_action_test"
+        TEST_DB_NAME_API: "github_action_test_api"
 #    - name: action-slack
 #      uses: 8398a7/action-slack@v3
 #      with:
