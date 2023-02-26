@@ -29,13 +29,16 @@ class PostPageNumberPagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
         previous = self.get_previous_link()
+        print(previous)
         if previous is not None:
             query = {k: v for k, v in list(map(lambda x: x.split('='), previous.split('?')[1].split('&')))}
+
             print(query)
             if 'page' not in query:
                 query['page'] = '1'
                 query = sorted(query.items(), key=lambda x: x[0])
                 previous = previous.split('?')[0] + '?' + '&'.join([f'{i[0]}={i[1]}' for i in query])
+                print(previous)
         return Response(OrderedDict([
             ('count', len(data)),
             ('next', self.get_next_link()),
