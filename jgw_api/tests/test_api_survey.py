@@ -205,7 +205,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.post(self.url, data=insert_data, content_type='application/json', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
@@ -221,7 +221,7 @@ class SurveyApiTestOK(APITestCase):
                       '{"selection": 0, "type": 1}]}'
         # when
         respons: Response = self.client.post(self.url + f'{self.survey_pks[0]}/answer/', data=insert_data, content_type='application/json', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
@@ -233,7 +233,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + '?page=0')
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
@@ -246,7 +246,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[0]}/', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
@@ -259,7 +259,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
@@ -272,7 +272,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.delete(self.url + f'{self.survey_pks[2]}/', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
@@ -286,7 +286,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/?analyze=1&answer_id={answer["_id"]}', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
@@ -300,7 +300,7 @@ class SurveyApiTestOK(APITestCase):
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/?analyze=1&answer_id={answer["_id"]}', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_200_OK)

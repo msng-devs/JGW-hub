@@ -927,6 +927,7 @@ class SurveyViewSet(viewsets.ViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
+            logger.debug(f'{user_uid} Survey Post post approved')
             post_data = request.data
             try:
                 created_time = datetime.datetime.now()
@@ -982,9 +983,15 @@ class SurveyViewSet(viewsets.ViewSet):
                     q['parent_post'] = str(q['parent_post'])
                     response_data['quizzes'].append(q)
 
+                update_log = f'{user_uid} Survey Post data created' \
+                             f'\tkey: {response_data["_id"]}: created log'
+                for k in response_data.keys():
+                    if k == 'quizzes': continue
+                    update_log += f'\n\t{k} {response_data[k]}'
+                logger.info(update_log)
                 return Response(response_data, status=status.HTTP_201_CREATED)
             except Exception as e:
-                traceback.print_exc()
+                logger.error(f'create survey post failed.\n\terror: {e}')
                 detail = {
                     'detail': str(e)
                 }
@@ -1008,6 +1015,7 @@ class SurveyViewSet(viewsets.ViewSet):
             request_data = request.data
             survey_data = self.collection_survey.find_one({'_id': ObjectId(pk)})
             assert survey_data['role'] <= int(user_role_id), "User is not a survey participant."
+            logger.debug(f'{user_uid} Answer post approved')
 
             quizzes_data = self.collection_quiz.find({'parent_post': ObjectId(pk)})
             quizzes_data = list(quizzes_data)
@@ -1037,7 +1045,7 @@ class SurveyViewSet(viewsets.ViewSet):
                     assert False, f'{type} is a non-existent answer type.'
                 answer_data['answers'].append(answer)
             assert len(answer_data['answers']) == len(quizzes_data), "Invalid response data exists."
-            print(answer_data)
+            # print(answer_data)
 
             if user_uid is not None:
                 self.collection_answer.delete_one({'parent_post': ObjectId(pk), 'user': user_uid})
@@ -1047,15 +1055,22 @@ class SurveyViewSet(viewsets.ViewSet):
             answer_data['parent_post'] = str(answer_data['parent_post'])
             for a in answer_data['answers']:
                 a['parent_quiz'] = str(a['parent_quiz'])
+
+            update_log = f'{user_uid} Answer data created' \
+                         f'\tkey: {answer_data["_id"]}\tparent post key: {answer_data["parent_post"]} created log'
+            for ans in answer_data['answers']:
+                update_log += f'\n\tparent_quiz: {ans["parent_quiz"]}'
+            logger.info(update_log)
             return Response(answer_data, status.HTTP_201_CREATED)
         except Exception as e:
-            traceback.print_exc()
+            logger.error(f'create answer failed.\n\terror: {e}')
             detail = {
                 'detail': str(e)
             }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
 
     def list_post(self, request):
+        logger.debug(f"Survey Post get request")
         try:
             request.query_params._mutable = True
             total_count = self.collection_survey.estimated_document_count()
@@ -1081,7 +1096,7 @@ class SurveyViewSet(viewsets.ViewSet):
                 elif max_page < request.query_params['page']:
                     request.query_params['page'] = max_page
 
-            print(request.query_params['page'], request.query_params['page_size'])
+            # print(request.query_params['page'], request.query_params['page_size'])
 
             sort_fields = [('activate', pymongo.DESCENDING), ('created_time', pymongo.DESCENDING)]
             page_now = self.collection_survey.find().sort(sort_fields)\
@@ -1106,7 +1121,7 @@ class SurveyViewSet(viewsets.ViewSet):
             response_data['results'] = page_now
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
-            traceback.print_exc()
+            logger.error(f'get list survey post failed.\n\terror: {e}')
             detail = {
                 'detail': str(e)
             }
@@ -1125,6 +1140,7 @@ class SurveyViewSet(viewsets.ViewSet):
             if survey_data is None: raise Http404('Data does not exist.')
 
             assert survey_data['role'] <= user_role_id, 'User is not a survey participant.'
+            logger.debug(f'{user_uid} Survey Post retrieve approved')
 
             quizzes_data = self.collection_quiz.find(({'parent_post': ObjectId(pk)}))
             quizzes_data = list(quizzes_data)
@@ -1137,14 +1153,16 @@ class SurveyViewSet(viewsets.ViewSet):
                 q['parent_post'] = str(q['parent_post'])
                 response_data['quizzes'].append(q)
 
+            logger.debug(f'{user_uid} Survey Post data get retrieve\tkey: {pk}\ttitle: {response_data["title"]}')
             return Response(response_data, status=status.HTTP_200_OK)
         except Http404 as e:
+            logger.error(f'retrieve survey post failed.\n\terror: {e}')
             detail = {
                 'detail': str(e)
             }
             return Response(detail, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            traceback.print_exc()
+            logger.error(f'retrieve survey post failed.\n\terror: {e}')
             detail = {
                 'detail': str(e)
             }
@@ -1157,7 +1175,9 @@ class SurveyViewSet(viewsets.ViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
+            logger.debug(f'{user_uid} Survey Answers list approved')
             if 'analyze' in request.query_params and int(request.query_params['analyze']) == 1: # 분석 요청
+                logger.debug(f'{user_uid} Survey Answers list analyze request')
                 try:
                     assert 'answer_id' in request.query_params, 'The id of the response to be analyzed is required.'
                     answer_id = request.query_params['answer_id']
@@ -1197,8 +1217,6 @@ class SurveyViewSet(viewsets.ViewSet):
                                 page = 1
                             elif max_page < page:
                                 page = max_page
-
-                        print(page, page_size)
 
                         results = list(self.collection_answer.aggregate([
                             {'$unwind': '$answers'},
@@ -1264,12 +1282,13 @@ class SurveyViewSet(viewsets.ViewSet):
                     else:
                         assert False, 'Error in question data.'
                 except Exception as e:
-                    traceback.print_exc()
+                    logger.error(f'get list survey answers analyze failed.\n\terror: {e}')
                     detail = {
                         'detail': str(e)
                     }
                     return Response(detail, status=status.HTTP_400_BAD_REQUEST)
             else: # 사용자별 데이터 요청
+                logger.debug(f'{user_uid} Survey Answers list user request')
                 try:
                     total_count = list(self.collection_answer.aggregate([
                         {'$project': {'parent_post': ObjectId(pk)}},
@@ -1297,7 +1316,7 @@ class SurveyViewSet(viewsets.ViewSet):
                         elif max_page < page:
                             page = max_page
 
-                    print(page, page_size)
+                    # print(page, page_size)
 
                     target_answers = self.collection_answer.find({'parent_post': ObjectId(pk)}) \
                         .skip((page - 1) * page_size) \
@@ -1323,13 +1342,13 @@ class SurveyViewSet(viewsets.ViewSet):
                     response_data['results'] = target_answers
                     return Response(response_data, status=status.HTTP_200_OK)
                 except Exception as e:
-                    traceback.print_exc()
+                    logger.error(f'get list survey answers user failed.\n\terror: {e}')
                     detail = {
                         'detail': str(e)
                     }
                     return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
-            # logger.info(f"{user_uid} Survey Post create denied")
+            logger.info(f"{user_uid} Survey Answers list denied")
             detail = {
                 'detail': 'Not Allowed.'
             }
@@ -1342,19 +1361,22 @@ class SurveyViewSet(viewsets.ViewSet):
             return checked
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
+            logger.debug(f'{user_uid} Survey Post delete approved')
             try:
-                self.collection_survey.delete_one({'_id': ObjectId(pk)})
-                self.collection_quiz.delete_many({'parent_post': ObjectId(pk)})
-                self.collection_answer.delete_many({'parent_post': ObjectId(pk)})
+                result_post = self.collection_survey.delete_one({'_id': ObjectId(pk)})
+                result_quiz = self.collection_quiz.delete_many({'parent_post': ObjectId(pk)})
+                result_answer = self.collection_answer.delete_many({'parent_post': ObjectId(pk)})
+                logger.debug(f'{user_uid} Survey Post data deleted\tkey: {pk}\tquiz count: {result_quiz.deleted_count}'
+                             f'\tanswer count: {result_answer.deleted_count}')
                 return Response(status=status.HTTP_204_NO_CONTENT)
             except Exception as e:
-                traceback.print_exc()
+                logger.error(f'delete survey post failed.\n\terror: {e}')
                 detail = {
                     'detail': str(e)
                 }
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
-            # logger.info(f"{user_uid} Survey Post create denied")
+            logger.info(f"{user_uid} Survey Post delete denied")
             detail = {
                 'detail': 'Not Allowed.'
             }
