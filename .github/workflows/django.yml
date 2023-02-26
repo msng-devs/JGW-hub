@@ -6,10 +6,6 @@ on:
       - master
       - jckim0307
       - jeno
-  pull_request:
-    branches:
-      - master
-    types: [ closed ]
 
 jobs:
   build:
