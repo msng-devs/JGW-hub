@@ -63,19 +63,20 @@ class CommentApiTestOK(APITestCase):
             Member.objects.create(
                 member_pk=get_random_string(length=24) + str(i),
                 member_nm=get_random_string(length=44) + str(i),
-                member_created_dttm=now,
-                member_modified_dttm=now,
+                # member_created_dttm=now,
+                # member_modified_dttm=now,
                 member_email=f'test{i}@test.com',
-                member_cell_phone_number='01000000000',
-                member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
-                member_year=38,
+                # member_cell_phone_number='01000000000',
+                # member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
+                # member_year=38,
                 role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
-                rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
-                major_major_pk=Major.objects.get(major_nm='인공지능학과'),
-                member_leave_absence=0,
-                member_created_by='system',
-                member_modified_by='system',
-                member_dateofbirth=now,
+                # rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
+                # major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+                # member_leave_absence=0,
+                # member_created_by='system',
+                # member_modified_by='system',
+                # member_dateofbirth=now,
+                member_status=1
             )
 
         for i in range(2):
