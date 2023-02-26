@@ -63,6 +63,13 @@ class BoardWriteSerializer(serializers.ModelSerializer):
         model = Board
         fields = '__all__'
 
+    #같은 이름의 board가 있을때 validate하는 함수
+    def validate(self, data):
+        board_name = Board.objects.get(board_name=data["board_name"])
+        if board_name.exists():
+            raise serializers.ValidationError("Board name already exists")
+        return data
+
 class BoardGetSerializer(serializers.ModelSerializer):
     '''
     board serializer. get method에 사용하는 serializer.
@@ -75,6 +82,7 @@ class BoardGetSerializer(serializers.ModelSerializer):
         model = Board
         fields = ['board_id_pk', 'board_name', 'board_layout', 'role_role_pk_write_level',
                   'role_role_pk_read_level', 'role_role_pk_comment_write_level']
+
 
 
 

@@ -10,7 +10,7 @@ import random
 
 class BoardApiTestOK(APITestCase):
     def setUp(self):
-        self.url = '/hub/api/v1/board/'
+        self.url = '/v1/board/'
 
     @classmethod
     def setUpTestData(cls):
@@ -212,7 +212,7 @@ class BoardApiTestOK(APITestCase):
 
 class BoardApiError(APITestCase):
     def setUp(self):
-        self.url = '/hub/api/v1/board/'
+        self.url = '/v1/board/'
 
     @classmethod
     def setUpTestData(cls):

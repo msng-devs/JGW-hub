@@ -1,6 +1,7 @@
 import datetime
 import random
 
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -57,9 +58,10 @@ from django.core.cache import cache
 # logger = logging.getLogger('hub')
 logger = logging.getLogger('hub_error')
 
+
 def get_user_header(
         request: rest_framework.request.Request
-    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
     전달받은 request에서 user header를 가져오는 함수
 
@@ -84,6 +86,7 @@ def get_user_header(
         logger.info(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
         return user_uid, user_role_id
 
+
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     Config 테이블에서 admin의 role이 몇 이상이지 가져오는 함수
@@ -104,6 +107,7 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
         logger.error('min admin role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     Config 테이블에서 서버에 콘텐츠(사진, 동영상 등)를 업로드 할 수 있는 role이 최소 몇 이상이지 가져오는 함수
@@ -123,9 +127,10 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
         logger.error('min upload role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 def request_check(
         request: rest_framework.request.Request
-    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+) -> Union[rest_framework.response.Response, Tuple[str, int]]:
     '''
     user header가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -140,9 +145,10 @@ def request_check(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id
 
+
 def request_check_admin_role(
         request: rest_framework.request.Request
-    ) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
+) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
     '''
     user header, admin role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -161,9 +167,10 @@ def request_check_admin_role(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked
 
+
 def request_check_admin_upload_role(
         request: rest_framework.request.Request
-    ) -> Union[rest_framework.response.Response, Tuple[str, int, int, int]]:
+) -> Union[rest_framework.response.Response, Tuple[str, int, int, int]]:
     '''
     user header, admin role, 최소 업로드 가능 role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -185,6 +192,7 @@ def request_check_admin_upload_role(
         return min_upload_role_checked
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked, min_upload_role_checked
+
 
 def save_images_storge(
         images_data: List[str],
@@ -245,8 +253,9 @@ def save_images_storge(
 def ping_pong(request):
     # 서버 health check 용도
     return Response({
-            'detail': 'pong'
-        }, status.HTTP_200_OK)
+        'detail': 'pong'
+    }, status.HTTP_200_OK)
+
 
 class BoardViewSet(viewsets.ModelViewSet):
     '''
@@ -259,29 +268,43 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
-        logger.debug(f"Board get request")
-        queryset = self.filter_queryset(self.get_queryset())
-        request.query_params._mutable = True
-        if 'page' not in request.query_params:
-            # page를 지정하지 않으면 1로 지정
-            request.query_params['page'] = 1
-        if 'page_size' in request.query_params:
-            # page size를 최소~최대 범위 안에서 지정
-            request.query_params['page_size'] = int(request.query_params['page_size'])
-            if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
-                request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
-            elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
-                request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        responses = self.get_paginated_response(serializer.data)
-        return responses
+        if 'board_id' in request.query_params:
+            try:
+                queryset = Board.objects.get(board_id_pk=int(request.query_params['board_id']))
+                key, name = queryset.board_id_pk, queryset.board_name
+                serailizer = self.get_serializer(queryset)
+                logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
+                return Response(serailizer.data)
+            except ObjectDoesNotExist:
+                response_data = {
+                    'detail': '특정 id의 board가 존재하지 않습니다'
+                }
+                return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+        else:
+            logger.debug(f"Board get request")
+            queryset = Board.objects.select_related('role_role_pk_write_level', 'role_role_pk_read_level', 'role_role_pk_comment_write_level').all()
+            request.query_params._mutable = True
+            if 'page' not in request.query_params:
+                # page를 지정하지 않으면 1로 지정
+                request.query_params['page'] = 1
+            if 'page_size' in request.query_params:
+                # page size를 최소~최대 범위 안에서 지정
+                request.query_params['page_size'] = int(request.query_params['page_size'])
+                if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
+                elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
+
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
+            responses = self.get_paginated_response(serializer.data)
+            return responses
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
         key, name = instance.board_id_pk, instance.board_name
+        serializer = self.get_serializer(instance)
         logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
         return Response(serializer.data)
 
@@ -295,6 +318,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
             # 요청한 유저가 admin 이라면 승인
+
             logger.debug(f'{user_uid} Board create approved')
             serializer = BoardWriteSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -380,7 +404,6 @@ class BoardViewSet(viewsets.ModelViewSet):
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
 
-
 def post_get_all_query(
         query_params: dict,
         queryset: django.db.models.query.QuerySet) -> django.db.models.query.QuerySet:
@@ -428,19 +451,20 @@ def post_get_all_query(
         queryset = queryset.order_by('post_write_time')
     return queryset
 
+
 class PostViewSet(viewsets.ModelViewSet):
     '''
     게시글 api를 담당하는 클래스
     '''
     serializer_class = PostGetSerializer
-    queryset = Post.objects.all()
+    queryset = Post.objects.prefetch_related('post_board', 'post_member', 'post_image').all()
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
-        queryset = Post.objects.all()
+        queryset = Post.objects.select_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
         queryset = post_get_all_query(request.query_params, queryset)
 
         request.query_params._mutable = True
@@ -485,6 +509,7 @@ class PostViewSet(viewsets.ModelViewSet):
             response_data = post_serializer.data
 
             key, name = instance.post_id_pk, instance.post_title
+
             logger.debug(f'{user_uid} Post data get retrieve\tkey: {key}\ttitle: {name}')
             return Response(response_data)
         else:
@@ -633,13 +658,12 @@ class PostViewSet(viewsets.ModelViewSet):
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
 
-
 class ImageViewSet(viewsets.ModelViewSet):
     '''
     이미지 api를 담당하는 클래스
     '''
     serializer_class = ImageSerializer
-    queryset = Image.objects.all()
+    queryset = Image.objects.prefetch_related('post_post_id_pk', 'member_member_pk').all()
     http_method_names = ['get', 'post', 'delete']
     pagination_class = ImagePageNumberPagination
 
@@ -678,7 +702,7 @@ class ImageViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Image get request")
-        queryset = Image.objects.all()
+        queryset = Image.objects.prefetch_related('post_post_id_pk', 'member_member_pk').all()
         if 'post_id' in request.query_params:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 이미지만 가져옴
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
@@ -731,12 +755,14 @@ class ImageViewSet(viewsets.ModelViewSet):
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
+
 class CommentViewSet(viewsets.ModelViewSet):
     '''
     댓글 api를 담당하는 클래스
     '''
     serializer_class = CommentGetSerializer
-    queryset = Comment.objects.all().order_by('-comment_id')
+    queryset = Comment.objects.select_related('post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref').all().order_by('-comment_id')
+
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
 
