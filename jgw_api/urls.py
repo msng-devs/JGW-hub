@@ -9,10 +9,10 @@ from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, 
 
 router = routers.DefaultRouter()
 router.register(r'v1/board', views.BoardViewSet, basename='board')
-# router.register(r'post', views.PostViewSet, basename='post')
+router.register(r'v1/post', views.PostViewSet, basename='post')
 router.register(r'v1/image', views.ImageViewSet, basename='image')
 router.register(r'v1/comment', views.CommentViewSet, basename='comment')
-# router.register(r'v1/survey', views.SurveyViewSet, basename='survey')
+router.register(r'v1/survey', views.SurveyViewSet, basename='survey')
 
 urlpatterns = [
     path('', include(router.urls)),
