@@ -960,6 +960,7 @@ class SurveyViewSet(viewsets.ViewSet):
                         'require': q['require'],
                         'type': type
                     }
+                    # post
                     if type == constant.SURVEY_TEXT_CODE:  # text
                         pass
                     elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
@@ -968,6 +969,14 @@ class SurveyViewSet(viewsets.ViewSet):
                             quiz_data['options'].append({
                                 'text': i['text']
                             })
+                        assert len(quiz_data) > 0, 'There must be at least one option.'
+                    elif type == constant.SURVEY_SELECT_MULTIPLE_CODE:
+                        quiz_data['options'] = []
+                        for i in q['options']:
+                            quiz_data['options'].append({
+                                'text': i['text']
+                            })
+                        assert len(quiz_data) > 0, 'There must be at least one option.'
                     else:
                         assert False, f'{type} is a non-existent question type.'
                     quizzes_data.append(quiz_data)
@@ -1035,12 +1044,19 @@ class SurveyViewSet(viewsets.ViewSet):
                 answer = {
                     "parent_quiz": q['_id']
                 }
+                # create answer
                 if type == constant.SURVEY_TEXT_CODE:
                     answer['text'] = a['text']
                 elif type == constant.SURVEY_SELECT_ONE_CODE:
                     selection = int(a['selection'])
                     assert selection < len(q['options']), 'An option that does not exist.'
                     answer['selection'] = selection
+                elif type == constant.SURVEY_SELECT_MULTIPLE_CODE:
+                    selections = sorted(list(set(map(int, a['selections']))))
+                    assert len(selections) > 0, 'There must be at least one option selected.'
+                    assert len(selections) <= len(q['options']), 'An option that does not exist.'
+                    assert selections[-1] < len(q['options']), 'An option that does not exist.'
+                    answer['selections'] = selections
                 else:
                     assert False, f'{type} is a non-existent answer type.'
                 answer_data['answers'].append(answer)
@@ -1278,6 +1294,51 @@ class SurveyViewSet(viewsets.ViewSet):
                                 }}
                             }
                         ])
+                        results = list(results)
+                        return Response(results, status=status.HTTP_200_OK)
+                    elif quiz_type == constant.SURVEY_SELECT_MULTIPLE_CODE:
+                        results = self.collection_quiz.aggregate([
+                            {'$match': {'_id': quiz_data['_id']}},
+                            {'$project': {'options': '$options.text'}},
+                            {'$unwind': {'path': '$options', 'includeArrayIndex': 'idx'}},
+                            {'$lookup': {
+                                'from': 'survey_answer',
+                                'let': {
+                                    'quiz_id': '$_id',
+                                    'quiz_idx': '$idx'
+                                },
+                                'pipeline': [
+                                    {'$unwind': '$answers'},
+                                    {'$match': {
+                                            '$expr': {
+                                                '$and': [
+                                                    {'$eq': ['$answers.parent_quiz', '$$quiz_id']},
+                                                    {'$in': ['$$quiz_idx', '$answers.selections']}
+                                                ]
+                                            }
+                                        }
+                                    }, {
+                                        '$project': {
+                                            '_id': 0,
+                                            'answers': 1
+                                        }
+                                    }, {
+                                        '$count': 'selected'
+                                    }
+                                ],
+                                'as': 'aaa'}},
+                            {'$project': {
+                                '_id': 0,
+                                'text': '$options',
+                                'idx': 1,
+                                'count': {
+                                    '$cond': [{'$anyElementTrue': '$aaa.selected'},
+                                              {'$arrayElemAt': ['$aaa.selected', 0]}, 0]
+                                }}
+                            }
+                        ])
+                        results = list(results)
+                        # print(results)
                         return Response(results, status=status.HTTP_200_OK)
                     else:
                         assert False, 'Error in question data.'

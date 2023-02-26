@@ -29,6 +29,7 @@ import pymongo
 from secrets_content.files.secret_key import *
 import os
 from bson.objectid import ObjectId
+import itertools
 
 class SurveyApiTestOK(APITestCase):
     databases = '__all__'
@@ -132,6 +133,8 @@ class SurveyApiTestOK(APITestCase):
                 {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True},
                 {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": False},
                 {"type": 1, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True,
+                 "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]},
+                {"type": 2, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True,
                  "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}
             ]
 
@@ -149,6 +152,12 @@ class SurveyApiTestOK(APITestCase):
                 if type == constant.SURVEY_TEXT_CODE:  # text
                     pass
                 elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
+                    quiz_data['options'] = []
+                    for i in q['options']:
+                        quiz_data['options'].append({
+                            'text': i['text']
+                        })
+                elif type == constant.SURVEY_SELECT_MULTIPLE_CODE:
                     quiz_data['options'] = []
                     for i in q['options']:
                         quiz_data['options'].append({
@@ -174,7 +183,8 @@ class SurveyApiTestOK(APITestCase):
                 'answers': [
                     {"parent_quiz": quizzes[0]['_id'], "text": get_random_string(length=random.randint(10, 100))},
                     {"parent_quiz": quizzes[1]['_id'], "text": get_random_string(length=random.randint(10, 100))},
-                    {"parent_quiz": quizzes[2]['_id'], "selection": random.choice([0, 2, 3])}
+                    {"parent_quiz": quizzes[2]['_id'], "selection": random.choice([0, 2, 3])},
+                    {"parent_quiz": quizzes[3]['_id'], "selections": list(list(itertools.combinations([0, 1, 2, 3], random.randint(1, 4)))[0])}
                 ]
             } for _ in range(49)])
 
@@ -201,6 +211,8 @@ class SurveyApiTestOK(APITestCase):
                       '{"type": 0, "title": "test1", "description": "test1", "require": true},' \
                       '{"type": 0, "title": "test2", "description": "test2", "require": false},' \
                       '{"type": 1, "title": "test3", "description": "test3", "require": true, "options": [' \
+                        '{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]},' \
+                      '{"type": 2, "title": "test3", "description": "test3", "require": true, "options": [' \
                         '{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}]}'
 
         # when
@@ -218,10 +230,11 @@ class SurveyApiTestOK(APITestCase):
         insert_data = '{"answers": [' \
                       '{"text": "answer text 11122233 fjf!! ^&*(*&^%$%^&*(*&^%$", "type": 0},' \
                       '{"text": "mjknbdhvinbuvuyiwhyrehiwubeyihc ncfbuihjfiub cnuegyh", "type": 0},' \
-                      '{"selection": 0, "type": 1}]}'
+                      '{"selection": 0, "type": 1},' \
+                      '{"selections": [0 ,3], "type": 2}]}'
         # when
         respons: Response = self.client.post(self.url + f'{self.survey_pks[0]}/answer/', data=insert_data, content_type='application/json', **self.__get_header(member_instance))
-        # print(respons.content)
+        print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
@@ -297,6 +310,21 @@ class SurveyApiTestOK(APITestCase):
         # given
         member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
         answer = list(self.collection_quiz.find({'parent_post': ObjectId(self.survey_pks[1])}))[2]
+
+        # when
+        respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/?analyze=1&answer_id={answer["_id"]}', **self.__get_header(member_instance))
+        # print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
+
+    def test_answer_analyze_select_multiple(self):
+        print("Answer Analyze SELECT MULTIPLE Api GET Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+        answer = list(self.collection_quiz.find({'parent_post': ObjectId(self.survey_pks[1])}))[3]
+        # print(list(self.collection_quiz.find({'parent_post': ObjectId(self.survey_pks[1])})))
 
         # when
         respons: Response = self.client.get(self.url + f'{self.survey_pks[1]}/answer/?analyze=1&answer_id={answer["_id"]}', **self.__get_header(member_instance))
