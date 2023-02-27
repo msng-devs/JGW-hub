@@ -13,7 +13,7 @@ from django.db import models
 from django.http import QueryDict
 
 from typing import List, Dict
-
+from django.core.cache import cache
 from .models import (
     Board,
     Post,
@@ -464,7 +464,7 @@ class PostViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
-        queryset = Post.objects.select_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
+        queryset = Post.objects.select_related('image_image_id_pk', 'board_board_id_pk', 'member_member_pk').all()
         queryset = post_get_all_query(request.query_params, queryset)
 
         request.query_params._mutable = True
@@ -539,9 +539,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
             if isinstance(request_data, QueryDict):
                 request_data._mutable = True
-            if 'board_boadr_id_pk' in request_data:
+            if 'board_board_id_pk' in request_data:
                 # 변경하려는 데이터가 해당 게시글이 소속된 게시판이라면
-                board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
+                board_instance = Board.objects.get(board_id_pk=int(request_data['board_board_id_pk']))
                 if board_instance.role_role_pk_write_level.role_pk > user_role_id:
                     # 변경하려는 게시판의 쓰기 레벨보다 요청한 유저의 권한이 낮다면 거부
                     logger.info(f"{user_uid} Post patch denied - request board not allowed")
@@ -604,7 +604,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Post data verified')
 
-        board_instance = post_serializer.validated_data['board_boadr_id_pk']
+        board_instance = post_serializer.validated_data['board_board_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post post approved')
