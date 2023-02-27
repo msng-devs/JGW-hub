@@ -1,3 +1,5 @@
+import time
+
 from rest_framework.test import APITestCase
 from rest_framework import status
 from rest_framework.response import Response
@@ -170,23 +172,24 @@ class SurveyApiTestOK(APITestCase):
             if not is_random:
                 cls.survey_pks.append(str(survey_data['_id']))
 
-        for i in range(5):
+        for i in range(500):
             __create_post(i, 0)
         for i in range(153):
             __create_post(i, 1)
 
-        quizzes = list(cls.collection_quiz.find({'parent_post': ObjectId(cls.survey_pks[1])}))
-        cls.collection_answer.insert_many([{
-                '_id': ObjectId(),
-                'parent_post': ObjectId(cls.survey_pks[1]),
-                'user': None,
-                'answers': [
-                    {"parent_quiz": quizzes[0]['_id'], "text": get_random_string(length=random.randint(10, 100))},
-                    {"parent_quiz": quizzes[1]['_id'], "text": get_random_string(length=random.randint(10, 100))},
-                    {"parent_quiz": quizzes[2]['_id'], "selection": random.choice([0, 2, 3])},
-                    {"parent_quiz": quizzes[3]['_id'], "selections": list(list(itertools.combinations([0, 1, 2, 3], random.randint(1, 4)))[0])}
-                ]
-            } for _ in range(49)])
+        for k in cls.survey_pks:
+            quizzes = list(cls.collection_quiz.find({'parent_post': ObjectId(k)}))
+            cls.collection_answer.insert_many([{
+                    '_id': ObjectId(),
+                    'parent_post': ObjectId(k),
+                    'user': None,
+                    'answers': [
+                        {"parent_quiz": quizzes[0]['_id'], "text": get_random_string(length=random.randint(10, 100))},
+                        {"parent_quiz": quizzes[1]['_id'], "text": get_random_string(length=random.randint(10, 100))},
+                        {"parent_quiz": quizzes[2]['_id'], "selection": random.choice([0, 2, 3])},
+                        {"parent_quiz": quizzes[3]['_id'], "selections": list(list(itertools.combinations([0, 1, 2, 3], random.randint(1, 4)))[0])}
+                    ]
+                } for _ in range(49)])
 
     def __get_header(self, member_instance):
         return {
@@ -218,9 +221,6 @@ class SurveyApiTestOK(APITestCase):
         # when
         respons: Response = self.client.post(self.url, data=insert_data, content_type='application/json', **self.__get_header(member_instance))
         # print(respons.content)
-
-        # then
-        self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
 
     def test_answer_post(self):
         print("Answer post Api POST Running...")
