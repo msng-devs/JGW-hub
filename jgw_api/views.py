@@ -281,24 +281,28 @@ class BoardViewSet(viewsets.ModelViewSet):
                 }
                 return Response(response_data, status=status.HTTP_204_NO_CONTENT)
         else:
-            logger.debug(f"Board get request")
-            queryset = Board.objects.select_related('role_role_pk_write_level', 'role_role_pk_read_level', 'role_role_pk_comment_write_level').all()
-            request.query_params._mutable = True
-            if 'page' not in request.query_params:
-                # page를 지정하지 않으면 1로 지정
-                request.query_params['page'] = 1
-            if 'page_size' in request.query_params:
-                # page size를 최소~최대 범위 안에서 지정
-                request.query_params['page_size'] = int(request.query_params['page_size'])
-                if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
-                    request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
-                elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
-                    request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
+            all_boards = cache.get("all_boards")
+            if not all_boards:
+                logger.debug(f"Board get request")
+                queryset = Board.objects.select_related('role_role_pk_write_level', 'role_role_pk_read_level', 'role_role_pk_comment_write_level').all()
+                request.query_params._mutable = True
+                if 'page' not in request.query_params:
+                    # page를 지정하지 않으면 1로 지정
+                    request.query_params['page'] = 1
+                if 'page_size' in request.query_params:
+                    # page size를 최소~최대 범위 안에서 지정
+                    request.query_params['page_size'] = int(request.query_params['page_size'])
+                    if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
+                        request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
+                    elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
+                        request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
 
-            page = self.paginate_queryset(queryset)
-            serializer = self.get_serializer(page, many=True)
-            responses = self.get_paginated_response(serializer.data)
-            return responses
+                page = self.paginate_queryset(queryset)
+                cache.set("all_boards", page)
+                all_boards=page
+                serializer = self.get_serializer(page, many=True)
+                responses = self.get_paginated_response(serializer.data)
+                return responses
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
