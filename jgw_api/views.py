@@ -441,7 +441,7 @@ def post_get_all_query(
         #         board_boadr_id_pk=query_params['board'],
         #         board_boadr_id_pk__role_role_pk_read_level__role_pk__gte=user_role_id
         #     )
-        queryset = queryset.filter(board_boadr_id_pk=query_params['board'])
+        queryset = queryset.filter(board_board_id_pk=query_params['board'])
 
     if 'title' in query_params:
         queryset = queryset.filter(post_title__icontains=query_params['title'])
@@ -506,7 +506,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         instance = self.get_object()
 
-        if user_role_id >= admin_role_checked or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
+        if user_role_id >= admin_role_checked or user_role_id >= instance.board_board_id_pk.role_role_pk_read_level.role_pk:
             # 요청한 유저가 admin or 해당 게시판 게시글 읽기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post get retrieve approved')
             post_serializer = self.get_serializer(instance)
@@ -532,7 +532,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_write_level.role_pk:
+        if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_board_id_pk.role_role_pk_write_level.role_pk:
             # 요청한 유저가 글을 작성했던 본인이고, 해당 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post patch approved')
             request_data = request.data
@@ -814,7 +814,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         logger.debug(f'{user_uid} Comment data verified')
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
-        board_instance = post_instance.board_boadr_id_pk
+        board_instance = post_instance.board_board_id_pk
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 댓글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Comment post approved')
@@ -851,7 +851,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        board_instance = instance.post_post_id_pk.board_boadr_id_pk
+        board_instance = instance.post_post_id_pk.board_board_id_pk
         user_instance = instance.member_member_pk
         if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
                 and user_uid == user_instance.member_pk:
