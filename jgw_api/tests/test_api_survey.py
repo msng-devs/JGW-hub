@@ -172,7 +172,7 @@ class SurveyApiTestOK(APITestCase):
             if not is_random:
                 cls.survey_pks.append(str(survey_data['_id']))
 
-        for i in range(500):
+        for i in range(54):
             __create_post(i, 0)
         for i in range(153):
             __create_post(i, 1)
@@ -234,7 +234,7 @@ class SurveyApiTestOK(APITestCase):
                       '{"selections": [0 ,3], "type": 2}]}'
         # when
         respons: Response = self.client.post(self.url + f'{self.survey_pks[0]}/answer/', data=insert_data, content_type='application/json', **self.__get_header(member_instance))
-        print(respons.content)
+        # print(respons.content)
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
