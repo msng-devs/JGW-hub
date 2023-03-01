@@ -52,7 +52,8 @@ survey_post_post = views.SurveyViewSet.as_view({
 
 survey_post_get = views.SurveyViewSet.as_view({
     'get': 'retrieve_post',
-    'delete': 'delete_post'
+    'delete': 'delete_post',
+    'patch': 'patch_post'
 })
 
 survey_post_answer = views.SurveyViewSet.as_view({

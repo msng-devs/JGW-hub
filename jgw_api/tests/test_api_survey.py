@@ -122,21 +122,23 @@ class SurveyApiTestOK(APITestCase):
         cls.collection_answer = __create_collection(db, constant.SURVEY_ANSWER, None)
 
         def __create_post(idx, is_random=0):
+            c_now = datetime.datetime.now()
             survey_data = {
                 '_id': ObjectId(),
                 'title': f'title{idx}',
                 'description': f'description{idx}',
                 'role': 100,
-                'activate': True if not is_random else bool(random.choice([0, 1])),
-                'created_time': datetime.datetime.now()
+                'activate': random.choice([0, 1]),
+                'created_time': c_now,
+                'modified_time': c_now,
             }
 
             quizzes = [
-                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True},
-                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": False},
-                {"type": 1, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True,
+                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": 1},
+                {"type": 0, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": 0},
+                {"type": 1, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": 1,
                  "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]},
-                {"type": 2, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": True,
+                {"type": 2, "title": get_random_string(length=random.randint(5, 20)), "description": get_random_string(length=random.randint(5, 20)), "require": 1,
                  "options": [{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}
             ]
 
@@ -148,7 +150,7 @@ class SurveyApiTestOK(APITestCase):
                     'parent_post': survey_data['_id'],
                     'title': q['title'],
                     'description': q['description'],
-                    'require': q['require'],
+                    'require': int(q['require']),
                     'type': type
                 }
                 if type == constant.SURVEY_TEXT_CODE:  # text
@@ -208,14 +210,13 @@ class SurveyApiTestOK(APITestCase):
                       '"description": "cfvgbhugyvftcdrftgvyhuj",' \
                       f'"writer": "{member_instance.member_pk}",' \
                       '"role": 100,' \
-                      f'"to_time": "{now}",' \
-                      f'"activate": "true",' \
+                      f'"activate": 1,' \
                       '"quizzes": [' \
-                      '{"type": 0, "title": "test1", "description": "test1", "require": true},' \
-                      '{"type": 0, "title": "test2", "description": "test2", "require": false},' \
-                      '{"type": 1, "title": "test3", "description": "test3", "require": true, "options": [' \
+                      '{"type": 0, "title": "test1", "description": "test1", "require": 1},' \
+                      '{"type": 0, "title": "test2", "description": "test2", "require": 0},' \
+                      '{"type": 1, "title": "test3", "description": "test3", "require": 1, "options": [' \
                         '{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]},' \
-                      '{"type": 2, "title": "test3", "description": "test3", "require": true, "options": [' \
+                      '{"type": 2, "title": "test3", "description": "test3", "require": 1, "options": [' \
                         '{"text": "옵션1"}, {"text": "옵션2"}, {"text": "옵션3"}, {"text": "옵션4"}]}]}'
 
         # when
@@ -289,6 +290,23 @@ class SurveyApiTestOK(APITestCase):
 
         # then
         self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_survey_patch(self):
+        print("Post Api Patch Running...")
+
+        # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
+        data = {
+            'title': '변경',
+            'activate': 0
+        }
+
+        # when
+        respons: Response = self.client.patch(self.url + f'{self.survey_pks[45]}/', data=data, **self.__get_header(member_instance))
+        # print(respons.content)
+
+        # then
+        self.assertEqual(respons.status_code, status.HTTP_200_OK)
 
     def test_answer_analyze_text(self):
         print("Answer Analyze TEXT Api GET Running...")
