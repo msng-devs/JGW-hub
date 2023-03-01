@@ -1,5 +1,6 @@
 import datetime
 import random
+import time
 
 from rest_framework import viewsets, status, renderers, generics
 from rest_framework.response import Response
@@ -932,22 +933,25 @@ class SurveyViewSet(viewsets.ViewSet):
             try:
                 created_time = datetime.datetime.now()
                 to = None
-                if 'to_time' in post_data:
-                    to = datetime.datetime.strptime(post_data['to_time'], constant.TIME_QUERY)
+                # if 'to_time' in post_data:
+                #     to = datetime.datetime.strptime(post_data['to_time'], constant.TIME_QUERY)
+                # print(post_data)
                 survey_data = {
                     '_id': ObjectId(),
                     'title': post_data['title'],
                     'description': post_data['description'],
                     'role': int(post_data['role']),
-                    'activate': bool(post_data['activate']),
-                    'created_time': created_time
+                    'activate': int(post_data['activate']),
+                    'created_time': created_time,
+                    'modified_time': created_time,
                 }
-                if to is not None:
-                    assert created_time < to, 'The last day must be later than the start date.'
-                    survey_data['to_time'] = to
+                # if to is not None:
+                #     assert created_time < to, 'The last day must be later than the start date.'
+                #     survey_data['to_time'] = to
 
                 quizzes = post_data['quizzes']
                 assert len(quizzes), "There must be at least one question."
+                assert len(quizzes) <= 60, "There must be no more than 60 questions."
 
                 quizzes_data = []
                 for q in quizzes:
@@ -957,7 +961,7 @@ class SurveyViewSet(viewsets.ViewSet):
                         'parent_post': survey_data['_id'],
                         'title': q['title'],
                         'description': q['description'],
-                        'require': q['require'],
+                        'require': int(q['require']),
                         'type': type
                     }
                     # post
@@ -987,6 +991,8 @@ class SurveyViewSet(viewsets.ViewSet):
                 response_data = survey_data
                 response_data['quizzes'] = []
                 response_data['_id'] = str(response_data['_id'])
+                response_data['created_time'] = response_data['created_time'].strftime(constant.TIME_QUERY)
+                response_data['modified_time'] = response_data['modified_time'].strftime(constant.TIME_QUERY)
                 for q in quizzes_data:
                     q['_id'] = str(q['_id'])
                     q['parent_post'] = str(q['parent_post'])
@@ -1041,9 +1047,19 @@ class SurveyViewSet(viewsets.ViewSet):
                 a = answers[idx]
                 type = int(a['type'])
                 assert q['type'] == a['type'], f'The data format of the response is different from the question. idx" {idx}'
+
                 answer = {
                     "parent_quiz": q['_id']
                 }
+
+                if 'null' in a:
+                    if int(q['require']) == 0 and int(a['null']) == 1:
+                        answer['null'] = 1
+                        answer_data['answers'].append(answer)
+                        continue
+                    elif int(q['require']) == 1 and int(a['null']) == 1:
+                        assert False, 'Required response questions must be answered.'
+
                 # create answer
                 if type == constant.SURVEY_TEXT_CODE:
                     answer['text'] = a['text']
@@ -1134,6 +1150,7 @@ class SurveyViewSet(viewsets.ViewSet):
             for d in page_now:
                 d['_id'] = str(d['_id'])
                 d['created_time'] = d['created_time'].strftime(constant.TIME_QUERY)
+                d['modified_time'] = d['modified_time'].strftime(constant.TIME_QUERY)
             response_data['results'] = page_now
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -1164,6 +1181,8 @@ class SurveyViewSet(viewsets.ViewSet):
             response_data = survey_data
             response_data['quizzes'] = []
             response_data['_id'] = str(response_data['_id'])
+            response_data['created_time'] = response_data['created_time'].strftime(constant.TIME_QUERY)
+            response_data['modified_time'] = response_data['modified_time'].strftime(constant.TIME_QUERY)
             for q in quizzes_data:
                 q['_id'] = str(q['_id'])
                 q['parent_post'] = str(q['parent_post'])
@@ -1438,6 +1457,67 @@ class SurveyViewSet(viewsets.ViewSet):
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             logger.info(f"{user_uid} Survey Post delete denied")
+            detail = {
+                'detail': 'Not Allowed.'
+            }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
+
+    def patch_post(self, request, pk):
+        checked = request_check_admin_role(request)
+        if isinstance(checked, Response):
+            # 요청한 유저 정보가 없다면 500 return
+            return checked
+        user_uid, user_role_id, admin_role_checked = checked
+        if user_role_id >= admin_role_checked:
+            logger.debug(f'{user_uid} Survey Post patch approved')
+            try:
+                before_patch = self.collection_survey.find_one({'_id': ObjectId(pk)})
+                assert before_patch is not None, 'Survey data not found'
+
+                request_data = request.data
+                update_data = {}
+                if 'title' in request_data:
+                    update_data['title'] = request_data['title']
+                if 'description' in request_data:
+                    update_data['description'] = request_data['description']
+                if 'role' in request_data:
+                    update_data['role'] = int(request_data['role'])
+                if 'activate' in request_data:
+                    update_data['activate'] = int(request_data['activate'])
+                assert len(update_data) > 0, 'You must have at least one data to update.'
+                update_data['modified_time'] = datetime.datetime.now()
+
+                patch_result = self.collection_survey.update_one(
+                    {'_id': ObjectId(pk)},
+                    {'$set': update_data}
+                )
+                after_patch = self.collection_survey.find_one({'_id': ObjectId(pk)})
+
+                update_log = f'{user_uid} Survey Post data patched' \
+                             f'\tkey: {pk} change log'
+                for k in update_data.keys():
+                    instance_data = after_patch[k]
+                    before_change = before_patch[k]
+                    if k in ('title', 'description'):
+                        instance_data = instance_data[:50]
+                        before_change = before_change[:50]
+                    update_log += f'\n\t{k}: {before_change} -> {instance_data}'
+                # logger.info(update_log)
+
+                after_patch['_id'] = str(after_patch['_id'])
+                after_patch['created_time'] = after_patch['created_time'].strftime(constant.TIME_QUERY)
+                after_patch['modified_time'] = after_patch['modified_time'].strftime(constant.TIME_QUERY)
+                # print(after_patch)
+
+                return Response(after_patch, status=status.HTTP_200_OK)
+            except Exception as e:
+                logger.error(f'patch survey post failed.\n\terror: {e}')
+                detail = {
+                    'detail': str(e)
+                }
+                return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            logger.info(f"{user_uid} Survey Post patch denied")
             detail = {
                 'detail': 'Not Allowed.'
             }
