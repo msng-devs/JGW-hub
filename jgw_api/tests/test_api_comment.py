@@ -119,7 +119,7 @@ class CommentApiTestOK(APITestCase):
                     comment_comment_id_ref=Comment.objects.get(comment_id=i + 1)
                 )
 
-    def __comment_get(self, data):
+    def __comment_get(self, data, page_size):
         def comment_get_data(ref_comment):
             instance = Comment.objects.all().order_by(('-' if ref_comment is None else '') + 'comment_id').filter(
                 post_post_id_pk=int(data['post_id']),
@@ -144,8 +144,13 @@ class CommentApiTestOK(APITestCase):
                 "reply": comment_get_data(i)
             } for i in instance]
 
+        total_count = Comment.objects.all().order_by('-comment_id').filter(
+                post_post_id_pk=int(data['post_id']),
+                comment_comment_id_ref=None
+            ).count()
         return {
             'count': 3,
+            'total_pages': total_count // page_size + (1 if total_count % 2 else 0),
             "next": "http://testserver/hub/api/v1/comment/?page=2&page_size=3&post_id=2",
             "previous": None,
             "results": comment_get_data(None)
@@ -161,7 +166,7 @@ class CommentApiTestOK(APITestCase):
         respons: Response = self.client.get(self.url, data=data)
 
         # # then
-        return_data = self.__comment_get(data)
+        return_data = self.__comment_get(data, 3)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
