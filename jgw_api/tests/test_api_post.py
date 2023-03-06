@@ -95,8 +95,9 @@ class PostApiTestOK(APITestCase):
                 member_member_pk=member_instance
             )
 
-    def __get_responses_data_pagenation(self, instance, query_parameters, url):
+    def __get_responses_data_pagenation(self, instance, query_parameters, url, total_count):
         next = previous = None
+        page_size = 10
         if 'page' in query_parameters:
             page = query_parameters['page']
             query = sorted(query_parameters.items(), key=lambda x: x[0])
@@ -106,8 +107,15 @@ class PostApiTestOK(APITestCase):
             if page != self.post_count / query_parameters['page_size']:
                 next = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
                            '&'.join([f'{i[0]}={i[1] + 1 if i[0] == "page" else i[1]}' for i in query])
+
+        if 'page_size' in query_parameters:
+            page_size = query_parameters['page_size']
+
+        total_pages = total_count // page_size + (1 if total_count % page_size else 0)
+        if not total_pages: total_pages = 1
         return_data = {
             'count': instance.count(),
+            'total_pages': total_pages,
             'next': next,
             'previous': previous,
             'results': [self.__get_response_data(i) for i in instance]
@@ -157,9 +165,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -195,9 +204,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -232,9 +242,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -271,9 +282,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -311,7 +323,7 @@ class PostApiTestOK(APITestCase):
         len_all_queryset = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, len_all_queryset)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -350,9 +362,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:

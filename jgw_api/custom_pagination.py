@@ -39,6 +39,7 @@ class PostPageNumberPagination(PageNumberPagination):
                 previous = previous.split('?')[0] + '?' + '&'.join([f'{i[0]}={i[1]}' for i in query])
         return Response(OrderedDict([
             ('count', len(data)),
+            ('total_pages', self.page.paginator.num_pages),
             ('next', self.get_next_link()),
             ('previous', previous),
             ('results', data)
