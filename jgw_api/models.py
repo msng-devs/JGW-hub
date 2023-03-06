@@ -190,7 +190,7 @@ class Post(models.Model):
     post_write_time = models.DateTimeField(db_column='POST_WRITE_TIME', auto_now_add=True)  # Field name made lowercase.
     post_update_time = models.DateTimeField(db_column='POST_UPDATE_TIME', auto_now=True)  # Field name made lowercase.
     image_image_id_pk = models.ForeignKey(Image, models.DO_NOTHING, db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True, related_name='post_image')  # Field name made lowercase.
-    board_board_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOARD_ID_PK', related_name='post_board')  # Field name made lowercase.
+    board_boadr_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOADR_ID_PK', related_name='post_board')  # Field name made lowercase.
     member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True, related_name='post_member')  # Field name made lowercase.
 
     class Meta:

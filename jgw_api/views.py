@@ -52,7 +52,7 @@ import logging
 from typing import Union, Tuple, Dict
 import rest_framework
 import django
-from django.core.cache import cache
+
 
 # 자람 허브 로거
 # logger = logging.getLogger('hub')
@@ -281,28 +281,25 @@ class BoardViewSet(viewsets.ModelViewSet):
                 }
                 return Response(response_data, status=status.HTTP_204_NO_CONTENT)
         else:
-            all_boards = cache.get("all_boards")
-            if not all_boards:
-                logger.debug(f"Board get request")
-                queryset = Board.objects.select_related('role_role_pk_write_level', 'role_role_pk_read_level', 'role_role_pk_comment_write_level').all()
-                request.query_params._mutable = True
-                if 'page' not in request.query_params:
-                    # page를 지정하지 않으면 1로 지정
-                    request.query_params['page'] = 1
-                if 'page_size' in request.query_params:
-                    # page size를 최소~최대 범위 안에서 지정
-                    request.query_params['page_size'] = int(request.query_params['page_size'])
-                    if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
-                        request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
-                    elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
-                        request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
+            logger.debug(f"Board get request")
+            queryset = Board.objects.prefetch_related('role_role_pk_write_level', 'role_role_pk_read_level',
+                                                    'role_role_pk_comment_write_level').all()
+            request.query_params._mutable = True
+            if 'page' not in request.query_params:
+                # page를 지정하지 않으면 1로 지정
+                request.query_params['page'] = 1
+            if 'page_size' in request.query_params:
+                # page size를 최소~최대 범위 안에서 지정
+                request.query_params['page_size'] = int(request.query_params['page_size'])
+                if request.query_params['page_size'] < constant.BOARD_MIN_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.BOARD_MIN_PAGE_SIZE
+                elif request.query_params['page_size'] > constant.BOARD_MAX_PAGE_SIZE:
+                    request.query_params['page_size'] = constant.BOARD_MAX_PAGE_SIZE
 
-                page = self.paginate_queryset(queryset)
-                cache.set("all_boards", page)
-                all_boards=page
-                serializer = self.get_serializer(page, many=True)
-                responses = self.get_paginated_response(serializer.data)
-                return responses
+            page = self.paginate_queryset(queryset)
+            serializer = self.get_serializer(page, many=True)
+            responses = self.get_paginated_response(serializer.data)
+            return responses
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
@@ -441,7 +438,7 @@ def post_get_all_query(
         #         board_boadr_id_pk=query_params['board'],
         #         board_boadr_id_pk__role_role_pk_read_level__role_pk__gte=user_role_id
         #     )
-        queryset = queryset.filter(board_board_id_pk=query_params['board'])
+        queryset = queryset.filter(board_boadr_id_pk=query_params['board'])
 
     if 'title' in query_params:
         queryset = queryset.filter(post_title__icontains=query_params['title'])
@@ -461,14 +458,14 @@ class PostViewSet(viewsets.ModelViewSet):
     게시글 api를 담당하는 클래스
     '''
     serializer_class = PostGetSerializer
-    queryset = Post.objects.prefetch_related('post_board', 'post_member', 'post_image').all()
+    queryset = Post.objects.prefetch_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
-        queryset = Post.objects.select_related('image_image_id_pk', 'board_board_id_pk', 'member_member_pk').all()
+        queryset = Post.objects.select_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
         queryset = post_get_all_query(request.query_params, queryset)
 
         request.query_params._mutable = True
@@ -506,7 +503,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         instance = self.get_object()
 
-        if user_role_id >= admin_role_checked or user_role_id >= instance.board_board_id_pk.role_role_pk_read_level.role_pk:
+        if user_role_id >= admin_role_checked or user_role_id >= instance.board_boadr_id_pk.role_role_pk_read_level.role_pk:
             # 요청한 유저가 admin or 해당 게시판 게시글 읽기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post get retrieve approved')
             post_serializer = self.get_serializer(instance)
@@ -532,7 +529,7 @@ class PostViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_board_id_pk.role_role_pk_write_level.role_pk:
+        if user_uid == instance.member_member_pk.member_pk and user_role_id >= instance.board_boadr_id_pk.role_role_pk_write_level.role_pk:
             # 요청한 유저가 글을 작성했던 본인이고, 해당 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post patch approved')
             request_data = request.data
@@ -545,7 +542,7 @@ class PostViewSet(viewsets.ModelViewSet):
                 request_data._mutable = True
             if 'board_board_id_pk' in request_data:
                 # 변경하려는 데이터가 해당 게시글이 소속된 게시판이라면
-                board_instance = Board.objects.get(board_id_pk=int(request_data['board_board_id_pk']))
+                board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
                 if board_instance.role_role_pk_write_level.role_pk > user_role_id:
                     # 변경하려는 게시판의 쓰기 레벨보다 요청한 유저의 권한이 낮다면 거부
                     logger.info(f"{user_uid} Post patch denied - request board not allowed")
@@ -608,7 +605,7 @@ class PostViewSet(viewsets.ModelViewSet):
         post_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Post data verified')
 
-        board_instance = post_serializer.validated_data['board_board_id_pk']
+        board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post post approved')
@@ -650,6 +647,7 @@ class PostViewSet(viewsets.ModelViewSet):
             # 요청한 유저가 admin or 글을 작성한 본인이면 승인
             logger.debug(f'{user_uid} Post delete approved')
             key, name = instance.post_id_pk, instance.post_title
+
             self.perform_destroy(instance)
 
             logger.debug(f'{user_uid} Post data deleted\tkey: {key}\ttitle: {name}')
@@ -657,7 +655,7 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post delete denied")
             detail = {
-                'detail': 'Image delete not allowed.'
+                'detail': 'Post delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
@@ -765,7 +763,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     댓글 api를 담당하는 클래스
     '''
     serializer_class = CommentGetSerializer
-    queryset = Comment.objects.select_related('post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref').all().order_by('-comment_id')
+    queryset = Comment.objects.select_related('post_post_id_pk', 'member_member_pk',
+                                              'comment_comment_id_ref').all().order_by('-comment_id')
 
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
@@ -814,7 +813,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         logger.debug(f'{user_uid} Comment data verified')
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
-        board_instance = post_instance.board_board_id_pk
+        board_instance = post_instance.board_boadr_id_pk
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 댓글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Comment post approved')
@@ -851,7 +850,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        board_instance = instance.post_post_id_pk.board_board_id_pk
+        board_instance = instance.post_post_id_pk.board_boadr_id_pk
         user_instance = instance.member_member_pk
         if user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk \
                 and user_uid == user_instance.member_pk:
