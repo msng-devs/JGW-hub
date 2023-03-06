@@ -17,6 +17,7 @@ class BoardPageNumberPagination(PageNumberPagination):
             previous += '?page=1'
         return Response(OrderedDict([
             ('count', len(data)),
+            ('total_pages', self.page.paginator.num_pages),
             ('next', self.get_next_link()),
             ('previous', previous),
             ('results', data)

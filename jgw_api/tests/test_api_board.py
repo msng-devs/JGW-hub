@@ -47,8 +47,10 @@ class BoardApiTestOK(APITestCase):
         respons: Response = self.client.get(self.url, data={'page': 1}, **self.__make_header())
 
         # then
+        total_count = Board.objects.count()
         return_data = {
                 'count': 10,
+                'total_pages': total_count // 10 + (1 if total_count % 2 else 0),
                 'next': 'http://testserver/hub/api/v1/board/?page=2',
                 'previous': None,
                 'results': [{"board_id_pk": i.board_id_pk,
