@@ -130,8 +130,11 @@ class ImageApiTestOK(APITestCase):
         # then
         instance = Image.objects.all().filter(post_post_id_pk=post_id).order_by('image_id_pk')
 
+
+        total_count = instance.count()
         return_data = {
             'count': instance.count(),
+            'total_pages': total_count // 50 + (1 if total_count % 50 else 0),
             'next': None,
             'previous': None,
             'results': [{
