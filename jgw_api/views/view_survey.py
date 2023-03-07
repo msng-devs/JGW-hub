@@ -227,10 +227,46 @@ class SurveyViewSet(viewsets.ViewSet):
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
 
     def list_post(self, request):
+        checked = request_check(request)
+        if isinstance(checked, Response):
+            # user role이 없다면 최하위 권한 적용
+            user_role_id = -1
+            user_uid = None
+        else:
+            user_uid, user_role_id = checked
         logger.debug(f"Survey Post get request")
         try:
             request.query_params._mutable = True
-            total_count = self.collection_survey.estimated_document_count()
+
+            target_title = ''
+            if 'title' in request.query_params:
+                target_title = request.query_paramsp['title']
+            aggregate_dict = [
+                {
+                    '$match': {
+                        '$expr': {
+                            '$and': [
+                                {'$lte': ['$role', user_role_id]}
+                            ]
+                        }
+                    }},
+                {'$match': {'title': {'$regex': target_title}}},
+                {
+                    '$sort': {
+                        'activate': -1,
+                        'created_time': -1
+                    }
+                },
+                {'$count': 'count'}
+            ]
+            print(list(self.collection_survey.aggregate(aggregate_dict)), user_role_id, target_title)
+            total_count = list(self.collection_survey.aggregate(aggregate_dict))
+            if total_count:
+                total_count = total_count[-1]['count']
+            else:
+                total_count = 0
+            del aggregate_dict[-1]
+
             if 'page_size' in request.query_params:
                 # page size를 최소~최대 범위 안에서 지정
                 request.query_params['page_size'] = int(request.query_params['page_size'])
@@ -253,16 +289,14 @@ class SurveyViewSet(viewsets.ViewSet):
                 elif max_page < request.query_params['page']:
                     request.query_params['page'] = max_page
 
-            # print(request.query_params['page'], request.query_params['page_size'])
-
-            sort_fields = [('activate', pymongo.DESCENDING), ('created_time', pymongo.DESCENDING)]
-            page_now = self.collection_survey.find().sort(sort_fields)\
-                .skip((request.query_params['page'] - 1) * request.query_params['page_size'])\
-                .limit(request.query_params['page_size'])
+            aggregate_dict.append({'$skip': (request.query_params['page'] - 1) * request.query_params['page_size']})
+            aggregate_dict.append({'$limit': request.query_params['page_size']})
+            page_now = self.collection_survey.aggregate(aggregate_dict)
             page_now = list(page_now)
 
             response_data = {
                 'count': len(page_now),
+                'total_pages': max_page,
                 'next': request.build_absolute_uri().split('?')[0] +
                         f'page={request.query_params["page"] + 1}&page_size={request.query_params["page_size"]}'
                         if request.query_params['page'] < max_page else None,
@@ -388,6 +422,7 @@ class SurveyViewSet(viewsets.ViewSet):
 
                         response_data = {
                             'count': len(results),
+                            'total_pages': max_page,
                             'next': request.build_absolute_uri().split('?')[0] +
                                     f'page={page + 1}&page_size={page_size}'
                             if page < max_page else None,
@@ -530,6 +565,7 @@ class SurveyViewSet(viewsets.ViewSet):
 
                     response_data = {
                         'count': len(target_answers),
+                        'total_pages': max_page,
                         'next': request.build_absolute_uri().split('?')[0] +
                                 f'page={page + 1}&page_size={page_size}'
                                 if page < max_page else None,

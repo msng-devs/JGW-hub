@@ -244,9 +244,10 @@ class SurveyApiTestOK(APITestCase):
         print("Survey Post list Api GET Running...")
 
         # given
+        member_instance = Member.objects.get(role_role_pk=Role.objects.get(role_nm='ROLE_DEV'))
 
         # when
-        respons: Response = self.client.get(self.url + '?page=0')
+        respons: Response = self.client.get(self.url + '?page=0', **self.__get_header(member_instance))
         # print(respons.content)
 
         # then
