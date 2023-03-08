@@ -21,6 +21,7 @@ import datetime
 import traceback
 
 class ImageApiTestOK(APITestCase):
+    databases = '__all__'
     test_files_root_url = './test/file_upload_test'
 
     def setUp(self):
@@ -50,19 +51,20 @@ class ImageApiTestOK(APITestCase):
         Member.objects.create(
             member_pk='ksjd793JNSO918234OLAKWMD',
             member_nm='test1',
-            member_created_dttm=now,
-            member_modified_dttm=now,
+            # member_created_dttm=now,
+            # member_modified_dttm=now,
             member_email=f'test@test.com',
-            member_cell_phone_number='01000000000',
-            member_student_id='012345678',
-            member_year=38,
+            # member_cell_phone_number='01000000000',
+            # member_student_id='012345678',
+            # member_year=38,
             role_role_pk=Role.objects.get(role_nm='ROLE_GUEST'),
-            rank_rank_pk=Rank.objects.get(rank_nm='none'),
-            major_major_pk=Major.objects.get(major_nm='인공지능학과'),
-            member_leave_absence=0,
-            member_created_by='system',
-            member_modified_by='system',
-            member_dateofbirth=now,
+            # rank_rank_pk=Rank.objects.get(rank_nm='none'),
+            # major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+            # member_leave_absence=0,
+            # member_created_by='system',
+            # member_modified_by='system',
+            # member_dateofbirth=now,
+            member_status=1
         )
 
         Post.objects.create(
@@ -128,8 +130,11 @@ class ImageApiTestOK(APITestCase):
         # then
         instance = Image.objects.all().filter(post_post_id_pk=post_id).order_by('image_id_pk')
 
+
+        total_count = instance.count()
         return_data = {
             'count': instance.count(),
+            'total_pages': total_count // 50 + (1 if total_count % 50 else 0),
             'next': None,
             'previous': None,
             'results': [{

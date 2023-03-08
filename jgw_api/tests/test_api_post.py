@@ -25,6 +25,7 @@ import traceback
 import jgw_api.constant as constant
 
 class PostApiTestOK(APITestCase):
+    databases = '__all__'
     now = datetime.datetime.now()
     post_count = 100
 
@@ -35,6 +36,7 @@ class PostApiTestOK(APITestCase):
     @classmethod
     def setUpTestData(cls):
         now = cls.now
+
         Role.objects.create(role_pk=0, role_nm='ROLE_GUEST')
         Role.objects.create(role_pk=100, role_nm='ROLE_USER0')
         Role.objects.create(role_pk=101, role_nm='ROLE_USER1')
@@ -64,19 +66,20 @@ class PostApiTestOK(APITestCase):
             Member.objects.create(
                 member_pk=get_random_string(length=24) + str(i),
                 member_nm=get_random_string(length=44) + str(i),
-                member_created_dttm=now,
-                member_modified_dttm=now,
+                # member_created_dttm=now,
+                # member_modified_dttm=now,
                 member_email=f'test{i}@test.com',
-                member_cell_phone_number='01000000000',
-                member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
-                member_year=38,
+                # member_cell_phone_number='01000000000',
+                # member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
+                # member_year=38,
                 role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
-                rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
-                major_major_pk=Major.objects.get(major_nm='인공지능학과'),
-                member_leave_absence=0,
-                member_created_by='system',
-                member_modified_by='system',
-                member_dateofbirth=now,
+                # rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
+                # major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+                # member_leave_absence=0,
+                # member_created_by='system',
+                # member_modified_by='system',
+                # member_dateofbirth=now,
+                member_status=1
             )
 
         for i in range(cls.post_count):
@@ -92,8 +95,9 @@ class PostApiTestOK(APITestCase):
                 member_member_pk=member_instance
             )
 
-    def __get_responses_data_pagenation(self, instance, query_parameters, url):
+    def __get_responses_data_pagenation(self, instance, query_parameters, url, total_count):
         next = previous = None
+        page_size = 10
         if 'page' in query_parameters:
             page = query_parameters['page']
             query = sorted(query_parameters.items(), key=lambda x: x[0])
@@ -103,8 +107,15 @@ class PostApiTestOK(APITestCase):
             if page != self.post_count / query_parameters['page_size']:
                 next = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
                            '&'.join([f'{i[0]}={i[1] + 1 if i[0] == "page" else i[1]}' for i in query])
+
+        if 'page_size' in query_parameters:
+            page_size = query_parameters['page_size']
+
+        total_pages = total_count // page_size + (1 if total_count % page_size else 0)
+        if not total_pages: total_pages = 1
         return_data = {
             'count': instance.count(),
+            'total_pages': total_pages,
             'next': next,
             'previous': previous,
             'results': [self.__get_response_data(i) for i in instance]
@@ -154,9 +165,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -192,9 +204,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -229,9 +242,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -268,9 +282,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -308,7 +323,7 @@ class PostApiTestOK(APITestCase):
         len_all_queryset = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, len_all_queryset)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
@@ -347,9 +362,10 @@ class PostApiTestOK(APITestCase):
 
         # then
         instance = post_get_all_query(query_parameters, Post.objects.all())
+        total_count = instance.count()
         instance = instance[page_size * (page - 1):page_size * page]
 
-        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1)
+        return_data = self.__get_responses_data_pagenation(instance, query_parameters, 1, total_count)
 
         for results in return_data['results']:
             if len(results['post_content']) > 500:
