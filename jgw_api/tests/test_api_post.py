@@ -35,7 +35,6 @@ class PostApiTestOK(APITestCase):
     @classmethod
     def setUpTestData(cls):
         now = cls.now
-
         Role.objects.create(role_pk=0, role_nm='ROLE_GUEST')
         Role.objects.create(role_pk=100, role_nm='ROLE_USER0')
         Role.objects.create(role_pk=101, role_nm='ROLE_USER1')
@@ -120,7 +119,7 @@ class PostApiTestOK(APITestCase):
             'post_write_time': instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             "image_image_id_pk": instance.image_image_id_pk,
-            'board_boardr_id_pk': {
+            'board_boadr_id_pk': {
                 'board_id_pk': instance.board_boadr_id_pk.board_id_pk,
                 'board_name': instance.board_boadr_id_pk.board_name,
                 'board_layout': instance.board_boadr_id_pk.board_layout,
@@ -443,7 +442,7 @@ class PostApiTestOK(APITestCase):
                 'image_name': thumbnail_image.image_name,
                 'image_url': thumbnail_image.image_url,
             },
-            'board_boardr_id_pk': {
+            'board_boadr_id_pk': {
                 'board_id_pk': post_instance.board_boadr_id_pk.board_id_pk,
                 'board_name': post_instance.board_boadr_id_pk.board_name,
                 'board_layout': post_instance.board_boadr_id_pk.board_layout,
