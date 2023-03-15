@@ -22,6 +22,7 @@ from .view_check import (
 
 logger = get_logger()
 
+
 class BoardViewSet(viewsets.ModelViewSet):
     '''
     게시판 api를 담당하는 클래스
@@ -37,18 +38,31 @@ class BoardViewSet(viewsets.ModelViewSet):
             try:
                 queryset = Board.objects.get(board_id_pk=int(request.query_params['board_id']))
                 key, name = queryset.board_id_pk, queryset.board_name
-                serailizer = self.get_serializer(queryset)
+                serializer = self.get_serializer(queryset)
                 logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
-                return Response(serailizer.data)
+                return Response(serializer.data)
             except ObjectDoesNotExist:
                 response_data = {
-                    'detail': '특정 id의 board가 존재하지 않습니다'
+                    'detail': f'id {key}를 가지는 board가 존재하지 않습니다.'
                 }
                 return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+        elif 'board_name' in request.query_params:
+            try:
+                queryset = Board.objects.get(board_name=request.query_params['board_name'])
+                name = queryset.board_name
+                serializer = self.get_serializer(queryset)
+                logger.debug(f'Board data get retrieve by board name\tkey: {name}\tname: {name}')
+                return Response(serializer.data)
+            except ObjectDoesNotExist:
+                response_data = {
+                    'detail': f'board name {name}를 가지는 board가 존재하지 않습니다.'
+                }
+                return Response(response_data, status=status.HTTP_204_NO_CONTENT)
+
         else:
             logger.debug(f"Board get request")
             queryset = Board.objects.prefetch_related('role_role_pk_write_level', 'role_role_pk_read_level',
-                                                    'role_role_pk_comment_write_level').all()
+                                                      'role_role_pk_comment_write_level').all()
             request.query_params._mutable = True
             if 'page' not in request.query_params:
                 # page를 지정하지 않으면 1로 지정
