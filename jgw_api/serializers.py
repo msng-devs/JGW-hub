@@ -30,7 +30,7 @@ class ImageSerializer(serializers.ModelSerializer):
     def validate(self, data):
         image_url = Image.objects.get(image_url=data['image_url'])
         if image_url.exists():
-            raise serializers.ValidationError("Board name already exists")
+            raise serializers.ValidationError("image_url already exists")
         return data
 
 class ImageNestedPostSerializer(serializers.ModelSerializer):
