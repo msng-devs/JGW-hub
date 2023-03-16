@@ -273,10 +273,11 @@ class PostViewSet(viewsets.ModelViewSet):
             # 요청한 유저가 admin or 글을 작성한 본인이면 승인
             logger.debug(f'{user_uid} Post delete approved')
             key, name = instance.post_id_pk, instance.post_title
+            ##### 불필요할수도 있어서 테스트하다 오류나면 지우기
             Comment.objects.filter(post_post_id_pk=key).delete()
             Image.objects.filter(post_post_id_pk=key).delete()
+            #####
             self.perform_destroy(instance)
-
             logger.debug(f'{user_uid} Post data deleted\tkey: {key}\ttitle: {name}')
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:

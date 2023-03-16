@@ -178,6 +178,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment delete denied")
             detail = {
-                'detail': 'Image delete not allowed.'
+                'detail': 'Comment delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

@@ -43,19 +43,19 @@ class BoardViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             except ObjectDoesNotExist:
                 response_data = {
-                    'detail': f'id {key}를 가지는 board가 존재하지 않습니다.'
+                    'detail': '특정 id를 가지는 board가 존재하지 않습니다.'
                 }
                 return Response(response_data, status=status.HTTP_204_NO_CONTENT)
         elif 'board_name' in request.query_params:
             try:
                 queryset = Board.objects.get(board_name=request.query_params['board_name'])
-                name = queryset.board_name
+                spec_name = queryset.board_name
                 serializer = self.get_serializer(queryset)
-                logger.debug(f'Board data get retrieve by board name\tkey: {name}\tname: {name}')
+                logger.debug(f'Board data get retrieve by board name\tkey: {spec_name}\tname: {spec_name}')
                 return Response(serializer.data)
             except ObjectDoesNotExist:
                 response_data = {
-                    'detail': f'board name {name}를 가지는 board가 존재하지 않습니다.'
+                    'detail': '특정 board name 를 가지는 board가 존재하지 않습니다.'
                 }
                 return Response(response_data, status=status.HTTP_204_NO_CONTENT)
 
@@ -186,6 +186,6 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Board delete denied")
             detail = {
-                'detail': 'Not Allowed.'
+                'detail': 'Board delete not allowed.'
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

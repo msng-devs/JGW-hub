@@ -27,6 +27,12 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = '__all__'
 
+    def validate(self, data):
+        image_url = Image.objects.get(image_url=data['image_url'])
+        if image_url.exists():
+            raise serializers.ValidationError("Board name already exists")
+        return data
+
 class ImageNestedPostSerializer(serializers.ModelSerializer):
     '''
     image nested serializer. 다른 serializer에서 모든 이미지 필드가 필요 없을때 사용.
