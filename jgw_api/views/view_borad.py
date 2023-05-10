@@ -42,6 +42,7 @@ class BoardViewSet(viewsets.ModelViewSet):
                 logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
                 return Response(serializer.data)
             except ObjectDoesNotExist:
+
                 response_data = {
                     'detail': '특정 id를 가지는 board가 존재하지 않습니다.'
                 }

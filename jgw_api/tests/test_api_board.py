@@ -8,6 +8,8 @@ from jgw_api.models import (
 )
 import random
 
+from jgw_api.custom_test_runner.runner import CustomRunner
+
 class BoardApiTestOK(APITestCase):
     databases = '__all__'
     def setUp(self):

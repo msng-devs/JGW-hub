@@ -137,7 +137,8 @@ class ImageViewSet(viewsets.ModelViewSet):
         if 'post_id' in request.query_params:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 이미지만 가져옴
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
-
+        if 'image_name' in request.query_params:
+            queryset = queryset.get(image_name=request.query_params['image_name'])
         queryset = queryset.order_by('image_id_pk')
 
         request.query_params._mutable = True
