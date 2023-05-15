@@ -214,11 +214,21 @@ LOGGING = {
             'backupCount': 10,
             'encoding': 'utf-8',
         },
+        'file_django_warn': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'format2',
+            'filters': ['require_debug_false'],
+            'filename': BASE_DIR / 'logs/django_warn.log',
+            'maxBytes': 1024 * 1024 * 200,
+            'backupCount': 10,
+            'encoding': 'utf-8',
+        },
     },
     # 로거
     'loggers': {
-        'hub': {
-            'handlers': ['console'],
+        'django': {
+            'handlers': ['file_django_warn'],
             'level': 'DEBUG'
         },
         'hub_error': {
