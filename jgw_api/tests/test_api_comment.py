@@ -25,6 +25,7 @@ import traceback
 import jgw_api.constant as constant
 
 class CommentApiTestOK(APITestCase):
+    databases = '__all__'
     now = datetime.datetime.now()
 
     def setUp(self):
@@ -63,19 +64,20 @@ class CommentApiTestOK(APITestCase):
             Member.objects.create(
                 member_pk=get_random_string(length=24) + str(i),
                 member_nm=get_random_string(length=44) + str(i),
-                member_created_dttm=now,
-                member_modified_dttm=now,
+                # member_created_dttm=now,
+                # member_modified_dttm=now,
                 member_email=f'test{i}@test.com',
-                member_cell_phone_number='01000000000',
-                member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
-                member_year=38,
+                # member_cell_phone_number='01000000000',
+                # member_student_id=get_random_string(length=9, allowed_chars='0123456789') + str(i),
+                # member_year=38,
                 role_role_pk=Role.objects.get(role_nm='ROLE_USER1'),
-                rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
-                major_major_pk=Major.objects.get(major_nm='인공지능학과'),
-                member_leave_absence=0,
-                member_created_by='system',
-                member_modified_by='system',
-                member_dateofbirth=now,
+                # rank_rank_pk=Rank.objects.get(rank_nm='정회원'),
+                # major_major_pk=Major.objects.get(major_nm='인공지능학과'),
+                # member_leave_absence=0,
+                # member_created_by='system',
+                # member_modified_by='system',
+                # member_dateofbirth=now,
+                member_status=1
             )
 
         for i in range(2):
@@ -117,7 +119,7 @@ class CommentApiTestOK(APITestCase):
                     comment_comment_id_ref=Comment.objects.get(comment_id=i + 1)
                 )
 
-    def __comment_get(self, data):
+    def __comment_get(self, data, page_size):
         def comment_get_data(ref_comment):
             instance = Comment.objects.all().order_by(('-' if ref_comment is None else '') + 'comment_id').filter(
                 post_post_id_pk=int(data['post_id']),
@@ -142,8 +144,13 @@ class CommentApiTestOK(APITestCase):
                 "reply": comment_get_data(i)
             } for i in instance]
 
+        total_count = Comment.objects.all().order_by('-comment_id').filter(
+                post_post_id_pk=int(data['post_id']),
+                comment_comment_id_ref=None
+            ).count()
         return {
             'count': 3,
+            'total_pages': total_count // page_size + (1 if total_count % 2 else 0),
             "next": "http://testserver/hub/api/v1/comment/?page=2&page_size=3&post_id=2",
             "previous": None,
             "results": comment_get_data(None)
@@ -159,7 +166,7 @@ class CommentApiTestOK(APITestCase):
         respons: Response = self.client.get(self.url, data=data)
 
         # # then
-        return_data = self.__comment_get(data)
+        return_data = self.__comment_get(data, 3)
 
         self.assertEqual(respons.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(respons.content, return_data)
