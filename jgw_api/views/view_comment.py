@@ -27,8 +27,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     댓글 api를 담당하는 클래스
     '''
     serializer_class = CommentGetSerializer
-    queryset = Comment.objects.select_related('post_post_id_pk', 'member_member_pk',
-                                              'comment_comment_id_ref').all().order_by('-comment_id')
+
+    queryset = Comment.objects.all().order_by('-comment_id')
 
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
@@ -178,6 +178,8 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment delete denied")
             detail = {
-                'detail': 'Comment delete not allowed.'
+
+                'detail': 'Image delete not allowed.'
+
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

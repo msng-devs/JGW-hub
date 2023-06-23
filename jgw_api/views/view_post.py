@@ -8,7 +8,9 @@ from django.http import QueryDict
 
 from ..models import (
     Board,
-    Post, Comment, Image,
+
+    Post,
+
 )
 from ..serializers import (
     PostWriteSerializer,
@@ -42,11 +44,13 @@ def post_get_all_query(
     '''
     start_date = datetime.datetime.min
     end_date = datetime.datetime.max
-    time_query = '%Y-%m-%dT%H-%M-%S'
+
+
     if 'start_date' in query_params:
-        start_date = datetime.datetime.strptime(query_params['start_date'], time_query)
+        start_date = datetime.datetime.strptime(query_params['start_date'], constant.TIME_QUERY)
     if 'end_date' in query_params:
-        end_date = datetime.datetime.strptime(query_params['end_date'], time_query)
+        end_date = datetime.datetime.strptime(query_params['end_date'], constant.TIME_QUERY)
+
     queryset = queryset.filter(post_write_time__range=(start_date, end_date))
 
     if 'writer_uid' in query_params:
@@ -83,14 +87,18 @@ class PostViewSet(viewsets.ModelViewSet):
     게시글 api를 담당하는 클래스
     '''
     serializer_class = PostGetSerializer
-    queryset = Post.objects.prefetch_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
+
+    queryset = Post.objects.all()
+
     pagination_class = PostPageNumberPagination
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
-        queryset = Post.objects.select_related('image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk').all()
+
+        queryset = Post.objects.all()
+
         queryset = post_get_all_query(request.query_params, queryset)
 
         request.query_params._mutable = True
@@ -166,7 +174,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
             if isinstance(request_data, QueryDict):
                 request_data._mutable = True
-            if 'board_board_id_pk' in request_data:
+
+            if 'board_boadr_id_pk' in request_data:
+
                 # 변경하려는 데이터가 해당 게시글이 소속된 게시판이라면
                 board_instance = Board.objects.get(board_id_pk=int(request_data['board_boadr_id_pk']))
                 if board_instance.role_role_pk_write_level.role_pk > user_role_id:
@@ -273,16 +283,17 @@ class PostViewSet(viewsets.ModelViewSet):
             # 요청한 유저가 admin or 글을 작성한 본인이면 승인
             logger.debug(f'{user_uid} Post delete approved')
             key, name = instance.post_id_pk, instance.post_title
-            ##### 불필요할수도 있어서 테스트하다 오류나면 지우기
-            Comment.objects.filter(post_post_id_pk=key).delete()
-            Image.objects.filter(post_post_id_pk=key).delete()
-            #####
+
             self.perform_destroy(instance)
+
+
             logger.debug(f'{user_uid} Post data deleted\tkey: {key}\ttitle: {name}')
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             logger.info(f"{user_uid} Post delete denied")
             detail = {
-                'detail': 'Post delete not allowed.'
+
+                'detail': 'Image delete not allowed.'
+
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

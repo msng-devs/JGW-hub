@@ -17,7 +17,8 @@ logger = logging.getLogger('hub_error')
 
 def get_user_header(
         request: rest_framework.request.Request
-) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+
     '''
     전달받은 request에서 user header를 가져오는 함수
 
@@ -58,7 +59,9 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     except:
         # 최소 어드민 롤 정보가 없다면 500 response 리턴
         responses_data = {
-            'detail': 'Admin Role does not Exist.'
+
+            'detail': 'Admin Role not Exist.'
+
         }
         logger.error('min admin role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -86,7 +89,8 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
 
 def request_check(
         request: rest_framework.request.Request
-) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+    ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
+
     '''
     user header가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -104,7 +108,8 @@ def request_check(
 
 def request_check_admin_role(
         request: rest_framework.request.Request
-) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
+    ) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
+
     '''
     user header, admin role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -126,7 +131,9 @@ def request_check_admin_role(
 
 def request_check_admin_upload_role(
         request: rest_framework.request.Request
-) -> Union[rest_framework.response.Response, Tuple[str, int, int, int]]:
+    ) -> Union[rest_framework.response.Response, Tuple[str, int, int, int]]:
+
+
     '''
     user header, admin role, 최소 업로드 가능 role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -158,5 +165,7 @@ def get_logger():
 def ping_pong(request):
     # 서버 health check 용도
     return Response({
-        'detail': 'pong'
-    }, status.HTTP_200_OK)
+
+            'detail': 'pong'
+        }, status.HTTP_200_OK)
+
