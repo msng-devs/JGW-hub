@@ -23,7 +23,7 @@ import datetime
 import traceback
 
 import jgw_api.constant as constant
-from jgw_api.custom_test_runner.runner import CustomRunner
+
 class PostApiTestOK(APITestCase):
     databases = '__all__'
     now = datetime.datetime.now()

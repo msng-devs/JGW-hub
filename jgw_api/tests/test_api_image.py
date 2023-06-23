@@ -19,7 +19,7 @@ import base64
 import random
 import datetime
 import traceback
-from jgw_api.custom_test_runner.runner import CustomRunner
+
 class ImageApiTestOK(APITestCase):
     databases = '__all__'
     test_files_root_url = './test/file_upload_test'
