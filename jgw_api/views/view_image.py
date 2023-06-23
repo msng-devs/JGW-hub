@@ -94,7 +94,9 @@ class ImageViewSet(viewsets.ModelViewSet):
     이미지 api를 담당하는 클래스
     '''
     serializer_class = ImageSerializer
+
     queryset = Image.objects.all()
+
     http_method_names = ['get', 'post', 'delete']
     pagination_class = ImagePageNumberPagination
 
@@ -133,10 +135,12 @@ class ImageViewSet(viewsets.ModelViewSet):
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Image get request")
+
         queryset = Image.objects.all()
         if 'post_id' in request.query_params:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 이미지만 가져옴
             queryset = queryset.filter(post_post_id_pk=int(request.query_params['post_id']))
+
 
         queryset = queryset.order_by('image_id_pk')
 
@@ -145,7 +149,9 @@ class ImageViewSet(viewsets.ModelViewSet):
             # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
         if 'page_size' in request.query_params:
+
             # page size를 최소~최대 범위 안에서 지정
+
             request.query_params['page_size'] = int(request.query_params['page_size'])
             if request.query_params['page_size'] < constant.IMAGE_MIN_PAGE_SIZE:
                 request.query_params['page_size'] = constant.IMAGE_MIN_PAGE_SIZE
