@@ -1,7 +1,6 @@
-
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-
+import datetime
 from ..models import (
     Board,
 )
@@ -20,6 +19,7 @@ from .view_check import (
     request_check_admin_role
 )
 
+
 logger = get_logger()
 
 
@@ -34,7 +34,6 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     # get
     def list(self, request, *args, **kwargs):
-
         logger.debug(f"Board get request")
         queryset = self.filter_queryset(self.get_queryset())
         request.query_params._mutable = True
@@ -53,15 +52,12 @@ class BoardViewSet(viewsets.ModelViewSet):
         responses = self.get_paginated_response(serializer.data)
         return responses
 
-
     # get by id
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-
         serializer = self.get_serializer(instance)
         key, name = instance.board_id_pk, instance.board_name
         logger.debug(f'Board data get retrieve\tkey: {key}\tname: {name}')
-
         return Response(serializer.data)
 
     # post
@@ -74,7 +70,6 @@ class BoardViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_checked = checked
         if user_role_id >= admin_role_checked:
             # 요청한 유저가 admin 이라면 승인
-
             logger.debug(f'{user_uid} Board create approved')
             serializer = BoardWriteSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -89,11 +84,21 @@ class BoardViewSet(viewsets.ModelViewSet):
             logger.info(update_log)
 
             return Response(responses_data, status=status.HTTP_201_CREATED)
-
         else:
             logger.info(f"{user_uid} Board create denied")
+
             detail = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-001",
+
+                "message": "Board create denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
@@ -133,7 +138,17 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Board patch denied")
             detail = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-002",
+
+                "message": "Board patch denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
@@ -156,8 +171,16 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Board delete denied")
             detail = {
+                "timestamp": datetime.datetime.now().isoformat(),
 
-                'detail': 'Not Allowed.'
+                "status": 403,
 
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-003",
+
+                "message": "Board delete denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

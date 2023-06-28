@@ -1,3 +1,5 @@
+from datetime import datetime
+import datetime
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -14,11 +16,9 @@ from rest_framework.decorators import api_view
 
 logger = logging.getLogger('hub_error')
 
-
 def get_user_header(
         request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
-
     '''
     전달받은 request에서 user header를 가져오는 함수
 
@@ -34,7 +34,17 @@ def get_user_header(
         # 유저 정보가 정상적으로 없다면 500 response 리턴
         logger.error('get user information failed.')
         responses_data = {
-            'detail': 'Header Required.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 500,
+
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-001",
+
+                "message": "get user information failed",
+
+                "path": ""
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
@@ -42,7 +52,6 @@ def get_user_header(
         user_role_id = int(user_role_id)
         logger.info(f'get user information success\tuser uid: {user_uid}\tuser role: {user_role_id}')
         return user_uid, user_role_id
-
 
 def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
@@ -59,13 +68,20 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     except:
         # 최소 어드민 롤 정보가 없다면 500 response 리턴
         responses_data = {
+                "timestamp": datetime.datetime.now().isoformat(),
 
-            'detail': 'Admin Role not Exist.'
+                "status": 500,
 
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-002",
+
+                "message": "min admin role not found",
+
+                "path": ""
         }
         logger.error('min admin role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
@@ -81,16 +97,24 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     else:
         # 최소 업로드 롤 정보가 없다면 500 response 리턴
         responses_data = {
-            'detail': 'Minimum upload role not exist.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 500,
+
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-003",
+
+                "message": "min upload role not found",
+
+                "path": ""
         }
         logger.error('min upload role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
 def request_check(
         request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int]]:
-
     '''
     user header가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -105,11 +129,9 @@ def request_check(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id
 
-
 def request_check_admin_role(
         request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int, int]]:
-
     '''
     user header, admin role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -128,12 +150,9 @@ def request_check_admin_role(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked
 
-
 def request_check_admin_upload_role(
         request: rest_framework.request.Request
     ) -> Union[rest_framework.response.Response, Tuple[str, int, int, int]]:
-
-
     '''
     user header, admin role, 최소 업로드 가능 role 모두가 정상적으로 리턴됐는지 확인하는 함수
 
@@ -156,16 +175,12 @@ def request_check_admin_upload_role(
     user_uid, user_role_id = header_checked
     return user_uid, user_role_id, admin_role_checked, min_upload_role_checked
 
-
 def get_logger():
     return logger
-
 
 @api_view(['GET'])
 def ping_pong(request):
     # 서버 health check 용도
     return Response({
-
             'detail': 'pong'
         }, status.HTTP_200_OK)
-

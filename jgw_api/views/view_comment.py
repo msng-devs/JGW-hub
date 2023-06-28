@@ -19,7 +19,7 @@ from .view_check import (
     get_logger,
     request_check_admin_role,
 )
-
+import datetime
 logger = get_logger()
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -27,9 +27,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     댓글 api를 담당하는 클래스
     '''
     serializer_class = CommentGetSerializer
-
     queryset = Comment.objects.all().order_by('-comment_id')
-
     http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = CommentPageNumberPagination
 
@@ -39,9 +37,20 @@ class CommentViewSet(viewsets.ModelViewSet):
         request.query_params._mutable = True
         if 'post_id' not in request.query_params:
             # query parameter에 post_id가 없으면 400 return
-            return Response(data={
-                'detail': 'post_id request'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 400,
+
+                "error": "Bad Request",
+
+                "code": "JGW_hub-comment-001",
+
+                "message": "post_id request",
+
+                "path": "/hub/api/v1/comment/"
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 댓글만 가져옴
             queryset = self.get_queryset().filter(
@@ -101,7 +110,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment create denied")
             responses_data = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-002",
+
+                "message": "Comment create denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
@@ -150,7 +169,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment patch denied")
             responses_data = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-003",
+
+                "message": "Comment patch denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
@@ -178,8 +207,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment delete denied")
             detail = {
+                "timestamp": datetime.datetime.now().isoformat(),
 
-                'detail': 'Image delete not allowed.'
+                "status": 403,
 
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-004",
+
+                "message": "Comment delete denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
