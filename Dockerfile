@@ -11,7 +11,7 @@ RUN pip install -r requirements.txt
 ENV TEST_DB_NAME docker_test
 ENV TEST_DB_NAME_API docker_test_api
 
-#RUN python manage.py test
+RUN python manage.py test
 RUN rm -rf ./logs
 RUN mkdir ./logs
 
