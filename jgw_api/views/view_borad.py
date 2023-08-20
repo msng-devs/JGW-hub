@@ -48,7 +48,7 @@ class BoardViewSet(viewsets.ModelViewSet):
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         responses = self.get_paginated_response(serializer.data)
-        return responses
+        return responses.json
 
     # get by id
     def retrieve(self, request, *args, **kwargs):
