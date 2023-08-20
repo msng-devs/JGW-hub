@@ -37,9 +37,20 @@ class CommentViewSet(viewsets.ModelViewSet):
         request.query_params._mutable = True
         if 'post_id' not in request.query_params:
             # query parameter에 post_id가 없으면 400 return
-            return Response(data={
-                'detail': 'post_id request'
-            }, status=status.HTTP_400_BAD_REQUEST)
+            data = {
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 400,
+
+                "error": "Bad Request",
+
+                "code": "JGW_hub-comment-001",
+
+                "message": "post_id request",
+
+                "path": "/hub/api/v1/comment/"
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 댓글만 가져옴
             queryset = self.get_queryset().filter(
