@@ -32,7 +32,17 @@ def get_user_header(
         # 유저 정보가 정상적으로 없다면 500 response 리턴
         logger.error('get user information failed.')
         responses_data = {
-            'detail': 'Header Required.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 500,
+
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-001",
+
+                "message": "get user information failed",
+
+                "path": ""
         }
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
@@ -56,11 +66,21 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     except:
         # 최소 어드민 롤 정보가 없다면 500 response 리턴
         responses_data = {
-            'detail': 'Admin Role not Exist.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 500,
+
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-002",
+
+                "message": "min admin role not found",
+
+                "path": ""
         }
         logger.error('min admin role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+        
 def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     Config 테이블에서 서버에 콘텐츠(사진, 동영상 등)를 업로드 할 수 있는 role이 최소 몇 이상이지 가져오는 함수
@@ -75,7 +95,17 @@ def get_min_upload_role_pk() -> Union[rest_framework.response.Response, int]:
     else:
         # 최소 업로드 롤 정보가 없다면 500 response 리턴
         responses_data = {
-            'detail': 'Minimum upload role not exist.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 500,
+
+                "error": "Internal server error",
+
+                "code": "JGW_hub-check-003",
+
+                "message": "min upload role not found",
+
+                "path": ""
         }
         logger.error('min upload role not found')
         return Response(responses_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
