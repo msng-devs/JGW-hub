@@ -126,10 +126,19 @@ class ImageViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Image create denied")
             detail = {
-                'detail': 'Image upload not allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-image-001",
+
+                "message": "'Image upload not allowed.'",
+
+                "path": "/hub/api/v1/image/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
-
     # get
     def list(self, request, *args, **kwargs):
         logger.debug(f"Image get request")
@@ -182,6 +191,16 @@ class ImageViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Image delete denied")
             detail = {
-                'detail': 'Image delete not allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-image-002",
+
+                "message": "Image delete not allowed.",
+
+                "path": "/hub/api/v1/image/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
