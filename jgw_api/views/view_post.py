@@ -139,7 +139,17 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post get retrieve denied")
             detail = {
-                'detail': 'Not allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-post-001",
+
+                "message": "Post retrieve denied",
+
+                "path": "/hub/api/v1/post/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
@@ -170,10 +180,19 @@ class PostViewSet(viewsets.ModelViewSet):
                     # 변경하려는 게시판의 쓰기 레벨보다 요청한 유저의 권한이 낮다면 거부
                     logger.info(f"{user_uid} Post patch denied - request board not allowed")
                     responses_data = {
-                        'detail': 'request board is not allowed.'
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-post-002",
+
+                        "message": "request board not allowed",
+
+                        "path": "/hub/api/v1/post/"
                     }
                     return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
-
             # if 'post_update_time' not in request_data:
             #     request_data['post_update_time'] = datetime.datetime.now()
             # if 'post_write_time' in request_data:
@@ -205,8 +224,18 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post patch denied")
             responses_data = {
-                'detail': 'Not Allowed.'
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-post-003",
+
+                        "message": "Post patch denied",
+
+                        "path": "/hub/api/v1/post/"
+                    }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # post
@@ -252,8 +281,18 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post create denied")
             responses_data = {
-                'detail': 'Not Allowed.'
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-post-004",
+
+                        "message": "Post create not allowed",
+
+                        "path": "/hub/api/v1/post/"
+                    }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # delete
@@ -277,6 +316,16 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post delete denied")
             detail = {
-                'detail': 'Image delete not allowed.'
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-post-005",
+
+                        "message": "Post delete not allowed",
+
+                        "path": "/hub/api/v1/post/"
+                    }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
