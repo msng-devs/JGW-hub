@@ -133,14 +133,34 @@ class SurveyViewSet(viewsets.ViewSet):
             except Exception as e:
                 logger.error(f'create survey post failed.\n\terror: {e}')
                 detail = {
-                    'detail': str(e)
-                }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-001",
+
+                        "message": "create survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             logger.info(f"{user_uid} Survey Post create denied")
             detail = {
-                'detail': 'Not Allowed.'
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-survey-002",
+
+                        "message": "Survey Post create denied",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
 
     def create_answer(self, request, pk):
@@ -222,8 +242,18 @@ class SurveyViewSet(viewsets.ViewSet):
         except Exception as e:
             logger.error(f'create answer failed.\n\terror: {e}')
             detail = {
-                'detail': str(e)
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-003",
+
+                        "message": "create answer failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
 
     def list_post(self, request):
@@ -315,10 +345,19 @@ class SurveyViewSet(viewsets.ViewSet):
         except Exception as e:
             logger.error(f'get list survey post failed.\n\terror: {e}')
             detail = {
-                'detail': str(e)
-            }
-            return Response(detail, status=status.HTTP_400_BAD_REQUEST)
+                        "timestamp": datetime.datetime.now().isoformat(),
 
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-004",
+
+                        "message": "get list survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
+            return Response(detail, status=status.HTTP_400_BAD_REQUEST)
     def retrieve_post(self, request, pk):
         checked = request_check(request)
         if isinstance(checked, Response):
@@ -352,14 +391,34 @@ class SurveyViewSet(viewsets.ViewSet):
         except Http404 as e:
             logger.error(f'retrieve survey post failed.\n\terror: {e}')
             detail = {
-                'detail': str(e)
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 404,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-005",
+
+                        "message": "retrieve survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
             return Response(detail, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             logger.error(f'retrieve survey post failed.\n\terror: {e}')
             detail = {
-                'detail': str(e)
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-006",
+
+                        "message": "retrieve survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
             return Response(detail, status=status.HTTP_400_BAD_REQUEST)
 
     def list_answers(self, request, pk):
@@ -524,7 +583,17 @@ class SurveyViewSet(viewsets.ViewSet):
                 except Exception as e:
                     logger.error(f'get list survey answers analyze failed.\n\terror: {e}')
                     detail = {
-                        'detail': str(e)
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-007",
+
+                        "message": "get list survey answers analyze failed",
+
+                        "path": "/hub/api/v1/survey/"
                     }
                     return Response(detail, status=status.HTTP_400_BAD_REQUEST)
             else: # 사용자별 데이터 요청
@@ -585,16 +654,35 @@ class SurveyViewSet(viewsets.ViewSet):
                 except Exception as e:
                     logger.error(f'get list survey answers user failed.\n\terror: {e}')
                     detail = {
-                        'detail': str(e)
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-008",
+
+                        "message": "get list survey answers user failed",
+
+                        "path": "/hub/api/v1/survey/"
                     }
                     return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             logger.info(f"{user_uid} Survey Answers list denied")
             detail = {
-                'detail': 'Not Allowed.'
-            }
-            return Response(detail, status=status.HTTP_403_FORBIDDEN)
+                        "timestamp": datetime.datetime.now().isoformat(),
 
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-survey-009",
+
+                        "message": "Survey Answers list denied",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
     def delete_post(self, request, pk):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
@@ -613,16 +701,35 @@ class SurveyViewSet(viewsets.ViewSet):
             except Exception as e:
                 logger.error(f'delete survey post failed.\n\terror: {e}')
                 detail = {
-                    'detail': str(e)
-                }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-010",
+
+                        "message": "delete survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             logger.info(f"{user_uid} Survey Post delete denied")
             detail = {
-                'detail': 'Not Allowed.'
-            }
-            return Response(detail, status=status.HTTP_403_FORBIDDEN)
+                        "timestamp": datetime.datetime.now().isoformat(),
 
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-survey-011",
+
+                        "message": "Survey Post delete denied",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
+            return Response(detail, status=status.HTTP_403_FORBIDDEN)
     def patch_post(self, request, pk):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
@@ -674,12 +781,32 @@ class SurveyViewSet(viewsets.ViewSet):
             except Exception as e:
                 logger.error(f'patch survey post failed.\n\terror: {e}')
                 detail = {
-                    'detail': str(e)
-                }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 400,
+
+                        "error": str(e),
+
+                        "code": "JGW_hub-survey-012",
+
+                        "message": "patch survey post failed",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
                 return Response(detail, status=status.HTTP_400_BAD_REQUEST)
         else:
             logger.info(f"{user_uid} Survey Post patch denied")
             detail = {
-                'detail': 'Not Allowed.'
-            }
+                        "timestamp": datetime.datetime.now().isoformat(),
+
+                        "status": 403,
+
+                        "error": "Forbidden",
+
+                        "code": "JGW_hub-survey-013",
+
+                        "message": "Survey Post patch denied",
+
+                        "path": "/hub/api/v1/survey/"
+                    }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
