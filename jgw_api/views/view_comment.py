@@ -110,7 +110,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment create denied")
             responses_data = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-002",
+
+                "message": "Comment create denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
@@ -159,7 +169,17 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment patch denied")
             responses_data = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-003",
+
+                "message": "Comment patch denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
@@ -187,6 +207,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Comment delete denied")
             detail = {
-                'detail': 'Image delete not allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-004",
+
+                "message": "Comment delete denied",
+
+                "path": "/hub/api/v1/comment/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
