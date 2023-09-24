@@ -97,6 +97,7 @@ class CommentViewSet(viewsets.ModelViewSet):
                 comment_comment_id_ref=comment_serializer.validated_data['comment_comment_id_ref']
 
             )
+            logger.debug(f'{comment}')
             post_instance = comment_serializer.validated_data['post_post_id_pk']
             board_instance = post_instance.board_boadr_id_pk
             if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
