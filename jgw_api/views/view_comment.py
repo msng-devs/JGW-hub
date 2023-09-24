@@ -74,7 +74,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
     # post
-        def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
             # user role, 최소 admin role 중 하나라도 없으면 500 return
