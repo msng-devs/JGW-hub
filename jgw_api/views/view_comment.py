@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from ..models import (
     Comment,
+    Member,
 )
 from ..serializers import (
     CommentGetSerializer,
@@ -73,29 +74,36 @@ class CommentViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
     # post
-    def create(self, request, *args, **kwargs):
+        def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
         if isinstance(checked, Response):
-            # user role, 최소 admin role 중 하나라도 없다면 500 return
+            # user role, 최소 admin role 중 하나라도 없으면 500 return
             return checked
-        user_uid, user_role_id, admin_role_pk = checked
 
+        user_uid, user_role_id, admin_role_pk = checked
         request_data = request.data
         comment_serializer = CommentWriteSerializer(data=request_data)
+
         comment_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Comment data verified')
+        member_member_pk = Member.objects.get(member_pk=user_uid)
+        comment = Comment(
+            comment_depth=comment_serializer.validated_data['comment_depth'],
+            comment_content=comment_serializer.validated_data['comment_content'],
+            comment_delete=comment_serializer.validated_data['comment_delete'],
+            post_post_id_pk=comment_serializer.validated_data['post_post_id_pk'],
+            member_member_pk=member_member_pk,
+            comment_comment_id_ref=comment_serializer.validated_data['comment_comment_id_ref']
 
+        )
         post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
-            # 요청한 유저가 admin or 요청한 게시판 댓글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Comment post approved')
-            self.perform_create(comment_serializer)
-
+            self.perform_create(comment)
             comment_pk = comment_serializer.data['comment_id']
             responses_instance = Comment.objects.get(comment_id=comment_pk)
             serializer = CommentWriteResultSerializer(responses_instance)
-
             responses_data = serializer.data
             update_log = f'{user_uid} Comment data created' \
                          f'\tkey: {responses_data["comment_id"]} created log'
