@@ -136,7 +136,8 @@ class CommentWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
 
-        fields = '__all__'
+        fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
+                  'comment_delete', 'post_post_id_pk', 'comment_comment_id_ref']
         
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
