@@ -94,7 +94,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             comment_depth=comment_serializer.validated_data['comment_depth'],
             comment_content=comment_serializer.validated_data['comment_content'],
             comment_write_time=comment_serializer.validated_data['comment_write_time'],
-            comment_update_time=comment_serializer.validated_data['comment_updated_time'],
+            comment_update_time=comment_serializer.validated_data['comment_update_time'],
             comment_delete=comment_serializer.validated_data['comment_delete'],
             post_post_id_pk=comment_serializer.validated_data['post_post_id_pk'],
             member_member_pk= user_uid,
