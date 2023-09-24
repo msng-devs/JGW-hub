@@ -135,8 +135,9 @@ class CommentWriteSerializer(serializers.ModelSerializer):
     '''
     class Meta:
         model = Comment
-        fields = '__all__'
 
+        fields = '__all__'
+        exclude = ('member_member_pk',)
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
     '''
