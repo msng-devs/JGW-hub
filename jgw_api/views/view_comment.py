@@ -76,7 +76,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     # post
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
-     
+
         if isinstance(checked, Response):
                 # user role, 최소 admin role 중 하나라도 없으면 500 return
             return checked
@@ -87,7 +87,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
         comment_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Comment data verified')
-        member_member_pk = Member.objects.get(member_pk=user_uid)
+        member_member_pk = user_uid
         logger.debug(f'{member_member_pk} found')
         comment = Comment(
             comment_depth=comment_serializer.validated_data['comment_depth'],
@@ -96,12 +96,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             comment_update_time=comment_serializer.validated_data['comment_updated_time'],
             comment_delete=comment_serializer.validated_data['comment_delete'],
             post_post_id_pk=comment_serializer.validated_data['post_post_id_pk'],
-            member_member_pk=member_member_pk,
+            member_member_pk= user_uid,
             comment_comment_id_ref=comment_serializer.validated_data['comment_comment_id_ref']
 
         )
         logger.debug(f'{comment}')
-        post_instance = comment_serializer.validated_data['post_post_id_pk']
+        post_instance = comment.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
             logger.debug(f'{user_uid} Comment post approved\nrequest_body= {comment}')
