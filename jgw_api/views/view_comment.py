@@ -90,6 +90,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         member_member_pk = user_uid
         logger.debug(f'{member_member_pk} found')
         comment = Comment(
+            comment_id= comment_serializer.validated_data['comment_id'],
             comment_depth=comment_serializer.validated_data['comment_depth'],
             comment_content=comment_serializer.validated_data['comment_content'],
             comment_write_time=comment_serializer.validated_data['comment_write_time'],
