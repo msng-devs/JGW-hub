@@ -100,7 +100,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             post_instance = comment_serializer.validated_data['post_post_id_pk']
             board_instance = post_instance.board_boadr_id_pk
             if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
-                logger.debug(f'{user_uid} Comment post approved')
+                logger.debug(f'{user_uid} Comment post approved\nrequest_body= {comment}')
                 self.perform_create(comment)
                 comment_pk = comment_serializer.data['comment_id']
                 responses_instance = Comment.objects.get(comment_id=comment_pk)
