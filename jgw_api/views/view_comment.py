@@ -86,7 +86,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment_serializer = CommentWriteSerializer(data=request_data)
 
         comment_serializer.is_valid(raise_exception=True)
-        logger.debug(f'{user_uid} Comment data verified')
+        logger.debug(f'{user_uid} Comment data verified\ncomment_serializer : {comment_serializer}')
         member_member_pk = user_uid
         logger.debug(f'{member_member_pk} found')
         comment = Comment(
