@@ -80,16 +80,21 @@ class CommentViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        request_data = request.data
-
+        request_data = {
+                "comment_depth": request["comment_depth"],
+                "comment_content": request["comment_content"],
+                "comment_delete": request["comment_delete"],
+                "post_post_id_pk": request["post_post_id_pk"],
+                "member_member_pk": user_uid,
+                "comment_comment_id_ref": request["comment_comment_id_ref"]
+        }       
+        logger.debug({f'request_data = {request_data}'})
         comment_serializer = CommentWriteSerializer(data=request_data)
         logger.debug(f'comment_serializer = {comment_serializer}')
-        if comment_serializer.is_valid():
-            logger.debug(f"comment_serializer: {comment_serializer}")
-            member_member_pk = user_uid
-            comment_serializer.validated_data['member_member_pk'] = member_member_pk
-            logger.debug(f"comment_serializer: {comment_serializer}")
-            comment_serializer.save()
+        
+        comment_serializer.is_valid(raise_exception=True)
+        logger.debug(f'{user_uid} Comment data verified')
+        
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
