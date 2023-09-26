@@ -97,7 +97,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             member_member_pk=member_member_pk,
             comment_comment_id_ref=comment_serializer.validated_data['comment_comment_id_ref']
 
-        )
+        ).json()
         logger.debug(f'{comment}')
         post_instance = comment.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
