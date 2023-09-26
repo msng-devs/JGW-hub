@@ -141,12 +141,12 @@ class CommentViewSet(viewsets.ModelViewSet):
             # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
-
+        logger.debug('1')
         request_data = request.data
-
+        logger.debug(f'{request_data}')
         comment_serializer = CommentWriteSerializer(data=request_data)
-
-        if comment_serializer.is_valid():
+        logger.debug(f'2\t{comment_serializer}')
+        if comment_serializer.is_valid(raise_exception=True):
             logger.debug(f"comment_serializer: {comment_serializer}")
             member_member_pk = user_uid
             comment_serializer.validated_data['member_member_pk'] = member_member_pk
