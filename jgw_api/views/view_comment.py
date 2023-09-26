@@ -143,13 +143,15 @@ class CommentViewSet(viewsets.ModelViewSet):
         user_uid, user_role_id, admin_role_pk = checked
 
         request_data = request.data
+
         comment_serializer = CommentWriteSerializer(data=request_data)
 
-        comment_serializer.is_valid(raise_exception=True)
-        logger.debug(f'{user_uid} Comment data verified')
-        comment_serializer.validated_data["member_member_pk"] = user_uid
-        comment_serializer.save()
-        
+        if comment_serializer.is_valid():
+
+            member_member_pk = user_uid
+            comment_serializer.validated_data['member_member_pk'] = member_member_pk
+
+            comment_serializer.save()
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk
