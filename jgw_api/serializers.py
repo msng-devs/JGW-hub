@@ -18,7 +18,7 @@ class RoleNestedSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
+'''
 class ImageSerializer(serializers.ModelSerializer):
     '''
     image serializer
@@ -35,7 +35,7 @@ class ImageNestedPostSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['image_id_pk', 'image_name', 'image_url']
 
-
+'''
 
 class MemberSerializer(serializers.ModelSerializer):
     '''
@@ -92,12 +92,12 @@ class PostGetSerializer(serializers.ModelSerializer):
     '''
     board_boadr_id_pk = BoardWriteSerializer(read_only=True)
     member_member_pk = MemberNestedSerializer(read_only=True)
-    image_image_id_pk = ImageNestedPostSerializer(read_only=True)
+    #image_image_id_pk = ImageNestedPostSerializer(read_only=True)
 
     class Meta:
         model = Post
         fields = ['post_id_pk', 'post_title', 'post_content', 'post_write_time', 'post_update_time',
-                  'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
+                  'thumbnail_img_id', 'board_boadr_id_pk', 'member_member_pk']
 
 class PostPatchSerializer(serializers.ModelSerializer):
     '''
