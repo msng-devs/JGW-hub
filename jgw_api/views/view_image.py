@@ -1,3 +1,4 @@
+'''
 import random
 import datetime
 from rest_framework import viewsets, status
@@ -204,3 +205,4 @@ class ImageViewSet(viewsets.ModelViewSet):
                 "path": "/hub/api/v1/image/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
+'''
