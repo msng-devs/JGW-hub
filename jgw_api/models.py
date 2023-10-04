@@ -121,7 +121,7 @@ class GatewayManagementConfig(models.Model):
         managed = True
         db_table = 'GATEWAY_MANAGEMENT_CONFIG'
 
-'''
+
 class Image(models.Model):
     image_id_pk = models.AutoField(db_column='IMAGE_ID_PK', primary_key=True)  # Field name made lowercase.
     image_name = models.CharField(db_column='IMAGE_NAME', max_length=45)  # Field name made lowercase.
@@ -132,7 +132,7 @@ class Image(models.Model):
     class Meta:
         managed = True
         db_table = 'IMAGE'
-'''
+
 
 class Major(models.Model):
     major_pk = models.IntegerField(db_column='MAJOR_PK', primary_key=True)  # Field name made lowercase.
