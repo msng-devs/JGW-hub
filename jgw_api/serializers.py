@@ -79,7 +79,7 @@ class PostGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ['post_id_pk', 'post_title', 'post_content', 'post_write_time', 'post_update_time',
-                  'image_image_id_pk', 'board_boadr_id_pk', 'member_member_pk']
+                  'thumbnail_id_pk', 'board_boadr_id_pk', 'member_member_pk']
 
 class PostPatchSerializer(serializers.ModelSerializer):
     '''
