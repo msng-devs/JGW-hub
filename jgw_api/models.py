@@ -215,7 +215,7 @@ class Post(models.Model):
     post_content = models.TextField(db_column='POST_CONTENT')  # Field name made lowercase.
     post_write_time = models.DateTimeField(db_column='POST_WRITE_TIME', auto_now_add=True)  # Field name made lowercase.
     post_update_time = models.DateTimeField(db_column='POST_UPDATE_TIME', auto_now=True)  # Field name made lowercase.
-    thumbnail_img_id = models.IntegerField(db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True)  # Field name made lowercase.
+    image_image_id_pk = models.IntegerField(db_column='IMAGE_IMAGE_ID_PK', blank=True, null=True)  # Field name made lowercase.
     board_boadr_id_pk = models.ForeignKey(Board, models.DO_NOTHING, db_column='BOARD_BOADR_ID_PK')  # Field name made lowercase.
     member_member_pk = models.ForeignKey(Member, models.DO_NOTHING, db_column='MEMBER_MEMBER_PK', blank=True, null=True)  # Field name made lowercase.
 
