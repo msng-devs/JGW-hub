@@ -3,7 +3,6 @@ from rest_framework import serializers
 from .models import (
     Board,
     Role,
-    Image,
     Post,
     Member,
     Comment
