@@ -5,6 +5,7 @@ from rest_framework.response import Response
 
 from ..models import (
     Config,
+    Role
 )
 
 import logging
@@ -62,7 +63,7 @@ def get_admin_role_pk() -> Union[rest_framework.response.Response, int]:
     '''
     try:
         # 어드민 롤을 정상적으로 가져오면 최소 어드민 롤 리턴
-        config_admin_role = Config.objects.get(config_nm='admin_role_pk').config_val
+        config_admin_role = Role.objects.get(role_nm="ROLE_ADMIN").role_pk #Config.objects.get(config_nm='admin_role_pk').config_val
         # logger.debug(f'get admin role success\tmin admin role: {config_admin_role}')
         return int(config_admin_role)
     except:
