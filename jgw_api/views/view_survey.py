@@ -12,7 +12,6 @@ from secrets_content.files.secret_key import *
 
 import pymongo
 from bson.objectid import ObjectId
-
 from .view_check import (
     get_logger,
     request_check_admin_role,
@@ -90,16 +89,16 @@ class SurveyViewSet(viewsets.ViewSet):
                         'type': type
                     }
                     # post
-                    if type == constant.SURVEY_TEXT_CODE:  # text
+                    if type == constant.SURVEY_TEXT_CODE:  # text, current: 0
                         pass
-                    elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one
+                    elif type == constant.SURVEY_SELECT_ONE_CODE:  # select one, current: 1
                         quiz_data['options'] = []
                         for i in q['options']:
                             quiz_data['options'].append({
                                 'text': i['text']
                             })
                         assert len(quiz_data) > 0, 'There must be at least one option.'
-                    elif type == constant.SURVEY_SELECT_MULTIPLE_CODE:
+                    elif type == constant.SURVEY_SELECT_MULTIPLE_CODE: #select multiple, current: 2
                         quiz_data['options'] = []
                         for i in q['options']:
                             quiz_data['options'].append({
@@ -562,8 +561,8 @@ class SurveyViewSet(viewsets.ViewSet):
                                             'answers': 1
                                         }
                                     }, {
-                                        '$count': 'selected'
-                                    }
+                                        '$count': 'selected',
+                                }
                                 ],
                                 'as': 'aaa'}},
                             {'$project': {
