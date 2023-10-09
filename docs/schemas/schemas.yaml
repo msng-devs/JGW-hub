@@ -118,13 +118,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/board/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/board/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/board/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/board/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -173,13 +173,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -472,13 +472,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/image/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/image/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -501,7 +501,7 @@ components:
         image_url:
           type: string
           maxLength: 45
-          example: https://api.hrabit64.xyz/image/jfiiHUJDmkkdjK332
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/jfiiHUJDmkkdjK332
           description: 이미지의 실제 url
         post_post_id_pk:
           type: integer
@@ -567,13 +567,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
