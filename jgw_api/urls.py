@@ -1,36 +1,34 @@
 from django.urls import path, include, re_path
 from django.conf import settings
-from . import views
+from views import *
 from rest_framework import routers, permissions
 from rest_framework.urlpatterns import format_suffix_patterns
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView, SpectacularJSONAPIView
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView, \
+    SpectacularJSONAPIView
 
 # app_name = 'jgw_api'
 
 router = routers.DefaultRouter()
-router.register(r'v1/board', views.BoardViewSet, basename='board')
+router.register(r'v1/board', BoardViewSet, basename='board')
 # router.register(r'v1/post', views.PostViewSet, basename='post')
 # router.register(r'v1/image', views.ImageViewSet, basename='image')
-router.register(r'v1/comment', views.CommentViewSet, basename='comment')
+router.register(r'v1/comment', CommentViewSet, basename='comment')
 # router.register(r'v1/survey', views.SurveyViewSet, basename='survey')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('ping/', views.ping_pong)
+    path('ping/', ping_pong)
 ]
 
-
-
-
-post_get_list = views.PostViewSet.as_view({
+post_get_list = PostViewSet.as_view({
     'get': 'list'
 })
 
-post_post_list = views.PostViewSet.as_view({
+post_post_list = PostViewSet.as_view({
     'post': 'create'
 })
 
-post_detail = views.PostViewSet.as_view({
+post_detail = PostViewSet.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
     'delete': 'destroy'
@@ -42,21 +40,18 @@ urlpatterns += format_suffix_patterns([
     path('v1/post/<int:pk>/', post_detail, name='post-detail'),
 ])
 
-
-
-
-survey_post_post = views.SurveyViewSet.as_view({
+survey_post_post = SurveyViewSet.as_view({
     'post': 'create_post',
     'get': 'list_post'
 })
 
-survey_post_get = views.SurveyViewSet.as_view({
+survey_post_get = SurveyViewSet.as_view({
     'get': 'retrieve_post',
     'delete': 'delete_post',
     'patch': 'patch_post'
 })
 
-survey_post_answer = views.SurveyViewSet.as_view({
+survey_post_answer = SurveyViewSet.as_view({
     'post': 'create_answer',
     'get': 'list_answers',
 })
