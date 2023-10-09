@@ -71,12 +71,13 @@ class PostGetSerializer(serializers.ModelSerializer):
     '''
     post serializer. get method에 사용하는 serializer.
     '''
+    board_boadr_id_pk = BoardWriteSerializer(read_only=True)
+    member_member_pk = MemberNestedSerializer(read_only=True)
 
     class Meta:
         model = Post
         fields = ['post_id_pk', 'post_title', 'post_content', 'post_write_time', 'post_update_time',
                   'thumbnail_id_pk', 'board_boadr_id_pk', 'member_member_pk']
-
 
 class PostPatchSerializer(serializers.ModelSerializer):
     '''
