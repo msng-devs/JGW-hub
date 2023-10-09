@@ -74,15 +74,35 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-400'
             example:
-              detail: board_name is required.
+              board_name:  [
+                    "This field is required."
+              ]
       '403':
         description: Forbidden
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
-            example:
-              detail: Not allowed.
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              status:
+                type: integer
+                example: 403
+              error:
+                type: string
+                example: Forbidden
+              code:
+                type: string
+                example: JGW_hub-board-001
+              message:
+                type: string
+                example: Board create denied
+              path:
+                type: string
+                example: /hub/api/v1/board/
       '500':
         description: Internal server error
         content:
