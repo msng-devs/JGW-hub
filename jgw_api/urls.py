@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from django.conf import settings
-from views import *
+from .views import *
 from rest_framework import routers, permissions
 from rest_framework.urlpatterns import format_suffix_patterns
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, SpectacularAPIView, \
