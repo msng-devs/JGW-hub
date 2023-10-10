@@ -246,7 +246,15 @@ class PostViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        request_data = request.data
+        request_data = {
+            "post_title": request.data["post_title"],
+            "post_content": request.data["post_content"],
+            "post_write_time": request.data["post_write_time"],
+            "post_update_time": request.data["post_update_time"],
+            "image_image_id_pk": request.data["image_image_id_pk"],
+            "board_boadr_id_pk": request.data["board_boadr_id_pk"],
+            "member_member_pk": user_uid
+        }           
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
         # now = datetime.datetime.now()
