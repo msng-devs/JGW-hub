@@ -20,7 +20,7 @@ info:
     'Authorization': 'Bearer [token]'
   version: 1.0.0
 servers:
-  - url: 'https://api.hrabit64.xyz/hub/api/'
+  - url: 'https://api.jaramgroupware.cloud/hub/api/'
 $ref: './schemas/schemas.yaml'
 paths:
   /v1/board/:
