@@ -88,7 +88,26 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              status:
+                type: integer
+                example: 403
+              error:
+                type: string
+                example: Forbidden
+              code:
+                type: string
+                example: JGW_hub-comment-002
+              message:
+                type: string
+                example: Comment create denied
+              path:
+                type: string
+                example: /hub/api/v1/comment/
+
       '500':
         description: Internal server error
         content:
@@ -96,7 +115,26 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"
+              status:
+                type: integer
+                example: 500
+              error:
+                type: string
+                example: Internal server error
+              code:
+                type: string
+                example: JGW_hub-check-001
+              message:
+                type: string
+                example: get user information failed
+              path:
+                type: string
+                example: ""
+
 \hubapi\comment\{comment_id_pk}\:
   patch:
     operationId: comment_partial_update
@@ -129,7 +167,25 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"
+              status:
+                type: string
+                example: 403
+              error:
+                type: string
+                example: Forbidden
+              code:
+                type: string
+                example: JGW_hub-comment-003
+              message:
+                type: string
+                example: Comment patch denied
+              path:
+                type: string
+                example: /hub/api/v1/comment/
       '500':
         description: Internal server error
         content:
@@ -137,7 +193,25 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"
+              status:
+                type: integer
+                example: 500
+              error:
+                type: string
+                example: Internal server error
+              code:
+                type: string
+                example: JGW_hub-check-001
+              message:
+                type: string
+                example: get user information failed
+              path:
+                type: string
+                example: ""
   delete:
     operationId: comment_destroy
     description: |
@@ -162,6 +236,30 @@
           application/json:
             schema:
               $ref: '#/components/schemas/CommentPatchResult'
+
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            example:
+              timestamp:
+                type: string
+                format: date-time
+                example: "2023-10-09T14:30:00.000000Z"
+            status:
+              type: integer
+              example: 403
+            error:
+              type: string
+              example: Forbidden
+            code:
+              type: string
+              example: JGW_hub-comment-004
+            message:
+              type: string
+              example: Comment delete denied
+            path:
+
       '404':
         description: Not found
         content:
