@@ -257,7 +257,9 @@ class PostViewSet(viewsets.ModelViewSet):
             "thumbnail_id_pk": request.data["thumbnail_id_pk"],
             "board_boadr_id_pk": request.data["board_boadr_id_pk"],
             "member_member_pk": user_uid
-        }
+
+        }          
+
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
         # now = datetime.datetime.now()
