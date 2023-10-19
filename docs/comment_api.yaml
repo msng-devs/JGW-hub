@@ -88,25 +88,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
-              status:
-                type: integer
-                example: 403
-              error:
-                type: string
-                example: Forbidden
-              code:
-                type: string
-                example: JGW_hub-comment-002
-              message:
-                type: string
-                example: Comment create denied
-              path:
-                type: string
-                example: /hub/api/v1/comment/
+              timestamp: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              status: 403
+              error: Forbidden
+              code: JGW_hub-comment-002
+              message: Comment create denied
+              path: /hub/api/v1/comment/
 
       '500':
         description: Internal server error
@@ -115,25 +102,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 500
-              error:
-                type: string
-                example: Internal server error
-              code:
-                type: string
-                example: JGW_hub-check-001
-              message:
-                type: string
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
 
 \hubapi\comment\{comment_id_pk}\:
   patch:
@@ -167,25 +141,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: string
-                example: 403
-              error:
-                type: string
-                example: Forbidden
-              code:
-                type: string
-                example: JGW_hub-comment-003
-              message:
-                type: string
-                example: Comment patch denied
-              path:
-                type: string
-                example: /hub/api/v1/comment/
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 403
+              error: Forbidden
+              code: JGW_hub-comment-003
+              message: Comment patch denied
+              path: /hub/api/v1/comment/
       '500':
         description: Internal server error
         content:
@@ -193,25 +154,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 500
-              error:
-                type: string
-                example: Internal server error
-              code:
-                type: string
-                example: JGW_hub-check-001
-              message:
-                type: string
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
   delete:
     operationId: comment_destroy
     description: |
@@ -242,23 +190,12 @@
         content:
           application/json:
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-            status:
-              type: integer
-              example: 403
-            error:
-              type: string
-              example: Forbidden
-            code:
-              type: string
-              example: JGW_hub-comment-004
-            message:
-              type: string
-              example: Comment delete denied
-            path:
+              timestamp: "2023-10-09T14:30:00.000000Z"
+            status: 403
+            error: Forbidden
+            code: JGW_hub-comment-004
+            message: Comment delete denied
+            path: ""
 
       '404':
         description: Not found
