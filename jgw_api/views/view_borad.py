@@ -113,9 +113,9 @@ class BoardViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             logger.debug('1')
             request_data = request.data
-            logger.debug(f'[2] request_data.dict : {request_data.dict()}')
-            target_keys = list(request_data.dict().keys())
-            logger.debug('3')
+            logger.debug('[2]')
+            target_keys = list(request_data.keys())
+            logger.debug(f'[3] target_keys : {target_keys}')
             before_change = dict()
             logger.debug('4')
             for k in target_keys:
