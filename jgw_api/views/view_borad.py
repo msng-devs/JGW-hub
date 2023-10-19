@@ -113,7 +113,7 @@ class BoardViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             logger.debug('1')
             request_data = request.data
-            logger.debug(f'[2] request_data.dict : {request_data.dict()}\nrequest_data.dict().keys() : {request_data.dict().keys()}')
+            logger.debug(f'[2] request_data.dict : {request_data.dict()}')
             target_keys = list(request_data.dict().keys())
             logger.debug('3')
             before_change = dict()
