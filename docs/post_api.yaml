@@ -145,25 +145,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 403
-              error:
-                type: string
-                example: Forbidden
-              code:
-                type: string
-                example: JGW_hub-post-004
-              message:
-                type: string
-                example: Post create not allowed
-              path:
-                type: string
-                example: /hub/api/v1/post/
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 403
+              error: Forbidden
+              code: JGW_hub-post-004
+              message: Post create not allowed
+              path: /hub/api/v1/post/
       '500':
         description: Internal server error
         content:
@@ -171,25 +158,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 500
-              error:
-                type: string
-                example: Internal server error
-              code:
-                type: string
-                example: JGW_hub-check-001
-              message:
-                type: string
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path:  ""
 \hubapi\post\{post_id_pk}\:
   get:
     operationId: post_retrieve
@@ -227,25 +201,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: string
-                example: Forbidden
-              error:
-                type: string
-                example: Forbidden
-              code:
-                type: string
-                example: JGW_hub-post-001
-              message:
-                type: string
-                example: Post retrieve denied
-              path:
-                type: string
-                example: /hub/api/v1/post/
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: Forbidden
+              error: Forbidden
+              code: JGW_hub-post-001
+              message: Post retrieve denied
+              path: /hub/api/v1/post/
 
       '404':
         description: Not found
@@ -262,25 +223,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 500
-              error:
-                type: string
-                example: Internal server error
-              code:
-                type: string
-                example: JGW_hub-check-001
-              message:
-                type: string
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
   patch:
     operationId: post_partial_update
     description: |
@@ -312,25 +260,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-                timestamp:
-                    type: string
-                    format: date-time
-                    example: "2023-10-09T14:30:00.000000Z"
-                status:
-                  type: integer
-                  example: 403
-                error:
-                  type: string
-                  example: Forbidden
-                code:
-                  type: string
-                  example: JGW_hub-post-002
-                message:
-                  type: string
-                  example: request board not allowed
-                path:
-                  type: string
-                  example: /hub/api/v1/post/
+                timestamp: "2023-10-09T14:30:00.000000Z"
+                status: 403
+                error: Forbidden
+                code: JGW_hub-post-002
+                message: request board not allowed
+                path: /hub/api/v1/post/
 
       '500':
         description: Internal server error
@@ -339,25 +274,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              timestamp:
-                type: string
-                format: date-time
-                example: "2023-10-09T14:30:00.000000Z"
-              status:
-                type: integer
-                example: 500
-              error:
-                type: string
-                example: Internal server error
-              code:
-                type: string
-                example: JGW_hub-check-001
-              message:
-                type: string
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+              timestamp:  "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
 
   delete:
     operationId: post_destroy
@@ -390,23 +312,14 @@
       '403':
         description: Forbidden
         content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardErrorPost-403'
           example:
-            timestamp:
-              type: string
-              format: date-time
-              example: "2023-10-09T14:30:00.000000Z"
-            status:
-              type: integer
-              example: 403
-            error:
-              type: string
-              example: Forbidden
-            code:
-              type: string
-              example: JGW_hub-post-005
-            message:
-              type: string
-              example: Post delete not allowed
-            path:
-              type: string
-              example: /hub/api/v1/post/
+            timestamp: "2023-10-09T14:30:00.000000Z"
+            status: 403
+            error: "Forbidden"
+            code: "JGW_hub-post-005"
+            message: "Post delete not allowed"
+            path: "/hub/api/v1/post/"
+
