@@ -269,7 +269,7 @@ components:
         thumbnail_id_pk:
           type: int
           description: 게시글의 썸네일 pk. 테이블 join 안 되어있음
-          example: 1
+          example: null
           nullable: true
         board_boadr_id_pk:
           type: int

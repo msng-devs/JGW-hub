@@ -21,7 +21,9 @@ from .view_check import (
     request_check_admin_role,
 )
 import datetime
+
 logger = get_logger()
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     '''
@@ -38,8 +40,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         request.query_params._mutable = True
         if 'post_id' not in request.query_params:
             # query parameter에 post_id가 없으면 400 return
-            
-            return Response(data = {
+            data = {
                 "timestamp": datetime.datetime.now().isoformat(),
 
                 "status": 400,
@@ -51,7 +52,8 @@ class CommentViewSet(viewsets.ModelViewSet):
                 "message": "post_id request",
 
                 "path": "/hub/api/v1/comment/"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            }
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         else:
             # query parameter에 post_id가 있으면 해당 게시글에 포함된 댓글만 가져옴
             queryset = self.get_queryset().filter(
@@ -75,11 +77,74 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         checked = request_check_admin_role(request)
+
+        if isinstance(checked, Response):
+            # user role, 최소 admin role 중 하나라도 없으면 500 return
+            return checked
+
+        user_uid, user_role_id, admin_role_pk = checked
+        request_data = request.data
+        comment_serializer = CommentWriteSerializer(data=request_data)
+
+        comment_serializer.is_valid(raise_exception=True)
+        logger.debug(f'{user_uid} Comment data verified')
+        member_member_pk = user_uid
+        logger.debug(f'{member_member_pk} found')
+        comment = Comment(
+            comment_depth=comment_serializer.validated_data['comment_depth'],
+            comment_content=comment_serializer.validated_data['comment_content'],
+            comment_delete=comment_serializer.validated_data['comment_delete'],
+            post_post_id_pk=comment_serializer.validated_data['post_post_id_pk'],
+            member_member_pk=member_member_pk,
+            comment_comment_id_ref=comment_serializer.validated_data['comment_comment_id_ref']
+
+        )
+        logger.debug(f'{comment}')
+        post_instance = comment.validated_data['post_post_id_pk']
+        board_instance = post_instance.board_boadr_id_pk
+        if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_comment_write_level.role_pk:
+            logger.debug(f'{user_uid} Comment post approved\nrequest_body= {comment}')
+            self.perform_create(comment.json())
+            comment_pk = comment_serializer.data['comment_id']
+            responses_instance = Comment.objects.get(comment_id=comment_pk)
+            serializer = CommentWriteResultSerializer(responses_instance)
+            responses_data = serializer.data
+            update_log = f'{user_uid} Comment data created' \
+                         f'\tkey: {responses_data["comment_id"]} created log'
+            for k in responses_data.keys():
+                instance_data = getattr(responses_instance, k)
+                if k in ('comment_content',):
+                    instance_data = instance_data[:50]
+                update_log += f'\n\t{k}: {instance_data}'
+            logger.info(update_log)
+
+            return Response(responses_data, status=status.HTTP_201_CREATED)
+        else:
+            logger.info(f"{user_uid} Comment create denied")
+            responses_data = {
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-comment-002",
+
+                "message": "Comment create denied",
+
+                "path": "/hub/api/v1/comment/"
+            }
+            return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
+
+    # post
+
+    def create(self, request, *args, **kwargs):
+        checked = request_check_admin_role(request)
         if isinstance(checked, Response):
             # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
-        
+
         request_data = {
                 "comment_depth": request.data["comment_depth"],
                 "comment_content": request.data["comment_content"],
@@ -88,14 +153,13 @@ class CommentViewSet(viewsets.ModelViewSet):
                 "member_member_pk": user_uid,
                 "comment_comment_id_ref": request.data["comment_comment_id_ref"]
         }
-    
+
         
         comment_serializer = CommentWriteSerializer(data=request_data)
         
-        
         comment_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Comment data verified')
-        
+
 
         post_instance = comment_serializer.validated_data['post_post_id_pk']
         board_instance = post_instance.board_boadr_id_pk

@@ -19,7 +19,9 @@ from .view_check import (
     request_check_admin_role
 )
 
+
 logger = get_logger()
+
 
 class BoardViewSet(viewsets.ModelViewSet):
     '''
@@ -113,9 +115,9 @@ class BoardViewSet(viewsets.ModelViewSet):
             instance = self.get_object()
             
             request_data = request.data
-            
+ 
             target_keys = list(request_data.keys())
-            
+
             before_change = dict()
             
             for k in target_keys:

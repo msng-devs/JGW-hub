@@ -27,8 +27,10 @@ from .view_check import (
     get_admin_role_pk,
     request_check,
 )
+import datetime
 
 logger = get_logger()
+
 
 def post_get_all_query(
         query_params: dict,
@@ -76,6 +78,7 @@ def post_get_all_query(
     else:
         queryset = queryset.order_by('post_write_time')
     return queryset
+
 
 class PostViewSet(viewsets.ModelViewSet):
     '''
@@ -254,7 +257,9 @@ class PostViewSet(viewsets.ModelViewSet):
             "thumbnail_id_pk": request.data["thumbnail_id_pk"],
             "board_boadr_id_pk": request.data["board_boadr_id_pk"],
             "member_member_pk": user_uid
+
         }          
+
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
         # now = datetime.datetime.now()
@@ -315,6 +320,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
             # 요청한 유저가 admin or 글을 작성한 본인이면 승인
+
             logger.debug(f'{user_uid} Post delete approved')
             key, name = instance.post_id_pk, instance.post_title
             self.perform_destroy(instance)

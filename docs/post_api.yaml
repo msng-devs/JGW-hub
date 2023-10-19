@@ -322,4 +322,3 @@
             code: "JGW_hub-post-005"
             message: "Post delete not allowed"
             path: "/hub/api/v1/post/"
-

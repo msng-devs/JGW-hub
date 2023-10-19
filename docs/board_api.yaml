@@ -261,7 +261,4 @@
               code: JGW_hub-check-001
               message: get user information failed
               path: ""
-                example: get user information failed
-              path:
-                type: string
-                example: ""
+
