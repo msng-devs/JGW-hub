@@ -88,12 +88,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              timestamp: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              timestamp: "2023-09-09T14:30:00.000000Z"
               status: 403
               error: Forbidden
               code: JGW_hub-comment-002
               message: Comment create denied
               path: /hub/api/v1/comment/
+
 
       '500':
         description: Internal server error
