@@ -111,20 +111,26 @@ class BoardViewSet(viewsets.ModelViewSet):
             # 요청한 유저가 admin 이라면 승인
             logger.debug(f'{user_uid} Board patch approved')
             instance = self.get_object()
+            logger.debug('1')
             request_data = request.data
+            logger.debug('2')
             target_keys = list(request_data.dict().keys())
+            logger.debug('3')
             before_change = dict()
+            logger.debug('4')
             for k in target_keys:
                 before_change[k] = getattr(instance, k)
-
+            logger.debug('5')
             serializer = BoardWriteSerializer(instance, data=request_data, partial=True)
+            logger.debug('6')
             serializer.is_valid(raise_exception=True)
             logger.debug(f'{user_uid} Board data verified')
             self.perform_update(serializer)
+            logger.debug('7')
             responses_data = serializer.data
-
             update_log = f'{user_uid} Board data patched' \
                          f'\tkey: {responses_data["board_id_pk"]} change log'
+            logger.debug('8')
             for k in target_keys:
                 update_log += f'\n\t{k}: {before_change[k]} -> {responses_data[k]}'
             logger.info(update_log)
