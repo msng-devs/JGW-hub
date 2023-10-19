@@ -196,7 +196,6 @@ class PostViewSet(viewsets.ModelViewSet):
                         "path": "/hub/api/v1/post/"
                     }
                     return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
-
             # if 'post_update_time' not in request_data:
             #     request_data['post_update_time'] = datetime.datetime.now()
             # if 'post_write_time' in request_data:
@@ -250,7 +249,15 @@ class PostViewSet(viewsets.ModelViewSet):
             return checked
         user_uid, user_role_id, admin_role_pk = checked
 
-        request_data = request.data
+        request_data = {
+            "post_title": request.data["post_title"],
+            "post_content": request.data["post_content"],
+            "post_write_time": request.data["post_write_time"],
+            "post_update_time": request.data["post_update_time"],
+            "thumbnail_id_pk": request.data["thumbnail_id_pk"],
+            "board_boadr_id_pk": request.data["board_boadr_id_pk"],
+            "member_member_pk": user_uid
+        }
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
         # now = datetime.datetime.now()
@@ -311,6 +318,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         if user_role_id >= admin_role_pk or user_uid == instance.member_member_pk.member_pk:
             # 요청한 유저가 admin or 글을 작성한 본인이면 승인
+
             logger.debug(f'{user_uid} Post delete approved')
             key, name = instance.post_id_pk, instance.post_title
             self.perform_destroy(instance)

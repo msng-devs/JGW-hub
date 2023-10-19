@@ -118,13 +118,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/board/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/board/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/board/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/board/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -173,13 +173,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -217,11 +217,9 @@ components:
             게시글이 마지막으로 수정된 시각.  
             형식: 년-월-일T시-분-초.밀리초
           example: 2023-01-04T21:39:20.619843
-        image_image_id_pk:
+        thumbnail_id_pk:
           description: 게시글의 썸네일 이미지 정보. 게시글에 이미지가 하나도 없다면 null.
           nullable: true
-          allOf:
-          - $ref: '#/components/schemas/ImageNestedPost'
           readOnly: true
         board_boadr_id_pk:
           description: 게시글이 속한 게시판 정보.
@@ -268,22 +266,18 @@ components:
           description: |
             게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.  
             형식: 년-월-일T시-분-초.밀리초
-        image_image_id_pk:
+        thumbnail_id_pk:
           type: int
-          description: 게시글의 썸네일 pk (Image). 전달받은 이미지 pk가 Image 테이블에 없다면 오류.
-          example: 1
+          description: 게시글의 썸네일 pk. 테이블 join 안 되어있음
+          example: null
           nullable: true
         board_boadr_id_pk:
           type: int
           description: 게시글이 속한 게시판 pk (Board). 전달받은 게시판 pk가 Board 테이블에 없다면 오류.
           example: 1
-        member_member_pk:
-          type: string
-          description: 게시글을 작성한 유저 정보
-          example: nfkOJDM8492KKMKndods9_@IiNJJjd
+
       required:
         - board_boadr_id_pk
-        - member_member_pk
         - post_content
         - post_title
         - post_update_time
@@ -307,9 +301,9 @@ components:
           description: |
             게시글이 마지막으로 수정된 시각. 게시글을 생성할때는 post_write_time과 같게 해주면 됩니다.  
             형식: 년-월-일T시-분-초.밀리초
-        image_image_id_pk:
+        thumbnail_id_pk:
           type: int
-          description: 게시글의 썸네일 pk (Image). 전달받은 이미지 pk가 Image 테이블에 없다면 오류.
+          description: 게시글의 썸네일 pk. 테이블 join 안 되어있음
           example: 1
           nullable: true
         board_boadr_id_pk:
@@ -396,11 +390,10 @@ components:
             게시글이 마지막으로 수정된 시각.  
             형식: 년-월-일T시-분-초.밀리초
           example: 2023-01-04T21:39:20.619843
-        image_image_id_pk:
+        thumbnail_id_pk:
           description: 게시글의 썸네일 이미지 정보. 게시글에 이미지가 하나도 없다면 null.
+          example: 1
           nullable: true
-          allOf:
-            - $ref: '#/components/schemas/ImageNestedPost'
           readOnly: true
         board_boadr_id_pk:
           description: 게시글이 속한 게시판 정보.
@@ -414,7 +407,7 @@ components:
           readOnly: true
       required:
         - board_boadr_id_pk
-        - image_image_id_pk
+        - thumbnail_id_pk
         - member_member_pk
         - post_content
         - post_id_pk
@@ -472,13 +465,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/image/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/image/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -501,7 +494,7 @@ components:
         image_url:
           type: string
           maxLength: 45
-          example: https://api.hrabit64.xyz/image/jfiiHUJDmkkdjK332
+          example: https://api.jaramgroupware.cloud/hub/api/v1/image/jfiiHUJDmkkdjK332
           description: 이미지의 실제 url
         post_post_id_pk:
           type: integer
@@ -567,13 +560,13 @@ components:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=4
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4
           description: 다음 페이지 uri. 다음 페이지가 없으면 null
         previous:
           type: string
           nullable: true
           format: uri
-          example: https://api.hrabit64.xyz/hubapi/post/?page=2
+          example: https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2
           description: 이전 페이지 uri. 이전 페이지가 없으면 null
         results:
           type: array
@@ -719,11 +712,7 @@ components:
           type: integer
           description: 댓글이 작성된 게시들 pk
           example: 1
-        member_member_pk:
-          type: string
-          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
-          example: nfkOJDM8492KKMKndods9_@IiNJJjd
-          nullable: true
+
         comment_comment_id_ref:
           type: integer
           description: 작성하려는 댓글의 부모 댓글 pk. 최상위 댓글이라면 null.
@@ -734,7 +723,6 @@ components:
         - comment_content
         - comment_delete
         - post_post_id_pk
-        - member_member_pk
         - comment_comment_id_ref
     CommentPatch:
       type: object
@@ -755,11 +743,6 @@ components:
           type: integer
           description: 댓글이 작성된 게시들 pk
           example: 1
-        member_member_pk:
-          type: string
-          description: 댓글을 작성한 유저 정보. 유저가 탈퇴하거나 사라지면 null.
-          nullable: true
-          example: nfkOJDM8492KKMKndods9_@IiNJJjd
         comment_comment_id_ref:
           type: integer
           description: 작성하려는 댓글의 부모 댓글 pk. 최상위 댓글이라면 null.

@@ -101,7 +101,6 @@ class BoardViewSet(viewsets.ModelViewSet):
                 "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
-
     # patch
     def partial_update(self, request, *args, **kwargs):
         # 요청한 유저의 정보를 헤더로 확인
@@ -115,7 +114,7 @@ class BoardViewSet(viewsets.ModelViewSet):
             logger.debug(f'{user_uid} Board patch approved')
             instance = self.get_object()
             request_data = request.data
-            target_keys = list(request_data.dict().keys())
+            target_keys = list(request_data.keys())
             before_change = dict()
             for k in target_keys:
                 before_change[k] = getattr(instance, k)
@@ -151,7 +150,6 @@ class BoardViewSet(viewsets.ModelViewSet):
                 "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
-
     # delete
     def destroy(self, request, *args, **kwargs):
         # 요청한 유저의 정보를 헤더로 확인

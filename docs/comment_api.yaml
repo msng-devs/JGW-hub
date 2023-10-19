@@ -88,7 +88,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              status: 403
+              error: Forbidden
+              code: JGW_hub-comment-002
+              message: Comment create denied
+              path: /hub/api/v1/comment/
+
       '500':
         description: Internal server error
         content:
@@ -96,7 +102,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
+
 \hubapi\comment\{comment_id_pk}\:
   patch:
     operationId: comment_partial_update
@@ -129,7 +141,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 403
+              error: Forbidden
+              code: JGW_hub-comment-003
+              message: Comment patch denied
+              path: /hub/api/v1/comment/
       '500':
         description: Internal server error
         content:
@@ -137,7 +154,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
   delete:
     operationId: comment_destroy
     description: |
@@ -162,6 +184,19 @@
           application/json:
             schema:
               $ref: '#/components/schemas/CommentPatchResult'
+
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            example:
+              timestamp: "2023-10-09T14:30:00.000000Z"
+            status: 403
+            error: Forbidden
+            code: JGW_hub-comment-004
+            message: Comment delete denied
+            path: ""
+
       '404':
         description: Not found
         content:
