@@ -75,6 +75,8 @@ def post_get_all_query(
             queryset = queryset.order_by('-' + query_params['order'])
         else:
             queryset = queryset.order_by(query_params['order'])
+    if 'content' in query_params:
+        queryset = queryset.filter(post_content__icontains=query_params['content'])
     else:
         queryset = queryset.order_by('post_write_time')
     return queryset
