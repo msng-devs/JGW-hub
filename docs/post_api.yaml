@@ -145,7 +145,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 403
+              error: Forbidden
+              code: JGW_hub-post-004
+              message: Post create not allowed
+              path: /hub/api/v1/post/
       '500':
         description: Internal server error
         content:
@@ -153,7 +158,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path:  ""
 \hubapi\post\{post_id_pk}\:
   get:
     operationId: post_retrieve
@@ -191,7 +201,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: Forbidden
+              error: Forbidden
+              code: JGW_hub-post-001
+              message: Post retrieve denied
+              path: /hub/api/v1/post/
+
       '404':
         description: Not found
         content:
@@ -207,7 +223,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
   patch:
     operationId: post_partial_update
     description: |
@@ -239,7 +260,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+                timestamp: "2023-10-09T14:30:00.000000Z"
+                status: 403
+                error: Forbidden
+                code: JGW_hub-post-002
+                message: request board not allowed
+                path: /hub/api/v1/post/
+
       '500':
         description: Internal server error
         content:
@@ -247,7 +274,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp:  "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
+
   delete:
     operationId: post_destroy
     description: |
@@ -276,3 +309,16 @@
               $ref: '#/components/schemas/BoardErrorPost-404'
             example:
               detail: Not found.
+      '403':
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardErrorPost-403'
+          example:
+            timestamp: "2023-10-09T14:30:00.000000Z"
+            status: 403
+            error: "Forbidden"
+            code: "JGW_hub-post-005"
+            message: "Post delete not allowed"
+            path: "/hub/api/v1/post/"

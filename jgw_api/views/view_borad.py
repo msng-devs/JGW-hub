@@ -1,6 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-
+import datetime
 from ..models import (
     Board,
 )
@@ -19,7 +19,9 @@ from .view_check import (
     request_check_admin_role
 )
 
+
 logger = get_logger()
+
 
 class BoardViewSet(viewsets.ModelViewSet):
     '''
@@ -84,11 +86,21 @@ class BoardViewSet(viewsets.ModelViewSet):
             return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f"{user_uid} Board create denied")
+
             detail = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-001",
+
+                "message": "Board create denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
-
     # patch
     def partial_update(self, request, *args, **kwargs):
         # 요청한 유저의 정보를 헤더로 확인
@@ -101,20 +113,26 @@ class BoardViewSet(viewsets.ModelViewSet):
             # 요청한 유저가 admin 이라면 승인
             logger.debug(f'{user_uid} Board patch approved')
             instance = self.get_object()
+            
             request_data = request.data
-            target_keys = list(request_data.dict().keys())
+ 
+            target_keys = list(request_data.keys())
+
             before_change = dict()
+            
             for k in target_keys:
                 before_change[k] = getattr(instance, k)
-
+            
             serializer = BoardWriteSerializer(instance, data=request_data, partial=True)
+           
             serializer.is_valid(raise_exception=True)
             logger.debug(f'{user_uid} Board data verified')
             self.perform_update(serializer)
+            
             responses_data = serializer.data
-
             update_log = f'{user_uid} Board data patched' \
                          f'\tkey: {responses_data["board_id_pk"]} change log'
+           
             for k in target_keys:
                 update_log += f'\n\t{k}: {before_change[k]} -> {responses_data[k]}'
             logger.info(update_log)
@@ -125,10 +143,19 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Board patch denied")
             detail = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-002",
+
+                "message": "Board patch denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
-
     # delete
     def destroy(self, request, *args, **kwargs):
         # 요청한 유저의 정보를 헤더로 확인
@@ -148,6 +175,16 @@ class BoardViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Board delete denied")
             detail = {
-                'detail': 'Not Allowed.'
+                "timestamp": datetime.datetime.now().isoformat(),
+
+                "status": 403,
+
+                "error": "Forbidden",
+
+                "code": "JGW_hub-board-003",
+
+                "message": "Board delete denied",
+
+                "path": "/hub/api/v1/board/"
             }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)

@@ -74,7 +74,9 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-400'
             example:
-              detail: board_name is required.
+              board_name:  [
+                    "This field is required."
+              ]
       '403':
         description: Forbidden
         content:
@@ -82,7 +84,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-10-09T14:30:00.000000Z"  # 이 예시를 현재 시간으로 변경하세요.
+              status: 403
+              error: Forbidden
+              code: JGW_hub-board-001
+              message: Board create denied
+              path: /hub/api/v1/board/
       '500':
         description: Internal server error
         content:
@@ -170,7 +177,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: "2023-01-04T21:39:20.619843"
+              status: 403
+              error: Forbidden
+              code: JGW_hub-board-002
+              message: Board patch denied
+              path: /hub/api/v1/board/
       '404':
         description: Not found
         content:
@@ -178,7 +190,8 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-404'
             example:
-              detail: Not found.
+              detail : Not found
+
       '500':
         description: Internal server error
         content:
@@ -186,7 +199,12 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
   delete:
     operationId: board_destroy
     description: |
@@ -215,7 +233,13 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-403'
             example:
-              detail: Not allowed.
+              timestamp: 2023-01-04T21:39:20.619843
+              status: 403
+              error: Forbidden
+              code: JGW_hub-board-003
+              message: Board delete denied
+              path: /hub/api/v1/board/
+
       '404':
         description: Not found
         content:
@@ -231,4 +255,10 @@
             schema:
               $ref: '#/components/schemas/BoardErrorPost-500'
             example:
-              detail: User header not found.
+              timestamp: "2023-10-09T14:30:00.000000Z"
+              status: 500
+              error: Internal server error
+              code: JGW_hub-check-001
+              message: get user information failed
+              path: ""
+
