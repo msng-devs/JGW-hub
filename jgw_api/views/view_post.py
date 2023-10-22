@@ -31,6 +31,8 @@ import datetime
 
 logger = get_logger()
 
+import markdown
+
 
 def post_get_all_query(
         query_params: dict,
@@ -253,7 +255,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         request_data = {
             "post_title": request.data["post_title"],
-            "post_content": request.data["post_content"],
+            "post_content": markdown.markdown(f'#{request.data["post_content"]}'),
             "post_write_time": request.data["post_write_time"],
             "post_update_time": request.data["post_update_time"],
             "thumbnail_id_pk": request.data["thumbnail_id_pk"],
