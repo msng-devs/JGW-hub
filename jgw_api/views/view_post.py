@@ -118,11 +118,11 @@ class PostViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         logger.debug("4")
         data = serializer.data
-        logger.debug("5")
+        logger.debug(f"[5]\n data : {data}")
         for i in data:
             if len(i['post_content']) > 500:
                 i['post_content'] = i['post_content'][:500]
-        logger.debug("6")
+        logger.debug(f"[6] data : {data}")
         return self.get_paginated_response(data)
 
     # get by id
