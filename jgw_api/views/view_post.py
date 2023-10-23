@@ -100,7 +100,7 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = Post.objects.all()
         logger.debug(f"[1]\nqueryset: {queryset}")
         queryset = post_get_all_query(request.query_params, queryset)
-        logger.debug(f"[2]\nqueryset : {queryset}"}
+        logger.debug(f"[2]\nqueryset : {queryset}"})
         request.query_params._mutable = True
         logger.debug(f"[3]")
         if 'page' not in request.query_params:
