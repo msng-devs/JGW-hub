@@ -98,9 +98,11 @@ class PostViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
         queryset = Post.objects.all()
+        logger.debug(f"[1]\nqueryset: {queryset}")
         queryset = post_get_all_query(request.query_params, queryset)
-
+        logger.debug(f"[2]\nqueryset : {queryset}"}
         request.query_params._mutable = True
+        logger.debug(f"[3]")
         if 'page' not in request.query_params:
             # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
@@ -112,11 +114,15 @@ class PostViewSet(viewsets.ModelViewSet):
             elif request.query_params['page_size'] > constant.POST_MAX_PAGE_SIZE:
                 request.query_params['page_size'] = constant.POST_MAX_PAGE_SIZE
         page = self.paginate_queryset(queryset)
+        logger.debug("3")
         serializer = self.get_serializer(page, many=True)
+        logger.debug("4")
         data = serializer.data
+        logger.debug("5")
         for i in data:
             if len(i['post_content']) > 500:
                 i['post_content'] = i['post_content'][:500]
+        logger.debug("6")
         return self.get_paginated_response(data)
 
     # get by id
