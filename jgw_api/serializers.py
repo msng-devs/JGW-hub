@@ -160,9 +160,7 @@ class CommentWriteSerializer(serializers.ModelSerializer):
         model = Comment
 
         fields = '__all__'
-        exclude = ('member_member_pk',)
-        '''fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
-                  'comment_delete', 'post_post_id_pk', 'comment_comment_id_ref']'''
+
 
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
