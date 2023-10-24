@@ -10,4 +10,3 @@ pymongo==4.3.3
 mongomock==4.1.2
 jsonschema==4.9.1
 Markdown==3.4.1
-

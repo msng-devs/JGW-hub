@@ -6,7 +6,8 @@ from .models import (
     Image,
     Post,
     Member,
-    Comment
+    Comment,
+    PostIndex
 )
 
 
@@ -28,8 +29,6 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
-
-
 
 class ImageNestedPostSerializer(serializers.ModelSerializer):
     '''
@@ -151,7 +150,6 @@ class CommentWriteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-
 class CommentWriteResultSerializer(serializers.ModelSerializer):
     '''
     comment serializer. post method에 결과값 리턴을 위해 사용하는 serializer.
@@ -160,5 +158,15 @@ class CommentWriteResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        
         fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
                   'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref']
+
+        
+
+class PostIndexSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostIndex
+        
+        fields = '__all__'
+

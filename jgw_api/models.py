@@ -279,3 +279,13 @@ class Timetable(models.Model):
 
         db_table = 'TIMETABLE'
 
+
+class PostIndex(models.Model):
+    postindex_id = models.ForeignKey(Post, models.CASCADE, db_column = "POSTINDEX_ID")
+    postindex_content = models.TextField(db_column="POSTINDEX_CONTENT")
+
+
+    class Meta:
+        managed = True
+
+        db_table = 'POSTINDEX'
