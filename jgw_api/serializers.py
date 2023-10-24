@@ -30,7 +30,6 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = '__all__'
 
-
 class ImageNestedPostSerializer(serializers.ModelSerializer):
     '''
     image nested serializer. 다른 serializer에서 모든 이미지 필드가 필요 없을때 사용.
@@ -69,6 +68,7 @@ class BoardWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = '__all__'
+
 
 
 class BoardGetSerializer(serializers.ModelSerializer):
@@ -158,11 +158,15 @@ class CommentWriteResultSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        
         fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
-                  'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_idg_ref']
+                  'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_id_ref']
 
+        
 
 class PostIndexSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostIndex
+        
         fields = '__all__'
+

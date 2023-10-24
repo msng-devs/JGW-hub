@@ -72,8 +72,10 @@ def post_get_all_query(
 
     if 'title' in query_params:
         queryset = queryset.filter(post_title__icontains=query_params['title'])
+
     if 'content' in query_params:
         queryset = queryset.filter(post_content__icontains=query_params['content'])
+
 
     if 'order' in query_params:
         if 'desc' in query_params and int(query_params['desc']):
@@ -98,10 +100,10 @@ class PostViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
         queryset = Post.objects.all()
-
         queryset = post_get_all_query(request.query_params, queryset)
-
+        logger.debug(f"[2]\nqueryset : {queryset}")
         request.query_params._mutable = True
+        logger.debug(f"[3]")
         if 'page' not in request.query_params:
             # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
@@ -114,11 +116,15 @@ class PostViewSet(viewsets.ModelViewSet):
             elif request.query_params['page_size'] > constant.POST_MAX_PAGE_SIZE:
                 request.query_params['page_size'] = constant.POST_MAX_PAGE_SIZE
         page = self.paginate_queryset(queryset)
+        logger.debug("3")
         serializer = self.get_serializer(page, many=True)
+        logger.debug("4")
         data = serializer.data
+        logger.debug(f"[5]\n data : {data}")
         for i in data:
             if len(i['post_content']) > 500:
                 i['post_content'] = i['post_content'][:500]
+        logger.debug(f"[6] data : {data}")
         return self.get_paginated_response(data)
 
     # get by id
