@@ -9,6 +9,7 @@ from django.http import QueryDict
 from ..models import (
     Board,
     Post,
+    PostIndex
 )
 from ..serializers import (
     PostWriteSerializer,
@@ -277,19 +278,12 @@ class PostViewSet(viewsets.ModelViewSet):
 
         post_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Post data verified')
-        index_id = post_serializer.validated_data["post_id_pk"]
-        index_data = {
-            "index_id": index_id,
-            "index_content": index_content
-        }
-        postindex_serializer = PostIndexSerializer(data=index_data)
-        postindex_serializer.is_valid(raise_exception=True)
         board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post post approved')
             self.perform_create(post_serializer)
-            self.perform_create(postindex_serializer)
+
             post_pk = post_serializer.data['post_id_pk']
             responses_instance = Post.objects.get(post_id_pk=post_pk)
             serializer = self.get_serializer(responses_instance)
@@ -303,7 +297,14 @@ class PostViewSet(viewsets.ModelViewSet):
                     instance_data = instance_data[:50]
                 update_log += f'\n\t{k}: {instance_data}'
             logger.info(update_log)
-
+            index_data = {
+                "postindex_id" : post_pk,
+                "postindex_content" : index_content
+            }
+            postindex_serailizer = PostIndexSerializer(data=index_data)
+            postindex_serailizer.is_valid(raise_exception=True)
+            logger.debug("postindex data verified")
+            self.perform_create(postindex_serailizer)
             return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f"{user_uid} Post create denied")
