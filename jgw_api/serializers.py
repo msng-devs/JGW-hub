@@ -6,7 +6,8 @@ from .models import (
     Image,
     Post,
     Member,
-    Comment
+    Comment,
+    PostIndex
 )
 
 
@@ -28,12 +29,6 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = '__all__'
-
-    def validate(self, data):
-        image_url = Image.objects.get(image_url=data['image_url'])
-        if image_url.exists():
-            raise serializers.ValidationError("image_url already exists")
-        return data
 
 
 class ImageNestedPostSerializer(serializers.ModelSerializer):
@@ -74,13 +69,6 @@ class BoardWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = '__all__'
-
-    # 같은 이름의 board가 있을때 validate하는 함수
-    def validate(self, data):
-        board_name = Board.objects.get(board_name=data["board_name"])
-        if board_name.exists():
-            raise serializers.ValidationError("Board name already exists")
-        return data
 
 
 class BoardGetSerializer(serializers.ModelSerializer):
@@ -160,9 +148,6 @@ class CommentWriteSerializer(serializers.ModelSerializer):
         model = Comment
 
         fields = '__all__'
-        exclude = ('member_member_pk',)
-        '''fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
-                  'comment_delete', 'post_post_id_pk', 'comment_comment_id_ref']'''
 
 
 class CommentWriteResultSerializer(serializers.ModelSerializer):
@@ -175,3 +160,9 @@ class CommentWriteResultSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['comment_id', 'comment_depth', 'comment_content', 'comment_write_time', 'comment_update_time',
                   'comment_delete', 'post_post_id_pk', 'member_member_pk', 'comment_comment_idg_ref']
+
+
+class PostIndexSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PostIndex
+        fields = '__all__'

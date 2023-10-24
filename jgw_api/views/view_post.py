@@ -14,6 +14,7 @@ from ..serializers import (
     PostWriteSerializer,
     PostGetSerializer,
     PostPatchSerializer,
+    PostIndexSerializer
 )
 from ..custom_pagination import (
     PostPageNumberPagination,
@@ -71,14 +72,14 @@ def post_get_all_query(
 
     if 'title' in query_params:
         queryset = queryset.filter(post_title__icontains=query_params['title'])
+    if 'content' in query_params:
+        queryset = queryset.filter(post_content__icontains=query_params['content'])
 
     if 'order' in query_params:
         if 'desc' in query_params and int(query_params['desc']):
             queryset = queryset.order_by('-' + query_params['order'])
         else:
             queryset = queryset.order_by(query_params['order'])
-    if 'content' in query_params:
-        queryset = queryset.filter(post_content__icontains=query_params['content'])
     else:
         queryset = queryset.order_by('post_write_time')
     return queryset
@@ -97,12 +98,14 @@ class PostViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         logger.debug(f"Post get request")
         queryset = Post.objects.all()
+
         queryset = post_get_all_query(request.query_params, queryset)
 
         request.query_params._mutable = True
         if 'page' not in request.query_params:
             # page를 지정하지 않으면 1로 지정
             request.query_params['page'] = 1
+
         if 'page_size' in request.query_params:
             # page size를 최소~최대 범위 안에서 지정
             request.query_params['page_size'] = int(request.query_params['page_size'])
@@ -231,18 +234,18 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post patch denied")
             responses_data = {
-                        "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": datetime.datetime.now().isoformat(),
 
-                        "status": 403,
+                "status": 403,
 
-                        "error": "Forbidden",
+                "error": "Forbidden",
 
-                        "code": "JGW_hub-post-003",
+                "code": "JGW_hub-post-003",
 
-                        "message": "Post patch denied",
+                "message": "Post patch denied",
 
-                        "path": "/hub/api/v1/post/"
-                    }
+                "path": "/hub/api/v1/post/"
+            }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # post
@@ -252,7 +255,7 @@ class PostViewSet(viewsets.ModelViewSet):
             # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
-
+        index_content = request.data["post_content"]
         request_data = {
             "post_title": request.data["post_title"],
             "post_content": markdown.markdown(f'#{request.data["post_content"]}'),
@@ -262,7 +265,7 @@ class PostViewSet(viewsets.ModelViewSet):
             "board_boadr_id_pk": request.data["board_boadr_id_pk"],
             "member_member_pk": user_uid
 
-        }          
+        }
 
         if isinstance(request_data, QueryDict):
             request_data._mutable = True
@@ -271,15 +274,22 @@ class PostViewSet(viewsets.ModelViewSet):
         # request_data['post_update_time'] = now
 
         post_serializer = PostWriteSerializer(data=request_data)
+
         post_serializer.is_valid(raise_exception=True)
         logger.debug(f'{user_uid} Post data verified')
-
+        index_id = post_serializer.validated_data["post_id_pk"]
+        index_data = {
+            "index_id": index_id,
+            "index_content": index_content
+        }
+        postindex_serializer = PostIndexSerializer(data=index_data)
+        postindex_serializer.is_valid(raise_exception=True)
         board_instance = post_serializer.validated_data['board_boadr_id_pk']
         if user_role_id >= admin_role_pk or user_role_id >= board_instance.role_role_pk_write_level.role_pk:
             # 요청한 유저가 admin or 요청한 게시판 게시글 쓰기 레벨 이상이면 승인
             logger.debug(f'{user_uid} Post post approved')
             self.perform_create(post_serializer)
-
+            self.perform_create(postindex_serializer)
             post_pk = post_serializer.data['post_id_pk']
             responses_instance = Post.objects.get(post_id_pk=post_pk)
             serializer = self.get_serializer(responses_instance)
@@ -298,18 +308,18 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post create denied")
             responses_data = {
-                        "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": datetime.datetime.now().isoformat(),
 
-                        "status": 403,
+                "status": 403,
 
-                        "error": "Forbidden",
+                "error": "Forbidden",
 
-                        "code": "JGW_hub-post-004",
+                "code": "JGW_hub-post-004",
 
-                        "message": "Post create not allowed",
+                "message": "Post create not allowed",
 
-                        "path": "/hub/api/v1/post/"
-                    }
+                "path": "/hub/api/v1/post/"
+            }
             return Response(responses_data, status=status.HTTP_403_FORBIDDEN)
 
     # delete
@@ -334,16 +344,16 @@ class PostViewSet(viewsets.ModelViewSet):
         else:
             logger.info(f"{user_uid} Post delete denied")
             detail = {
-                        "timestamp": datetime.datetime.now().isoformat(),
+                "timestamp": datetime.datetime.now().isoformat(),
 
-                        "status": 403,
+                "status": 403,
 
-                        "error": "Forbidden",
+                "error": "Forbidden",
 
-                        "code": "JGW_hub-post-005",
+                "code": "JGW_hub-post-005",
 
-                        "message": "Post delete not allowed",
+                "message": "Post delete not allowed",
 
-                        "path": "/hub/api/v1/post/"
-                    }
+                "path": "/hub/api/v1/post/"
+            }
             return Response(detail, status=status.HTTP_403_FORBIDDEN)
