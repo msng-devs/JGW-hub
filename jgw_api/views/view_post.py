@@ -9,6 +9,7 @@ from django.http import QueryDict
 from ..models import (
     Board,
     Post,
+    PostIndex
 )
 from ..serializers import (
     PostWriteSerializer,
@@ -306,10 +307,13 @@ class PostViewSet(viewsets.ModelViewSet):
                 "postindex_id" : post_pk,
                 "postindex_content" : index_content
             }
-            postindex_serailizer = PostIndexSerializer(data=index_data)
-            postindex_serailizer.is_valid(raise_exception=True)
+            postindex_serializer = PostIndexSerializer(data=index_data)
+            postindex_serializer.is_valid(raise_exception=True)
             logger.debug("postindex data verified")
-            self.perform_create(postindex_serailizer)
+            validated_data = postindex_serializer.validated_data
+            postindex_instance = PostIndex(**validated_data)
+            postindex_instance.save()
+            logger.debug("postindex data verified")
             return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f"{user_uid} Post create denied")
