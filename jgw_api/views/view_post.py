@@ -262,7 +262,7 @@ class PostViewSet(viewsets.ModelViewSet):
             # user role, 최소 admin role 중 하나라도 없다면 500 return
             return checked
         user_uid, user_role_id, admin_role_pk = checked
-        index_content = request.data["post_content"]
+        
         request_data = {
             "post_title": request.data["post_title"],
             "post_content": markdown.markdown(f'#{request.data["post_content"]}'),
@@ -303,17 +303,6 @@ class PostViewSet(viewsets.ModelViewSet):
                     instance_data = instance_data[:50]
                 update_log += f'\n\t{k}: {instance_data}'
             logger.info(update_log)
-            index_data = {
-                "postindex_id" : post_pk,
-                "postindex_content" : index_content
-            }
-            postindex_serializer = PostIndexSerializer(data=index_data)
-            postindex_serializer.is_valid(raise_exception=True)
-            logger.debug("postindex data verified")
-            validated_data = postindex_serializer.validated_data
-            postindex_instance = PostIndex(**validated_data)
-            postindex_instance.save()
-            logger.debug("postindex data verified")
             return Response(responses_data, status=status.HTTP_201_CREATED)
         else:
             logger.info(f"{user_uid} Post create denied")
