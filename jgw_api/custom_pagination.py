@@ -30,13 +30,15 @@ class PostPageNumberPagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
         previous = self.get_previous_link()
-        if previous is not None:
-            query = {k: v for k, v in list(map(lambda x: x.split('='), previous.split('?')[1].split('&')))}
-            print(query)
+        if previous and '?' in previous:
+            query_string = previous.split('?', 1)[1]
+            query = {k: v for k, v in (param.split('=') for param in query_string.split('&'))}
+
             if 'page' not in query:
                 query['page'] = '1'
-                query = sorted(query.items(), key=lambda x: x[0])
-                previous = previous.split('?')[0] + '?' + '&'.join([f'{i[0]}={i[1]}' for i in query])
+                query = sorted(query.items())
+                previous = previous.split('?', 1)[0] + '?' + '&'.join(f'{key}={value}' for key, value in query)
+
         return Response(OrderedDict([
             ('count', len(data)),
             ('total_pages', self.page.paginator.num_pages),

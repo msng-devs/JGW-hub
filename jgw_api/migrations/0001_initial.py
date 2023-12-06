@@ -210,7 +210,6 @@ class Migration(migrations.Migration):
                 ('post_write_time', models.DateTimeField(auto_now_add=True, db_column='POST_WRITE_TIME')),
                 ('post_update_time', models.DateTimeField(auto_now=True, db_column='POST_UPDATE_TIME')),
                 ('board_boadr_id_pk', models.ForeignKey(db_column='BOARD_BOADR_ID_PK', on_delete=django.db.models.deletion.DO_NOTHING, to='jgw_api.board')),
-                ('image_image_id_pk', models.ForeignKey(blank=True, db_column='IMAGE_IMAGE_ID_PK', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='jgw_api.image')),
                 ('member_member_pk', models.ForeignKey(blank=True, db_column='MEMBER_MEMBER_PK', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='jgw_api.member')),
             ],
             options={

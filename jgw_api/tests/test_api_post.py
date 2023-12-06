@@ -24,6 +24,7 @@ import traceback
 
 import jgw_api.constant as constant
 
+
 class PostApiTestOK(APITestCase):
     databases = '__all__'
     now = datetime.datetime.now()
@@ -92,8 +93,10 @@ class PostApiTestOK(APITestCase):
                 post_write_time=now,
                 post_update_time=now,
                 board_boadr_id_pk=board_instance,
-                member_member_pk=member_instance
+                member_member_pk=member_instance,
+                thumbnail_id_pk=None
             )
+        print("All Post lists length", len(Post.objects.all()))
 
     def __get_responses_data_pagenation(self, instance, query_parameters, url, total_count):
         next = previous = None
@@ -102,11 +105,11 @@ class PostApiTestOK(APITestCase):
             page = query_parameters['page']
             query = sorted(query_parameters.items(), key=lambda x: x[0])
             if page != 1:
-                previous = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
+                previous = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' + \
                            '&'.join([f'{i[0]}={i[1] - 1 if i[0] == "page" else i[1]}' for i in query])
             if page != self.post_count / query_parameters['page_size']:
-                next = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' +\
-                           '&'.join([f'{i[0]}={i[1] + 1 if i[0] == "page" else i[1]}' for i in query])
+                next = 'http://testserver/hub/api/v1/post/' + ('list/' if url else '') + '?' + \
+                       '&'.join([f'{i[0]}={i[1] + 1 if i[0] == "page" else i[1]}' for i in query])
 
         if 'page_size' in query_parameters:
             page_size = query_parameters['page_size']
@@ -129,7 +132,6 @@ class PostApiTestOK(APITestCase):
             'post_content': instance.post_content,
             'post_write_time': instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            "image_image_id_pk": instance.image_image_id_pk,
             'board_boadr_id_pk': {
                 'board_id_pk': instance.board_boadr_id_pk.board_id_pk,
                 'board_name': instance.board_boadr_id_pk.board_name,
@@ -411,7 +413,6 @@ class PostApiTestOK(APITestCase):
             'post_content': post_instance.post_content,
             'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            "image_image_id_pk": post_instance.image_image_id_pk,
             'board_boadr_id_pk': {
                 'board_id_pk': board_instance.board_id_pk,
                 'board_name': board_instance.board_name,
@@ -452,12 +453,6 @@ class PostApiTestOK(APITestCase):
             'post_content': post_instance.post_content,
             'post_write_time': post_instance.post_write_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
             'post_update_time': post_instance.post_update_time.strftime('%Y-%m-%dT%H:%M:%S.%f'),
-            "image_image_id_pk":
-                None if thumbnail_image is None else {
-                'image_id_pk': thumbnail_image.image_id_pk,
-                'image_name': thumbnail_image.image_name,
-                'image_url': thumbnail_image.image_url,
-            },
             'board_boadr_id_pk': {
                 'board_id_pk': post_instance.board_boadr_id_pk.board_id_pk,
                 'board_name': post_instance.board_boadr_id_pk.board_name,
