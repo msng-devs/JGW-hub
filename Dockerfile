@@ -1,8 +1,7 @@
 FROM python:3.10.10
 
 COPY . .
-WORKDIR /JGW_hub
-RUN echo "is_debug = 0" > debug.py
+WORKDIR /app
 
 WORKDIR ..
 RUN python -m pip install --upgrade pip
@@ -13,4 +12,4 @@ RUN mkdir ./logs
 
 EXPOSE 50007
 
-ENTRYPOINT gunicorn --bind=0.0.0.0:50007 JGW_hub.wsgi:application
+ENTRYPOINT uvicorn main:app --host=0.0.0.0 --port=50007 --reload
