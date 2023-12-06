@@ -32,7 +32,7 @@ class AppSettings(BaseSettings):
         description="Log file path",
     )
     DATABASE_URI: AnyUrl = Field(
-        default="mysql+aiomysql://bnbong:password@localhost:3306/JGW_API",
+        default="mysql+aiomysql://bnbong:password@localhost:3306/JGW_TEST",
         description="MariaDB connection URI.",
     )
     DATABASE_OPTIONS: Dict[str, Any] = Field(

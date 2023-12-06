@@ -36,11 +36,11 @@ async def _create_test_board_at_db(
 class TestBoardApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
-        self.url = "/hub/api/v1/board/"
+        self.url = "/hub/api/v2/board/"
         # Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
 
     def __make_header(self):
-        header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": 5}
+        header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
         return header_data
 
     async def test_board_get(self, app_client: AsyncClient):
@@ -57,80 +57,52 @@ class TestBoardApi:
             )
 
         # when
-        response = await app_client.get(
-            self.url, params={"page": 1}, **self.__make_header()
-        )
+        headers = self.__make_header()
+        response = await app_client.get(self.url, params={"page": 1}, headers=headers)
 
         # then
-        print(response.json())
-        # total_count = Board.objects.count()
-        # return_data = {
-        #     "count": 10,
-        #     "total_pages": total_count // 10 + (1 if total_count % 2 else 0),
-        #     "next": "http://testserver/hub/api/v1/board/?page=2",
-        #     "previous": None,
-        #     "results": [
-        #         {
-        #             "board_id_pk": i.board_id_pk,
-        #             "board_name": i.board_name,
-        #             "board_layout": i.board_layout,
-        #             "role_role_pk_write_level": {
-        #                 "role_pk": i.role_role_pk_write_level.role_pk,
-        #                 "role_nm": i.role_role_pk_write_level.role_nm,
-        #             },
-        #             "role_role_pk_read_level": {
-        #                 "role_pk": i.role_role_pk_read_level.role_pk,
-        #                 "role_nm": i.role_role_pk_read_level.role_nm,
-        #             },
-        #             "role_role_pk_comment_write_level": {
-        #                 "role_pk": i.role_role_pk_comment_write_level.role_pk,
-        #                 "role_nm": i.role_role_pk_comment_write_level.role_nm,
-        #             },
-        #         }
-        #         for i in Board.objects.all().order_by("board_id_pk")[:10]
-        #     ],
-        # }
-        # self.assertEqual(respons.status_code, status.HTTP_200_OK)
-        # self.assertJSONEqual(respons.content, return_data)
+        response_data = response.json()
+        assert response.status_code == 200
+        assert response_data.get("count") == 20
+        assert response_data.get("next") == "http://test/hub/api/v2/board/?page=2"
+        assert response_data.get("previous") is None
+        assert len(response_data.get("results")) == 10
+        assert response_data.get("results")[0].get("board_name") == "공지사항0"
 
-    # def test_board_get_by_id(self):
-    #     print("Board Api GET BY ID Running...")
-    #
-    #     # given
-    #     Board.objects.create(
-    #         board_name="공지사항1",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=0),
-    #     )
-    #     Board.objects.create(
-    #         board_name="공지사항2",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=0),
-    #     )
-    #
-    #     # when
-    #     target = "공지사항1"
-    #     ins = Board.objects.filter(board_name=target)[0]
-    #     respons: Response = self.client.get(
-    #         f"{self.url}{ins.board_id_pk}/", **self.__make_header()
-    #     )
-    #
-    #     # then
-    #     return_data = {
-    #         "board_id_pk": ins.board_id_pk,
-    #         "board_name": ins.board_name,
-    #         "board_layout": ins.board_layout,
-    #         "role_role_pk_write_level": {"role_pk": 0, "role_nm": "ROLE_GUEST"},
-    #         "role_role_pk_read_level": {"role_pk": 0, "role_nm": "ROLE_GUEST"},
-    #         "role_role_pk_comment_write_level": {"role_pk": 0, "role_nm": "ROLE_GUEST"},
-    #     }
-    #     self.assertEqual(respons.status_code, status.HTTP_200_OK)
-    #     self.assertJSONEqual(respons.content, return_data)
-    #
+    async def test_get_board_by_id(self, app_client: AsyncClient):
+        print("Board Api GET BY ID Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        await _create_test_board_at_db(
+            board_name="공지사항2",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+
+        # when
+        response = await app_client.get(f"{self.url}1", headers=self.__make_header())
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 200
+        assert response_data == {
+            "board_id_pk": 1,
+            "board_name": "공지사항1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 1,
+            "role_role_pk_read_level": 1,
+            "role_role_pk_comment_write_level": 1,
+        }
+
     # def test_board_post(self):
     #     print("Board Api POST Running...")
     #

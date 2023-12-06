@@ -15,6 +15,7 @@ from app.db.database import engine
 from app.db.models import Base
 from app.routers import router
 from app.core.settings import AppSettings
+from app.core.middlewares import PaginationMiddleware
 from app.utils.documents import add_description_at_api_tags
 from app.helper.logging import init_logger as _init_logger
 
@@ -48,15 +49,10 @@ async def lifespan(app: FastAPI):
 
 
 def create_app(app_settings: AppSettings) -> FastAPI:
-    if not app_settings.DEBUG_MODE:
-        root_path = "/hub/api/v2"
-    else:
-        root_path = ""
     logger.info(
         "FastAPI application running in DEBUG mode: %s", app_settings.DEBUG_MODE
     )
     app = FastAPI(
-        root_path=root_path,
         title="자람 허브 API v2",
         description="FastAPI로 재작성된 자람 허브 API 입니다.",
         version=__version__,
@@ -73,6 +69,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(PaginationMiddleware)
 
     app.include_router(router)
 

@@ -1,4 +1,3 @@
-# TODO: 실제 DB Table 설정과 동일하게 모델 ORM 수정
 # --------------------------------------------------------------------------
 # 자람 허브 model ORM을 정의한 모듈입니다.
 #
@@ -43,8 +42,12 @@ class Board(Base):
     name = Column(String(length=45), nullable=False, name="BOARD_NAME")
     layout = Column(Integer, nullable=False, name="BOARD_LAYOUT")
 
-    write_level = Column(Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_WRITE_LEVEL")
-    read_level = Column(Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_READ_LEVEL")
+    write_level = Column(
+        Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_WRITE_LEVEL"
+    )
+    read_level = Column(
+        Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_READ_LEVEL"
+    )
     comment_write_level = Column(
         Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_COMMENT_WRITE_LEVEL"
     )
@@ -102,7 +105,7 @@ class Comment(Base):
     update_date = Column(DateTime, nullable=False, name="COMMENT_UPDATE_TIME")
 
     post_id = Column(
-        Integer, ForeignKey("POST.POST_ID_PK", ondelete="CASCADE"), nullable=False, name="POST_POST_ID_PK"
+        Integer, ForeignKey("POST.POST_ID_PK"), nullable=False, name="POST_POST_ID_PK"
     )
     member_id = Column(
         String(length=28),
