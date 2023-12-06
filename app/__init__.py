@@ -49,7 +49,7 @@ async def lifespan(app: FastAPI):
 
 def create_app(app_settings: AppSettings) -> FastAPI:
     if not app_settings.DEBUG_MODE:
-        root_path = "/v1"
+        root_path = "/hub/api/v2"
     else:
         root_path = ""
     logger.info(
