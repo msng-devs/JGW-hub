@@ -48,17 +48,16 @@ async def lifespan(app: FastAPI):
 
 
 def create_app(app_settings: AppSettings) -> FastAPI:
-    if not app_settings.DEBUG_MODE:
-        root_path = "/hub/api/v2"
-    else:
-        root_path = ""
-
+    logger.info(
+        "FastAPI application running in DEBUG mode: %s", app_settings.DEBUG_MODE
+    )
     app = FastAPI(
-        root_path=root_path,
         title="자람 허브 API v2",
         description="FastAPI로 재작성된 자람 허브 API 입니다.",
         version=__version__,
         lifespan=lifespan,
+        docs_url="/hub/api/v2/docs",
+        redoc_url="/hub/api/v2/redoc",
     )
 
     origins = ["*"]

@@ -8,6 +8,6 @@ from fastapi import APIRouter
 router = APIRouter(prefix="/hub/api/v2")
 
 
-@router.get("/ping")
+@router.get("/ping", summary="FastAPI server health check", description="FastAPI 서버가 정상적으로 동작하는지 확인합니다.")
 async def ping():
     return {"ping": "pong"}
