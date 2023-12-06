@@ -1,4 +1,4 @@
-FROM python:3.9.14
+FROM python:3.10.10
 
 COPY . .
 WORKDIR /JGW_hub
@@ -8,12 +8,9 @@ WORKDIR ..
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-ENV TEST_DB_NAME docker_test
-ENV TEST_DB_NAME_API docker_test_api
-#RUN python manage.py test
 RUN rm -rf ./logs
 RUN mkdir ./logs
 
-EXPOSE 50003
+EXPOSE 50007
 
-ENTRYPOINT gunicorn --bind=0.0.0.0:50003 JGW_hub.wsgi:application
+ENTRYPOINT gunicorn --bind=0.0.0.0:50007 JGW_hub.wsgi:application
