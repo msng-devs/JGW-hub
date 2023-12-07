@@ -5,8 +5,7 @@
 # --------------------------------------------------------------------------
 from typing import List, Generic, TypeVar, Optional
 
-from pydantic import Field, AnyHttpUrl
-from pydantic.generics import GenericModel
+from pydantic import Field, AnyHttpUrl, BaseModel
 from sqlalchemy import Select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +15,7 @@ from app.core.middlewares import request_object
 T = TypeVar("T")
 
 
-class PaginatedResponse(GenericModel, Generic[T]):
+class PaginatedResponse(BaseModel, Generic[T]):
     count: int = Field(..., title="Count", description="불러온 아이템 전체 개수를 나타냅니다.")
     next: Optional[AnyHttpUrl] = Field(
         None,

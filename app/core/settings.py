@@ -28,7 +28,7 @@ class AppSettings(BaseSettings):
         description="True: DEBUG mode, False:: INFO mode",
     )
     LOG_FILE_PATH: str = Field(
-        default="../logs/hub.log",
+        default="logs/hub.log",
         description="Log file path",
     )
     DATABASE_URI: AnyUrl = Field(

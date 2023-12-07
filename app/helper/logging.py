@@ -24,4 +24,25 @@ def init_logger(root_logger_name: str, app_settings: AppSettings) -> logging.Log
         logging.DEBUG if app_settings.LOGGING_DEBUG_LEVEL else logging.INFO
     )
 
-    logging.basicConfig(level=app_logger_level, format=LOGGING_FORMAT)
+    logging_file = app_settings.LOG_FILE_PATH
+    error_logging_file = logging_file.replace(".log", "_errors.log")
+
+    logging.basicConfig(
+        level=app_logger_level, format=LOGGING_FORMAT, filename=logging_file
+    )
+
+    # Access log - HTTP status, 로직 Exception 등이 포함됩니다.
+    uvicorn_logger = logging.getLogger("uvicorn.access")
+    uvicorn_logger.setLevel(app_logger_level)
+    file_handler = logging.FileHandler(logging_file)
+    file_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
+    uvicorn_logger.addHandler(file_handler)
+
+    # Error log - 로직 Exception이 발생한 error stack trace가 포함됩니다.
+    uvicorn_error_logger = logging.getLogger("uvicorn.error")
+    error_file_handler = logging.FileHandler(error_logging_file)
+    error_file_handler.setLevel(logging.ERROR)
+    error_file_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))
+    uvicorn_error_logger.addHandler(error_file_handler)
+
+    return logging.getLogger(root_logger_name)
