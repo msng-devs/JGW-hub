@@ -202,6 +202,39 @@ class TestBoardApi:
     #     self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
 
 
+class TestBoardApiError:
+    @pytest_asyncio.fixture(autouse=True)
+    async def setup(self, app_client: AsyncClient):
+        self.url = "/hub/api/v2/board/"
+        # Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
+
+    def __make_header(self):
+        header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
+        return header_data
+
+    async def test_board_get_by_id_not_found(self, app_client: AsyncClient):
+        print("Board Api GET BY ID not found Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+
+        # when
+        response = await app_client.get(f"{self.url}1000", headers=self.__make_header())
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 404
+        assert response_data.get('status') == 404
+        assert response_data.get('error') == 'NOT_FOUND'
+        assert response_data.get('errorCode') == 'HB-001'
+
+
 # class BoardApiError(APITestCase):
 #     databases = "__all__"
 #

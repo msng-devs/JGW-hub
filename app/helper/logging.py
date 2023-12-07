@@ -39,7 +39,7 @@ def init_logger(root_logger_name: str, app_settings: AppSettings) -> logging.Log
     uvicorn_logger.addHandler(file_handler)
 
     # Error log - 로직 Exception이 발생한 error stack trace가 포함됩니다.
-    uvicorn_error_logger = logging.getLogger("uvicorn.error")
+    uvicorn_error_logger = logging.getLogger("hub_error_logger")
     error_file_handler = logging.FileHandler(error_logging_file)
     error_file_handler.setLevel(logging.ERROR)
     error_file_handler.setFormatter(logging.Formatter(LOGGING_FORMAT))

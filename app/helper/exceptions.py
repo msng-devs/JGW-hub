@@ -7,9 +7,9 @@ from enum import Enum
 
 
 class ErrorCode(Enum):
-    NOT_FOUND = ("NOT_FOUND", "HUB-001", 404)
-    UNKNOWN_ERROR = ("UNKNOWN_ERROR", "HUB-002", 500)
-    FORBIDDEN = ("FORBIDDEN", "HUB-003", 403)
+    NOT_FOUND = ("NOT_FOUND", "HB-001", 404)
+    UNKNOWN_ERROR = ("UNKNOWN_ERROR", "HB-002", 500)
+    FORBIDDEN = ("FORBIDDEN", "HB-003", 403)
 
 
 class InternalException(Exception):

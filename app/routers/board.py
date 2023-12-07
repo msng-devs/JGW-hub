@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import database
 from app.db.models import Board
 from app.helper.pagination import PaginatedResponse, paginate
+from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import board as schemas
 from app.crud import board as crud
 from app.utils import constant
@@ -47,5 +48,5 @@ async def read_boards(
 async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db)):
     db_board = await crud.get_board(db, board_id)
     if db_board is None:
-        raise HTTPException(status_code=404, detail="해당 게시판을 찾을 수 없습니다.")
+        raise InternalException("해당 게시판을 찾을 수 없습니다.", ErrorCode.NOT_FOUND)
     return db_board
