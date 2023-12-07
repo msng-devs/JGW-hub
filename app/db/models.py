@@ -4,7 +4,7 @@
 # @author bnbong bbbong9@gmail.com
 # --------------------------------------------------------------------------
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, SmallInteger
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.declarative import DeclarativeMeta
 
 Base: DeclarativeMeta = declarative_base()
@@ -39,7 +39,7 @@ class Board(Base):
     __tablename__ = "BOARD"
 
     id = Column(Integer, primary_key=True, autoincrement=True, name="BOARD_ID_PK")
-    name = Column(String(length=45), nullable=False, name="BOARD_NAME")
+    name = Column(String(length=45), unique=True, nullable=False, name="BOARD_NAME")
     layout = Column(Integer, nullable=False, name="BOARD_LAYOUT")
 
     write_level = Column(

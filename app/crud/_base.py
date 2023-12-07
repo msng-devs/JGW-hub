@@ -56,8 +56,7 @@ async def update_object(
     obj: BaseModel,
     response_model: Type[BaseModel],
 ) -> Optional[Any]:
-    query = select(model).filter(model.id == model_id)
-    db_obj = (await db.execute(query)).scalar_one_or_none()
+    db_obj = await db.get(model, model_id)
     if db_obj is None:
         return None
     update_data = obj.model_dump(exclude_unset=True)
@@ -70,8 +69,7 @@ async def update_object(
 
 
 async def delete_object(db: AsyncSession, model: Any, model_id: int) -> Optional[int]:
-    query = select(model).filter(model.id == model_id)
-    db_obj = (await db.execute(query)).scalar_one_or_none()
+    db_obj = await db.get(model, model_id)
     if db_obj:
         await db.delete(db_obj)
         await db.commit()

@@ -9,6 +9,7 @@ from fastapi import FastAPI
 def add_description_at_api_tags(app: FastAPI):
     tag_descriptions = {
         # add application's description here
+        "board": "게시판 카테고리 API 입니다.",
     }
 
     # OpenAPI 태그별 description 생성

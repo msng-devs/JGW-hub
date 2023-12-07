@@ -37,7 +37,6 @@ class TestBoardApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
         self.url = "/hub/api/v2/board/"
-        # Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
 
     def __make_header(self):
         header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
@@ -103,103 +102,147 @@ class TestBoardApi:
             "role_role_pk_comment_write_level": 1,
         }
 
-    # def test_board_post(self):
-    #     print("Board Api POST Running...")
-    #
-    #     # given
-    #     data = {
-    #         "board_name": "test1",
-    #         "board_layout": 0,
-    #         "role_role_pk_write_level": 100,
-    #         "role_role_pk_read_level": 100,
-    #         "role_role_pk_comment_write_level": 100,
-    #     }
-    #
-    #     # when
-    #     respons: Response = self.client.post(
-    #         self.url, data=data, **self.__make_header()
-    #     )
-    #
-    #     # then
-    #     i = Board.objects.get(board_name="test1")
-    #     responses_data = {
-    #         "board_id_pk": i.board_id_pk,
-    #         "board_name": i.board_name,
-    #         "board_layout": i.board_layout,
-    #         "role_role_pk_write_level": i.role_role_pk_write_level.role_pk,
-    #         "role_role_pk_read_level": i.role_role_pk_read_level.role_pk,
-    #         "role_role_pk_comment_write_level": i.role_role_pk_comment_write_level.role_pk,
-    #     }
-    #     self.assertEqual(respons.status_code, status.HTTP_201_CREATED)
-    #     self.assertJSONEqual(respons.content, responses_data)
-    #
-    # def test_board_patch_by_id(self):
-    #     print("Board Api PATCH BY ID Running...")
-    #     # given
-    #     Board.objects.create(
-    #         board_name="공지사항1",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=0),
-    #     )
-    #     Board.objects.create(
-    #         board_name="공지사항2",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=0),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=0),
-    #     )
-    #     patch_data = {"board_name": "자유게시판", "role_role_pk_write_level": 100}
-    #
-    #     # when
-    #     target = "공지사항1"
-    #     instance = Board.objects.filter(board_name=target)[0]
-    #     key = instance.board_id_pk
-    #     respons: Response = self.client.patch(
-    #         f"{self.url}{key}/", data=patch_data, **self.__make_header()
-    #     )
-    #
-    #     # then
-    #     return_data = {
-    #         "board_id_pk": key,
-    #         "board_name": "자유게시판",
-    #         "board_layout": 0,
-    #         "role_role_pk_write_level": 100,
-    #         "role_role_pk_read_level": 0,
-    #         "role_role_pk_comment_write_level": 0,
-    #     }
-    #     self.assertEqual(respons.status_code, status.HTTP_200_OK)
-    #     self.assertJSONEqual(respons.content, return_data)
-    #
-    # def test_board_delete_by_id(self):
-    #     print("Board Api DELETE BY ID Running...")
-    #     # given
-    #     Board.objects.create(
-    #         board_name="공지사항1",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=100),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=101),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=101),
-    #     )
-    #     Board.objects.create(
-    #         board_name="공지사항2",
-    #         board_layout=0,
-    #         role_role_pk_write_level=Role.objects.get(role_pk=100),
-    #         role_role_pk_read_level=Role.objects.get(role_pk=100),
-    #         role_role_pk_comment_write_level=Role.objects.get(role_pk=101),
-    #     )
-    #
-    #     # when
-    #     target = "공지사항1"
-    #     instance = Board.objects.filter(board_name=target)[0]
-    #     key = instance.board_id_pk
-    #     respons: Response = self.client.delete(
-    #         f"{self.url}{key}/", **self.__make_header()
-    #     )
-    #
-    #     # then
-    #     self.assertEqual(respons.status_code, status.HTTP_204_NO_CONTENT)
+    async def test_post_board(self, app_client: AsyncClient):
+        print("Board Api POST Running...")
+
+        # given
+        data = {
+            "board_name": "test1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 1,
+            "role_role_pk_read_level": 1,
+            "role_role_pk_comment_write_level": 1,
+        }
+
+        # when
+        response = await app_client.post(
+            self.url, json=data, headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 201
+        assert response_data == {
+            "board_id_pk": 1,
+            "board_name": "test1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 1,
+            "role_role_pk_read_level": 1,
+            "role_role_pk_comment_write_level": 1,
+        }
+
+    async def test_patch_board_by_id(self, app_client: AsyncClient):
+        print("Board Api PATCH BY ID Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        await _create_test_board_at_db(
+            board_name="공지사항2",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        patch_data = {"board_name": "자유게시판", "role_role_pk_write_level": 3}
+
+        # when
+        response = await app_client.patch(
+            f"{self.url}1", json=patch_data, headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 200
+        assert response_data == {
+            "board_id_pk": 1,
+            "board_name": "자유게시판",
+            "board_layout": 0,
+            "role_role_pk_write_level": 3,
+            "role_role_pk_read_level": 1,
+            "role_role_pk_comment_write_level": 1,
+        }
+
+    async def test_put_board_by_id(self, app_client: AsyncClient):
+        print("Board Api PUT BY ID Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        await _create_test_board_at_db(
+            board_name="공지사항2",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        put_data = {
+            "board_name": "자유게시판",
+            "board_layout": 0,
+            "role_role_pk_write_level": 3,
+            "role_role_pk_read_level": 4,
+            "role_role_pk_comment_write_level": 5,
+        }
+
+        # when
+        response = await app_client.put(
+            f"{self.url}1", json=put_data, headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 200
+        assert response_data == {
+            "board_id_pk": 1,
+            "board_name": "자유게시판",
+            "board_layout": 0,
+            "role_role_pk_write_level": 3,
+            "role_role_pk_read_level": 4,
+            "role_role_pk_comment_write_level": 5,
+        }
+
+    async def test_delete_board_by_id(self, app_client: AsyncClient):
+        print("Board Api DELETE BY ID Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        await _create_test_board_at_db(
+            board_name="공지사항2",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+
+        # when
+        response = await app_client.delete(f"{self.url}1", headers=self.__make_header())
+
+        # then
+        assert response.status_code == 204
+
+        # deletion check
+        response_check = await app_client.get(f"{self.url}1", headers=self.__make_header())
+        response_data = response_check.json()
+        assert response_check.status_code == 404
+        assert response_data.get("status") == 404
+        assert response_data.get("error") == "NOT_FOUND"
+        assert response_data.get("errorCode") == "HB-001"
 
 
 class TestBoardApiError:
@@ -211,6 +254,27 @@ class TestBoardApiError:
     def __make_header(self):
         header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
         return header_data
+
+    async def _create_test_board_api(
+            self,
+            app_client: AsyncClient,
+            board_name: str,
+            board_layout: int,
+            role_role_pk_write_level: int,
+            role_role_pk_read_level: int,
+            role_role_pk_comment_write_level: int,
+    ):
+        data = {
+            "board_name": board_name,
+            "board_layout": board_layout,
+            "role_role_pk_write_level": role_role_pk_write_level,
+            "role_role_pk_read_level": role_role_pk_read_level,
+            "role_role_pk_comment_write_level": role_role_pk_comment_write_level,
+        }
+        response = await app_client.post(
+            "/hub/api/v2/board/", json=data, headers=self.__make_header()
+        )
+        return response
 
     async def test_board_get_by_id_not_found(self, app_client: AsyncClient):
         print("Board Api GET BY ID not found Running...")
@@ -230,104 +294,69 @@ class TestBoardApiError:
         # then
         response_data = response.json()
         assert response.status_code == 404
-        assert response_data.get('status') == 404
-        assert response_data.get('error') == 'NOT_FOUND'
-        assert response_data.get('errorCode') == 'HB-001'
+        assert response_data.get("status") == 404
+        assert response_data.get("error") == "NOT_FOUND"
+        assert response_data.get("errorCode") == "HB-001"
 
+    async def test_board_post_already_exist(self, app_client: AsyncClient):
+        print("Board Api POST already exist Running...")
 
-# class BoardApiError(APITestCase):
-#     databases = "__all__"
-#
-#     def setUp(self):
-#         self.url = "/hub/api/v1/board/"
-#
-#     @classmethod
-#     def setUpTestData(cls):
-#         Role.objects.create(role_pk=0, role_nm="ROLE_GUEST")
-#         Role.objects.create(role_pk=1, role_nm="ROLE_USER0")
-#         Role.objects.create(role_pk=2, role_nm="ROLE_USER1")
-#         Role.objects.create(role_pk=3, role_nm="ROLE_ADMIN")
-#         Role.objects.create(role_pk=4, role_nm="ROLE_DEV")
-#
-#         Config.objects.create(config_nm="admin_role_pk", config_val="4")
-#
-#     def __make_header(self):
-#         header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": 5}
-#         return header_data
-#
-#     def test_board_get_by_id_not_found(self):
-#         print("Board Api GET BY ID not found Running...")
-#
-#         # given
-#         Board.objects.create(
-#             board_name="공지사항1",
-#             board_layout=0,
-#             role_role_pk_write_level=Role.objects.get(role_pk=1),
-#             role_role_pk_read_level=Role.objects.get(role_pk=1),
-#             role_role_pk_comment_write_level=Role.objects.get(role_pk=1),
-#         )
-#
-#         # when
-#         respons: Response = self.client.get(f"{self.url}1000/", **self.__make_header())
-#
-#         # then
-#         return_data = {"detail": "Not found."}
-#         self.assertEqual(respons.status_code, status.HTTP_404_NOT_FOUND)
-#         self.assertJSONEqual(respons.content, return_data)
-#
-#     def test_board_post_already_exist(self):
-#         print("Board Api POST already exist Running...")
-#
-#         # given
-#         Board.objects.create(
-#             board_name="공지사항1",
-#             board_layout=0,
-#             role_role_pk_write_level=Role.objects.get(role_pk=0),
-#             role_role_pk_read_level=Role.objects.get(role_pk=0),
-#             role_role_pk_comment_write_level=Role.objects.get(role_pk=0),
-#         )
-#
-#         data = {
-#             "board_name": "공지사항1",
-#             "board_layout": 0,
-#             "role_role_pk_write_level": 0,
-#             "role_role_pk_read_level": 20,
-#             "role_role_pk_comment_write_level": 0,
-#         }
-#
-#         # when
-#         respons: Response = self.client.post(
-#             self.url, data=data, **self.__make_header()
-#         )
-#
-#         # then
-#         responses_data = {
-#             "board_name": ["board with this board name already exists."],
-#             "role_role_pk_read_level": ['Invalid pk "20" - object does not exist.'],
-#         }
-#         self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
-#         self.assertJSONEqual(respons.content, responses_data)
-#
-#     def test_board_post_required(self):
-#         print("Board Api POST already exist not found Running...")
-#
-#         # given
-#
-#         data = {
-#             "board_name": "공지사항1",
-#             "board_layout": 0,
-#         }
-#
-#         # when
-#         respons: Response = self.client.post(
-#             self.url, data=data, **self.__make_header()
-#         )
-#
-#         # then
-#         responses_data = {
-#             "role_role_pk_write_level": ["This field is required."],
-#             "role_role_pk_read_level": ["This field is required."],
-#             "role_role_pk_comment_write_level": ["This field is required."],
-#         }
-#         self.assertEqual(respons.status_code, status.HTTP_400_BAD_REQUEST)
-#         self.assertJSONEqual(respons.content, responses_data)
+        # given
+        await self._create_test_board_api(
+            app_client=app_client,
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=0,
+            role_role_pk_read_level=0,
+            role_role_pk_comment_write_level=0,
+        )
+
+        data = {
+            "board_name": "공지사항1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 0,
+            "role_role_pk_read_level": 2,
+            "role_role_pk_comment_write_level": 0,
+        }
+
+        # when
+        response = await app_client.post(
+            self.url, json=data, headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 400
+        assert response_data.get('status') == 'BAD_REQUEST'
+        assert response_data.get('message') == "데이터베이스에 중복된 값이 존재합니다."
+        assert response_data.get('errorCode') == "HB-004"
+
+    async def test_board_post_required(self, app_client: AsyncClient):
+        print("Board Api POST already exist not found Running...")
+
+        # given
+        data = {
+            "board_name": "공지사항1",
+            "board_layout": 0,
+        }
+
+        # when
+        response = await app_client.post(
+            self.url, json=data, headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        err_detail = response_data.get('detail')
+        assert response.status_code == 422
+        assert err_detail[0].get('type') == 'missing'
+        assert err_detail[0].get('msg') == 'Field required'
+        assert err_detail[0].get('loc') == ['body', 'role_role_pk_write_level']
+
+        assert err_detail[1].get('type') == 'missing'
+        assert err_detail[1].get('msg') == 'Field required'
+        assert err_detail[1].get('loc') == ['body', 'role_role_pk_read_level']
+
+        assert err_detail[2].get('type') == 'missing'
+        assert err_detail[2].get('msg') == 'Field required'
+        assert err_detail[2].get('loc') == ['body', 'role_role_pk_comment_write_level']

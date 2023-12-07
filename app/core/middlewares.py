@@ -9,6 +9,8 @@ import logging
 from datetime import datetime
 from contextvars import ContextVar
 
+from sqlalchemy.exc import IntegrityError
+
 from starlette.requests import Request
 from starlette.responses import Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
@@ -58,6 +60,24 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
                 content=json.dumps(response),
                 media_type="application/json",
             )
+
+        except IntegrityError as e:
+            print(e)
+            response = {
+                "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+                "status": "BAD_REQUEST",
+                "error": "BAD_REQUEST",
+                "message": "데이터베이스에 중복된 값이 존재합니다.",
+                "errorCode": "HB-004",
+                "path": request.url.path,
+            }
+            self.logger.error(json.dumps(response))
+            return Response(
+                status_code=400,
+                content=json.dumps(response),
+                media_type="application/json",
+            )
+
         except Exception as e:
             print(e)
             response = {
