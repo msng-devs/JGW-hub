@@ -29,7 +29,7 @@ class Role(Base):
     __tablename__ = "ROLE"
 
     id = Column(Integer, primary_key=True, autoincrement=True, name="ROLE_PK")
-    name = Column(String(length=45), nullable=False, name="ROLE_NM")
+    name = Column(String(length=45), unique=True, nullable=False, name="ROLE_NM")
 
 
 # --------------------------------------------------------------------------
@@ -50,6 +50,12 @@ class Board(Base):
     )
     comment_write_level = Column(
         Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_COMMENT_WRITE_LEVEL"
+    )
+
+    write_level_role = relationship("Role", foreign_keys=[write_level], lazy="selectin")
+    read_level_role = relationship("Role", foreign_keys=[read_level], lazy="selectin")
+    comment_write_level_role = relationship(
+        "Role", foreign_keys=[comment_write_level], lazy="selectin"
     )
 
 

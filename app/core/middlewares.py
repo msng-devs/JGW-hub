@@ -34,6 +34,7 @@ class PaginationMiddleware(BaseHTTPMiddleware):
         return response
 
 
+# TODO: Validation ERROR 처리, 그 외 다른 에러들도 찾아서 처리.
 # --------------------------------------------------------------------------
 # ExceptionMiddleware
 # --------------------------------------------------------------------------

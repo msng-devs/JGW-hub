@@ -29,7 +29,9 @@ async def create_board(
 async def update_board(
     db: AsyncSession, board_id: int, board: schema.BoardUpdateSchema
 ) -> Optional[schema.BoardSchema]:
-    return await update_object(db, Board, board_id, board, response_model=schema.BoardSchema)
+    return await update_object(
+        db, Board, board_id, board, response_model=schema.BoardSchema
+    )
 
 
 async def delete_board(db: AsyncSession, board_id: int) -> Optional[int]:

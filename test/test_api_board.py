@@ -10,7 +10,7 @@ from httpx import AsyncClient
 
 from test.conftest import test_engine, AsyncSession
 
-from app.db.models import Board
+from app.db.models import Board, Role
 
 
 async def _create_test_board_at_db(
@@ -37,6 +37,8 @@ class TestBoardApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
         self.url = "/hub/api/v2/board/"
+        async with AsyncSession(bind=test_engine) as session:
+            self.test_role = await session.get(Role, 1)
 
     def __make_header(self):
         header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
@@ -75,16 +77,16 @@ class TestBoardApi:
         await _create_test_board_at_db(
             board_name="공지사항1",
             board_layout=0,
-            role_role_pk_write_level=1,
-            role_role_pk_read_level=1,
-            role_role_pk_comment_write_level=1,
+            role_role_pk_write_level=self.test_role.id,
+            role_role_pk_read_level=self.test_role.id,
+            role_role_pk_comment_write_level=self.test_role.id,
         )
         await _create_test_board_at_db(
             board_name="공지사항2",
             board_layout=0,
-            role_role_pk_write_level=1,
-            role_role_pk_read_level=1,
-            role_role_pk_comment_write_level=1,
+            role_role_pk_write_level=self.test_role.id,
+            role_role_pk_read_level=self.test_role.id,
+            role_role_pk_comment_write_level=self.test_role.id,
         )
 
         # when
@@ -97,9 +99,12 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "공지사항1",
             "board_layout": 0,
-            "role_role_pk_write_level": 1,
-            "role_role_pk_read_level": 1,
-            "role_role_pk_comment_write_level": 1,
+            "role_role_pk_write_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_comment_write_level": {
+                "role_id_pk": 1,
+                "role_name": "ROLE_GUEST",
+            },
         }
 
     async def test_post_board(self, app_client: AsyncClient):
@@ -126,9 +131,12 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "test1",
             "board_layout": 0,
-            "role_role_pk_write_level": 1,
-            "role_role_pk_read_level": 1,
-            "role_role_pk_comment_write_level": 1,
+            "role_role_pk_write_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_comment_write_level": {
+                "role_id_pk": 1,
+                "role_name": "ROLE_GUEST",
+            },
         }
 
     async def test_patch_board_by_id(self, app_client: AsyncClient):
@@ -163,9 +171,12 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "자유게시판",
             "board_layout": 0,
-            "role_role_pk_write_level": 3,
-            "role_role_pk_read_level": 1,
-            "role_role_pk_comment_write_level": 1,
+            "role_role_pk_write_level": {"role_id_pk": 3, "role_name": "ROLE_USER1"},
+            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_comment_write_level": {
+                "role_id_pk": 1,
+                "role_name": "ROLE_GUEST",
+            },
         }
 
     async def test_put_board_by_id(self, app_client: AsyncClient):
@@ -206,9 +217,12 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "자유게시판",
             "board_layout": 0,
-            "role_role_pk_write_level": 3,
-            "role_role_pk_read_level": 4,
-            "role_role_pk_comment_write_level": 5,
+            "role_role_pk_write_level": {"role_id_pk": 3, "role_name": "ROLE_USER1"},
+            "role_role_pk_read_level": {"role_id_pk": 4, "role_name": "ROLE_ADMIN"},
+            "role_role_pk_comment_write_level": {
+                "role_id_pk": 5,
+                "role_name": "ROLE_DEV",
+            },
         }
 
     async def test_delete_board_by_id(self, app_client: AsyncClient):
@@ -237,7 +251,9 @@ class TestBoardApi:
         assert response.status_code == 204
 
         # deletion check
-        response_check = await app_client.get(f"{self.url}1", headers=self.__make_header())
+        response_check = await app_client.get(
+            f"{self.url}1", headers=self.__make_header()
+        )
         response_data = response_check.json()
         assert response_check.status_code == 404
         assert response_data.get("status") == 404
@@ -256,13 +272,13 @@ class TestBoardApiError:
         return header_data
 
     async def _create_test_board_api(
-            self,
-            app_client: AsyncClient,
-            board_name: str,
-            board_layout: int,
-            role_role_pk_write_level: int,
-            role_role_pk_read_level: int,
-            role_role_pk_comment_write_level: int,
+        self,
+        app_client: AsyncClient,
+        board_name: str,
+        board_layout: int,
+        role_role_pk_write_level: int,
+        role_role_pk_read_level: int,
+        role_role_pk_comment_write_level: int,
     ):
         data = {
             "board_name": board_name,
@@ -327,9 +343,9 @@ class TestBoardApiError:
         # then
         response_data = response.json()
         assert response.status_code == 400
-        assert response_data.get('status') == 'BAD_REQUEST'
-        assert response_data.get('message') == "데이터베이스에 중복된 값이 존재합니다."
-        assert response_data.get('errorCode') == "HB-004"
+        assert response_data.get("status") == "BAD_REQUEST"
+        assert response_data.get("message") == "데이터베이스에 중복된 값이 존재합니다."
+        assert response_data.get("errorCode") == "HB-004"
 
     async def test_board_post_required(self, app_client: AsyncClient):
         print("Board Api POST already exist not found Running...")
@@ -347,16 +363,16 @@ class TestBoardApiError:
 
         # then
         response_data = response.json()
-        err_detail = response_data.get('detail')
+        err_detail = response_data.get("detail")
         assert response.status_code == 422
-        assert err_detail[0].get('type') == 'missing'
-        assert err_detail[0].get('msg') == 'Field required'
-        assert err_detail[0].get('loc') == ['body', 'role_role_pk_write_level']
+        assert err_detail[0].get("type") == "missing"
+        assert err_detail[0].get("msg") == "Field required"
+        assert err_detail[0].get("loc") == ["body", "role_role_pk_write_level"]
 
-        assert err_detail[1].get('type') == 'missing'
-        assert err_detail[1].get('msg') == 'Field required'
-        assert err_detail[1].get('loc') == ['body', 'role_role_pk_read_level']
+        assert err_detail[1].get("type") == "missing"
+        assert err_detail[1].get("msg") == "Field required"
+        assert err_detail[1].get("loc") == ["body", "role_role_pk_read_level"]
 
-        assert err_detail[2].get('type') == 'missing'
-        assert err_detail[2].get('msg') == 'Field required'
-        assert err_detail[2].get('loc') == ['body', 'role_role_pk_comment_write_level']
+        assert err_detail[2].get("type") == "missing"
+        assert err_detail[2].get("msg") == "Field required"
+        assert err_detail[2].get("loc") == ["body", "role_role_pk_comment_write_level"]

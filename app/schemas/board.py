@@ -2,6 +2,9 @@
 # Board 기능의 스키마를 정의한 모듈입니다.
 #
 # serialization_alias : JSON으로 직렬화할 때 사용할 이름을 지정합니다.
+# validation_alias : validation을 할 때 사용할 이름을 지정합니다.
+#
+# from_attributes : ORM 모델을 스키마로 변환할 때 사용합니다.
 #
 # @author bnbong bbbong9@gmail.com
 # --------------------------------------------------------------------------
@@ -24,8 +27,9 @@ class RoleSchema(BaseModel):
         serialization_alias="role_name",
     )
 
-    class ConfigDict:
+    class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class BoardCreateSchema(BaseModel):
@@ -113,24 +117,28 @@ class BoardSchema(BaseModel):
         description="게시판의 레이아웃입니다.",
         serialization_alias="board_layout",
     )
-    write_level: RoleSchema | int = Field(
+    write_level: RoleSchema = Field(
         ...,
         title="Board's Write Level",
         description="게시판의 글 작성 권한입니다. (Role pk)",
+        validation_alias="write_level_role",
         serialization_alias="role_role_pk_write_level",
     )
-    read_level: RoleSchema | int = Field(
+    read_level: RoleSchema = Field(
         ...,
         title="Board's Read Level",
         description="게시판의 글 읽기 권한입니다. (Role pk)",
+        validation_alias="read_level_role",
         serialization_alias="role_role_pk_read_level",
     )
-    comment_write_level: RoleSchema | int = Field(
+    comment_write_level: RoleSchema = Field(
         ...,
         title="Board's Comment Write Level",
         description="게시판의 댓글 작성 권한입니다. (Role pk)",
+        validation_alias="comment_write_level_role",
         serialization_alias="role_role_pk_comment_write_level",
     )
 
     class ConfigDict:
         orm_mode = True
+        from_attributes = True
