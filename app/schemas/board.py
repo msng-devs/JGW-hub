@@ -12,24 +12,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-
-class RoleSchema(BaseModel):
-    id: int = Field(
-        ...,
-        title="Role's ID (pk)",
-        description="권한의 고유 식별자입니다.",
-        serialization_alias="role_id_pk",
-    )
-    name: str = Field(
-        ...,
-        title="Role's Name",
-        description="권한의 이름입니다.",
-        serialization_alias="role_name",
-    )
-
-    class Config:
-        orm_mode = True
-        from_attributes = True
+from .common import RoleSchema
 
 
 class BoardCreateSchema(BaseModel):
@@ -139,6 +122,6 @@ class BoardSchema(BaseModel):
         serialization_alias="role_role_pk_comment_write_level",
     )
 
-    class ConfigDict:
+    class Config:
         orm_mode = True
         from_attributes = True

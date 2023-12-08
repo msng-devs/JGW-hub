@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from .board import board_router
+from .post import post_router
 
 router = APIRouter(prefix="/hub/api/v2")
 
@@ -20,3 +21,4 @@ async def ping():
 
 
 router.include_router(board_router, tags=["board"])
+router.include_router(post_router, tags=["post"])

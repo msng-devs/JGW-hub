@@ -24,6 +24,8 @@ class Member(Base):
         Integer, ForeignKey("ROLE.ROLE_PK"), nullable=False, name="ROLE_ROLE_PK"
     )
 
+    role = relationship("Role", foreign_keys=[role_id], lazy="selectin")
+
 
 class Role(Base):
     __tablename__ = "ROLE"
@@ -82,6 +84,10 @@ class Post(Base):
         name="MEMBER_MEMBER_PK",
     )
 
+    thumbnail = relationship("Image", back_populates="post")
+    board_relation = relationship("Board", foreign_keys=[board_id], lazy="selectin")
+    member_relation = relationship("Member", foreign_keys=[member_id], lazy="selectin")
+
 
 class Image(Base):
     __tablename__ = "IMAGE"
@@ -99,6 +105,9 @@ class Image(Base):
         nullable=True,
         name="MEMBER_MEMBER_PK",
     )
+
+    post = relationship("Post", back_populates="thumbnail")
+    member_relation = relationship("Member", foreign_keys=[member_id], lazy="selectin")
 
 
 class Comment(Base):

@@ -10,7 +10,7 @@ from httpx import AsyncClient
 
 from test.conftest import test_engine, AsyncSession
 
-from app.db.models import Board, Role
+from app.db.models import Board
 
 
 async def _create_test_board_at_db(
@@ -37,11 +37,12 @@ class TestBoardApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
         self.url = "/hub/api/v2/board/"
-        async with AsyncSession(bind=test_engine) as session:
-            self.test_role = await session.get(Role, 1)
 
     def __make_header(self):
-        header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
+        header_data = {
+            "HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
+            "HTTP_ROLE_PK": "5",
+        }
         return header_data
 
     async def test_board_get(self, app_client: AsyncClient):
@@ -77,16 +78,16 @@ class TestBoardApi:
         await _create_test_board_at_db(
             board_name="공지사항1",
             board_layout=0,
-            role_role_pk_write_level=self.test_role.id,
-            role_role_pk_read_level=self.test_role.id,
-            role_role_pk_comment_write_level=self.test_role.id,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
         )
         await _create_test_board_at_db(
             board_name="공지사항2",
             board_layout=0,
-            role_role_pk_write_level=self.test_role.id,
-            role_role_pk_read_level=self.test_role.id,
-            role_role_pk_comment_write_level=self.test_role.id,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
         )
 
         # when

@@ -17,7 +17,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 from app.db.database import get_db
-from app.db.models import Base, Role
+from app.db.models import Base, Role, Member
 from app.core.settings import AppSettings
 from app import create_app
 
@@ -76,4 +76,14 @@ async def init_data(init_db):
             Role(id=5, name="ROLE_DEV"),
         ]
         session.add_all(roles)
+        members = [
+            Member(
+                id="pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
+                name="Test Member",
+                email="test@testmail.com",
+                status=True,
+                role_id=4,
+            )
+        ]
+        session.add_all(members)
         await session.commit()
