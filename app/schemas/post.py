@@ -13,7 +13,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from .common import MemberSchema
 from .board import BoardSchema
@@ -100,7 +100,7 @@ class PostUpdateSchema(BaseModel):
     )
 
 
-class PostSchema(BaseModel):
+class PostBase(BaseModel):
     id: int = Field(
         ...,
         title="Post's ID (pk)",
@@ -112,12 +112,6 @@ class PostSchema(BaseModel):
         title="Post's Title",
         description="게시글의 제목입니다.",
         serialization_alias="post_title",
-    )
-    content: str = Field(
-        ...,
-        title="Post's Content",
-        description="게시글의 내용입니다.",
-        serialization_alias="post_content",
     )
     write_date: datetime = Field(
         ...,
@@ -150,6 +144,31 @@ class PostSchema(BaseModel):
         description="게시글의 작성자 ID입니다.",
         validation_alias="member_relation",
         serialization_alias="member_member_pk",
+    )
+
+
+class PostPreviewSchema(PostBase):
+    content: str = Field(
+        ...,
+        title="Post's Content",
+        description="게시글의 내용입니다.",
+        serialization_alias="post_content",
+    )
+
+    class Config:
+        from_attributes = True
+
+    @field_validator("content", mode="before")
+    def trim_content(cls, v):
+        return v[:500]
+
+
+class PostSchema(PostBase):
+    content: str = Field(
+        ...,
+        title="Post's Content",
+        description="게시글의 내용입니다.",
+        serialization_alias="post_content",
     )
 
     class Config:

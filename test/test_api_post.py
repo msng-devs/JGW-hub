@@ -4,6 +4,7 @@
 # @author bnbong bbbong9@gmail.com
 # --------------------------------------------------------------------------
 import random
+import string
 import markdown
 import pytest_asyncio
 
@@ -66,14 +67,16 @@ class TestPostApi:
         iter_num: int,
         member_member_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
         board_board_id_pk: int = 1,
+        content: str = "".join(
+            random.choices(string.ascii_letters + string.digits, k=501)
+        ),
     ):
         for i in range(iter_num):
             days_ago = random.randint(1, 30)
             write_date = datetime.now() - timedelta(days=days_ago)
             update_date = write_date + timedelta(days=random.randint(0, 5))
+            content = markdown.markdown(content)
 
-            content_str = "test_content" + str(i)
-            content = markdown.markdown(content_str)
             await _create_test_post_at_db(
                 post_title="test_title" + str(i),
                 post_content=content,
@@ -101,6 +104,7 @@ class TestPostApi:
         assert response_data.get("previous") is None
         assert len(response_data.get("results")) == 10
         assert response_data.get("results")[0].get("post_id_pk") == 1
+        assert len(response_data.get("results")[0].get("post_content")) == 500
 
     async def test_get_posts_by_desc(self, app_client: AsyncClient):
         print("Post Api GET desc Running...")
@@ -465,3 +469,180 @@ class TestPostApi:
 
         # then
         assert response.status_code == 204
+
+
+class TestPostApiError:
+    @pytest_asyncio.fixture(autouse=True)
+    async def setup(self):
+        self.url = "/hub/api/v2/post/"
+        self.member_id = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
+        for i in range(5):
+            await _create_test_board_at_db(
+                board_name=f"공지사항{i}",
+                board_layout=0,
+                role_role_pk_write_level=4,
+                role_role_pk_read_level=2,
+                role_role_pk_comment_write_level=random.choice([1, 2, 3, 4, 5]),
+            )
+
+    def __make_header(
+        self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
+    ):
+        header_data = {
+            "HTTP_USER_PK": user_pk,
+            "HTTP_ROLE_PK": str(role_pk),
+        }
+        return header_data
+
+    async def test_create_post_forbidden_role_read(self, app_client: AsyncClient):
+        print("Post Api read Forbidden Role Running...")
+
+        # given
+        content_str = "test_content"
+        content = markdown.markdown(content_str)
+        await _create_test_post_at_db(
+            post_title="test_title",
+            post_content=content,
+            post_write_date=datetime.now(),
+            post_update_date=datetime.now(),
+            board_board_id_pk=1,
+            member_member_pk=self.member_id,
+            thumbnail_id_pk=None,
+        )
+
+        # when
+        response = await app_client.get(
+            f"{self.url}1", headers=self.__make_header(role_pk=1)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+    async def test_create_post_forbidden_role_post(self, app_client: AsyncClient):
+        print("Post Api create Forbidden Role Running...")
+
+        # given
+        data = {
+            "post_title": "test_title",
+            "post_content": "test_content",
+            "post_write_time": str(datetime.now()),
+            "post_update_time": str(datetime.now()),
+            "thumbnail_id_pk": None,
+            "board_board_id_pk": 1,
+        }
+
+        # when
+        response = await app_client.post(
+            self.url, json=data, headers=self.__make_header(role_pk=3)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+    async def test_create_post_forbidden_role_put(self, app_client: AsyncClient):
+        print("Post Api edit Forbidden Role Running...")
+
+        # given
+        content_str = "test_content"
+        content = markdown.markdown(content_str)
+        await _create_test_post_at_db(
+            post_title="test_title",
+            post_content=content,
+            post_write_date=datetime.now(),
+            post_update_date=datetime.now(),
+            board_board_id_pk=1,
+            member_member_pk=self.member_id,
+            thumbnail_id_pk=None,
+        )
+        data = {
+            "post_title": "test_title2",
+            "post_update_time": str(datetime.now()),
+        }
+
+        # when
+        response = await app_client.put(
+            f"{self.url}1", json=data, headers=self.__make_header(role_pk=1)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+        data_check_1 = (
+            await app_client.get(f"{self.url}1", headers=self.__make_header())
+        ).json()
+
+        # when
+        response = await app_client.put(
+            f"{self.url}1",
+            json=data,
+            headers=self.__make_header(
+                role_pk=3, user_pk="idididididididididididididid"
+            ),
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+        data_check_2 = (
+            await app_client.get(f"{self.url}1", headers=self.__make_header())
+        ).json()
+
+        assert data_check_1 == data_check_2
+
+    async def test_create_post_forbidden_role_delete(self, app_client: AsyncClient):
+        print("Post Api delete Forbidden Role Running...")
+
+        # given
+        content_str = "test_content"
+        content = markdown.markdown(content_str)
+        await _create_test_post_at_db(
+            post_title="test_title",
+            post_content=content,
+            post_write_date=datetime.now(),
+            post_update_date=datetime.now(),
+            board_board_id_pk=1,
+            member_member_pk=self.member_id,
+            thumbnail_id_pk=None,
+        )
+
+        # when
+        response = await app_client.delete(
+            f"{self.url}1",
+            headers=self.__make_header(
+                role_pk=3, user_pk="idididididididididididididid"
+            ),
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+        data_check = (
+            await app_client.get(f"{self.url}1", headers=self.__make_header())
+        ).json()
+
+        assert data_check is not None

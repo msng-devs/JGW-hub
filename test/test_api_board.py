@@ -268,8 +268,13 @@ class TestBoardApiError:
         self.url = "/hub/api/v2/board/"
         # Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
 
-    def __make_header(self):
-        header_data = {"HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpk", "HTTP_ROLE_PK": "5"}
+    def __make_header(
+        self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
+    ):
+        header_data = {
+            "HTTP_USER_PK": user_pk,
+            "HTTP_ROLE_PK": str(role_pk),
+        }
         return header_data
 
     async def _create_test_board_api(
@@ -377,3 +382,92 @@ class TestBoardApiError:
         assert err_detail[2].get("type") == "missing"
         assert err_detail[2].get("msg") == "Field required"
         assert err_detail[2].get("loc") == ["body", "role_role_pk_comment_write_level"]
+
+    async def test_user_forbidden_role_post(self, app_client: AsyncClient):
+        print("Post Api read Forbidden Role Running...")
+
+        # given
+        data = {
+            "board_name": "test1",
+            "board_layout": 0,
+            "role_role_pk_write_level": 1,
+            "role_role_pk_read_level": 1,
+            "role_role_pk_comment_write_level": 1,
+        }
+
+        # when
+        response = await app_client.post(
+            self.url, json=data, headers=self.__make_header(role_pk=2)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+    async def test_user_forbidden_role_put(self, app_client: AsyncClient):
+        print("Post Api edit Forbidden Role Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+        patch_data = {"board_name": "자유게시판", "role_role_pk_write_level": 3}
+
+        # when
+        response = await app_client.put(
+            f"{self.url}1", json=patch_data, headers=self.__make_header(role_pk=2)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+        data_check = (
+            await app_client.get(f"{self.url}1", headers=self.__make_header())
+        ).json()
+
+        assert data_check.get("board_name") == "공지사항1"
+        assert data_check.get("role_role_pk_write_level").get("role_id_pk") == 1
+
+    async def test_user_forbidden_role_delete(self, app_client: AsyncClient):
+        print("Post Api delete Forbidden Role Running...")
+
+        # given
+        await _create_test_board_at_db(
+            board_name="공지사항1",
+            board_layout=0,
+            role_role_pk_write_level=1,
+            role_role_pk_read_level=1,
+            role_role_pk_comment_write_level=1,
+        )
+
+        # when
+        response = await app_client.delete(
+            f"{self.url}1", headers=self.__make_header(role_pk=2)
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 403
+        assert response_data.get("status") == 403
+        assert response_data.get("error") == "FORBIDDEN"
+        assert response_data.get("errorCode") == "HB-AUTH-002"
+        assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
+
+        data_check = (
+            await app_client.get(f"{self.url}1", headers=self.__make_header())
+        ).json()
+
+        assert data_check is not None
