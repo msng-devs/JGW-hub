@@ -259,7 +259,7 @@ class TestBoardApi:
         assert response_check.status_code == 404
         assert response_data.get("status") == 404
         assert response_data.get("error") == "NOT_FOUND"
-        assert response_data.get("errorCode") == "HB-001"
+        assert response_data.get("errorCode") == "HB-HTTP-002"
 
 
 class TestBoardApiError:
@@ -313,7 +313,7 @@ class TestBoardApiError:
         assert response.status_code == 404
         assert response_data.get("status") == 404
         assert response_data.get("error") == "NOT_FOUND"
-        assert response_data.get("errorCode") == "HB-001"
+        assert response_data.get("errorCode") == "HB-HTTP-002"
 
     async def test_board_post_already_exist(self, app_client: AsyncClient):
         print("Board Api POST already exist Running...")
@@ -344,9 +344,9 @@ class TestBoardApiError:
         # then
         response_data = response.json()
         assert response.status_code == 400
-        assert response_data.get("status") == "BAD_REQUEST"
+        assert response_data.get("status") == "DATABASE_BAD_REQUEST"
         assert response_data.get("message") == "데이터베이스에 중복된 값이 존재합니다."
-        assert response_data.get("errorCode") == "HB-004"
+        assert response_data.get("errorCode") == "HB-DATA-001"
 
     async def test_board_post_required(self, app_client: AsyncClient):
         print("Board Api POST already exist not found Running...")

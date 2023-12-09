@@ -66,10 +66,10 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
             print(e)
             response = {
                 "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-                "status": "BAD_REQUEST",
-                "error": "BAD_REQUEST",
+                "status": "DATABASE_BAD_REQUEST",
+                "error": "DATABASE_BAD_REQUEST",
                 "message": "데이터베이스에 중복된 값이 존재합니다.",
-                "errorCode": "HB-004",
+                "errorCode": "HB-DATA-001",
                 "path": request.url.path,
             }
             self.logger.error(json.dumps(response))
@@ -85,8 +85,8 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
                 "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
                 "status": "INTERNAL_SERVER_ERROR",
                 "error": "INTERNAL_SERVER_ERROR",
-                "message": "알 수 없는 오류가 발생했습니다.",
-                "errorCode": "HB-200",
+                "message": "서버 로직에 알 수 없는 오류가 발생했습니다.",
+                "errorCode": "HB-GENL-000",
                 "path": request.url.path,
             }
             self.logger.error(json.dumps(response))
