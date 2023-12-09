@@ -6,7 +6,7 @@
 from logging import getLogger
 from typing import Tuple
 
-from fastapi import Header
+from fastapi import Header, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -20,6 +20,7 @@ async def check_user(
     user_pk: str = Header(None, description="사용자의 고유 식별자입니다.", alias="http_user_pk"),
     role_pk: int = Header(None, description="사용자의 이름입니다.", alias="http_role_pk"),
 ) -> Tuple[str, int]:
+    print(Request.headers)
     if not user_pk or not role_pk:
         raise InternalException("사용자 정보가 없습니다.", ErrorCode.BAD_REQUEST)
 
