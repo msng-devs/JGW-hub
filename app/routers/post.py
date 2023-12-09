@@ -19,6 +19,7 @@ from app.schemas import post as schemas
 from app.crud import post as crud
 from app.utils import constant
 from ._check import (
+    auth,
     check_user,
     check_user_is_admin_or_self,
     check_user_is_admin_or_able_to_post,
@@ -104,6 +105,7 @@ async def read_posts(
     summary="특정 게시글 가져오기",
     description="지정한 게시글의 데이터를 가져옵니다. 요청한 유저의 권한이 가져오려는 게시글이 속한 게시판의 읽기 레벨과 같거나 \
     더 높아야 글 읽기가 가능합니다.\n\n관리자는 게시판의 읽기 권한과 상관 없이 글 읽기가 가능합니다.",
+    dependencies=[Depends(auth)],
 )
 async def read_post(
     post_id: int,
@@ -129,6 +131,7 @@ async def read_post(
     summary="게시글 생성",
     description="새로운 게시글을 생성합니다. 쓰기 요청한 유저의 권한이 작성하려는 게시판의 쓰기 레벨과 같거나 더 높아야 글 작성이 가능합니다.\
                 \n\n관리자는 게시판의 쓰기 권한과 상관 없이 글 작성이 가능합니다.",
+    dependencies=[Depends(auth)],
 )
 async def create_post(
     post: schemas.PostCreateBase,
@@ -154,6 +157,7 @@ async def create_post(
     description="지정한 게시글의 데이터를 전체적으로 수정합니다. (부분 업데이트도 지원합니다) 요청한 유저가 글을 작성한 본인이면서 \
     요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
     \n\n관리자도 본인이 아니면 글 수정이 불가능합니다.",
+    dependencies=[Depends(auth)],
 )
 @post_router.patch(
     "/{post_id}",
@@ -162,6 +166,7 @@ async def create_post(
     description="지정한 게시글의 데이터를 부분적으로 수정합니다. 요청한 유저가 글을 작성한 본인이면서 \
     요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
     \n\n관리자도 본인이 아니면 글 수정이 불가능합니다.",
+    dependencies=[Depends(auth)],
 )
 async def update_post(
     post_id: int,
@@ -186,6 +191,7 @@ async def update_post(
     status_code=204,
     summary="게시글 삭제",
     description="지정한 게시글을 삭제합니다.\n\n글을 쓴 본인 또는 관리자만 삭제가 가능합니다.",
+    dependencies=[Depends(auth)],
 )
 async def delete_post(
     post_id: int,

@@ -16,11 +16,23 @@ from app.helper.exceptions import InternalException, ErrorCode
 log = getLogger(__name__)
 
 
+def auth(request: Request):
+    header = request.headers
+    uid = header.get("user_pk") if header.get("user_pk") else None
+    role = header.get("role_pk") if header.get("role_pk") else None
+
+    if uid is None or role is None:
+        raise InternalException("인증 정보가 없습니다.", ErrorCode.UNKNOWN_ERROR)
+    if len(uid) != 28:
+        raise InternalException("잘못된 인증 정보입니다.", ErrorCode.UNKNOWN_ERROR)
+
+
 async def check_user(
-    user_pk: str = Header(None, description="사용자의 고유 식별자입니다.", alias="http_user_pk"),
-    role_pk: int = Header(None, description="사용자의 이름입니다.", alias="http_role_pk"),
+    user_pk: str = Header(
+        None, description="사용자의 고유 식별자입니다.", convert_underscores=False
+    ),
+    role_pk: int = Header(None, description="사용자의 이름입니다.", convert_underscores=False),
 ) -> Tuple[str, int]:
-    print(Request.headers)
     if not user_pk or not role_pk:
         raise InternalException("사용자 정보가 없습니다.", ErrorCode.BAD_REQUEST)
 

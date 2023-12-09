@@ -17,8 +17,7 @@ from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import board as schemas
 from app.crud import board as crud
 from app.utils import constant
-from ._check import check_user, check_user_is_admin
-
+from ._check import check_user, check_user_is_admin, auth
 
 log = getLogger(__name__)
 board_router = APIRouter(prefix="/board")
@@ -62,6 +61,7 @@ async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db))
     status_code=201,
     summary="게시판 생성",
     description="새로운 게시판을 생성합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    dependencies=[Depends(auth)],
 )
 async def create_board(
     board: schemas.BoardCreateSchema,
@@ -80,12 +80,14 @@ async def create_board(
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (전체 업데이트)",
     description="지정한 게시판의 데이터를 전체적으로 수정합니다. (부분 업데이트도 지원합니다)\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    dependencies=[Depends(auth)],
 )
 @board_router.patch(
     "/{board_id}",
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (부분 업데이트)",
     description="지정한 게시판의 데이터를 부분적으로 수정합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    dependencies=[Depends(auth)],
 )
 async def update_board(
     board_id: int,
@@ -107,6 +109,7 @@ async def update_board(
     status_code=204,
     summary="게시판 삭제",
     description="지정한 게시판을 삭제합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    dependencies=[Depends(auth)],
 )
 async def delete_board(
     board_id: int,

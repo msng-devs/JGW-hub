@@ -40,8 +40,8 @@ class TestBoardApi:
 
     def __make_header(self):
         header_data = {
-            "HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
-            "HTTP_ROLE_PK": "5",
+            "user_pk": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
+            "role_pk": "5",
         }
         return header_data
 
@@ -272,8 +272,8 @@ class TestBoardApiError:
         self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
     ):
         header_data = {
-            "HTTP_USER_PK": user_pk,
-            "HTTP_ROLE_PK": str(role_pk),
+            "user_pk": user_pk,
+            "role_pk": str(role_pk),
         }
         return header_data
 

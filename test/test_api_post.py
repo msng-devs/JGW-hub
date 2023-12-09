@@ -57,8 +57,8 @@ class TestPostApi:
 
     def __make_header(self):
         header_data = {
-            "HTTP_USER_PK": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
-            "HTTP_ROLE_PK": "5",
+            "user_pk": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
+            "role_pk": "5",
         }
         return header_data
 
@@ -94,13 +94,13 @@ class TestPostApi:
         await self._create_random_posts(20)
 
         # when
-        response = await app_client.get(self.url, headers=self.__make_header())
+        response = await app_client.get(f"{self.url}list", headers=self.__make_header())
 
         # then
         response_data = response.json()
         assert response.status_code == 200
         assert response_data.get("count") == 20
-        assert response_data.get("next") == "http://test/hub/api/v2/post/?page=2"
+        assert response_data.get("next") == "http://test/hub/api/v2/post/list?page=2"
         assert response_data.get("previous") is None
         assert len(response_data.get("results")) == 10
         assert response_data.get("results")[0].get("post_id_pk") == 1
@@ -120,7 +120,7 @@ class TestPostApi:
             "desc": 1,
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -144,7 +144,7 @@ class TestPostApi:
             "start_date": formatted_date,
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then (start_date)
@@ -173,7 +173,7 @@ class TestPostApi:
             "end_date": formatted_date,
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then (end_date)
@@ -208,7 +208,7 @@ class TestPostApi:
             "writer_uid": self.member_id,
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -236,7 +236,7 @@ class TestPostApi:
             "writer_name": "Test Member",
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -262,7 +262,7 @@ class TestPostApi:
             "board": 2,
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -291,7 +291,7 @@ class TestPostApi:
             "title": "test_title1",
         }
         response = await app_client.get(
-            self.url, params=query_params, headers=self.__make_header()
+            f"{self.url}list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -489,8 +489,8 @@ class TestPostApiError:
         self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
     ):
         header_data = {
-            "HTTP_USER_PK": user_pk,
-            "HTTP_ROLE_PK": str(role_pk),
+            "user_pk": user_pk,
+            "role_pk": str(role_pk),
         }
         return header_data
 
