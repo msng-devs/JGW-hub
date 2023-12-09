@@ -19,7 +19,7 @@ from .common import MemberSchema
 from .board import BoardSchema
 
 
-class PostCreateSchema(BaseModel):
+class PostCreateBase(BaseModel):
     title: str = Field(
         ...,
         title="Post's Title",
@@ -44,7 +44,7 @@ class PostCreateSchema(BaseModel):
         description="게시글의 수정일입니다.",
         alias="post_update_time",
     )
-    thumbnail_id: int = Field(
+    thumbnail_id: Optional[int] = Field(
         None,
         title="Post's Thumbnail ID",
         description="게시글의 썸네일 ID입니다.",
@@ -55,6 +55,15 @@ class PostCreateSchema(BaseModel):
         title="Post's Board ID",
         description="게시글의 게시판 ID입니다.",
         alias="board_board_id_pk",
+    )
+
+
+class PostCreateSchema(PostCreateBase):
+    member_id: str = Field(
+        None,
+        title="Post's Member ID",
+        description="게시글의 작성자 ID입니다.",
+        alias="member_member_pk",
     )
 
 
@@ -77,7 +86,7 @@ class PostUpdateSchema(BaseModel):
         description="게시글의 수정일입니다.",
         alias="post_update_time",
     )
-    thumbnail_id: int = Field(
+    thumbnail_id: Optional[int] = Field(
         None,
         title="Post's Thumbnail ID",
         description="게시글의 썸네일 ID입니다.",
@@ -144,5 +153,4 @@ class PostSchema(BaseModel):
     )
 
     class Config:
-        orm_mode = True
         from_attributes = True

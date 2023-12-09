@@ -28,11 +28,12 @@ board_router = APIRouter(prefix="/board")
     description="게시판 목록을 가져옵니다.",
 )
 async def read_boards(
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, description="몇번째 페이지를 가져올지 지정합니다."),
     page_size: int = Query(
         default=constant.BOARD_DEFAULT_PAGE_SIZE,
         ge=constant.BOARD_MIN_PAGE_SIZE,
         le=constant.BOARD_MAX_PAGE_SIZE,
+        description="한 페이지에 몇개의 데이터를 가져올지 지정합니다.",
     ),
     db: AsyncSession = Depends(database.get_db),
 ):

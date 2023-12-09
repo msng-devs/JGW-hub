@@ -45,7 +45,7 @@ class TestBoardApi:
         }
         return header_data
 
-    async def test_board_get(self, app_client: AsyncClient):
+    async def test_get_boards(self, app_client: AsyncClient):
         print("Board Api GET ALL Pagination Running...")
 
         # given
@@ -108,7 +108,7 @@ class TestBoardApi:
             },
         }
 
-    async def test_post_board(self, app_client: AsyncClient):
+    async def test_create_board(self, app_client: AsyncClient):
         print("Board Api POST Running...")
 
         # given

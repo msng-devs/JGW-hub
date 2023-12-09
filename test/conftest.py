@@ -83,7 +83,14 @@ async def init_data(init_db):
                 email="test@testmail.com",
                 status=True,
                 role_id=4,
-            )
+            ),
+            Member(
+                id="idididididididididididididid",
+                name="Another Test Member",
+                email="test2@testmail.com",
+                status=True,
+                role_id=2,
+            ),
         ]
         session.add_all(members)
         await session.commit()

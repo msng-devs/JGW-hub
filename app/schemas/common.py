@@ -26,7 +26,6 @@ class RoleSchema(BaseModel):
     )
 
     class Config:
-        orm_mode = True
         from_attributes = True
 
 
@@ -45,5 +44,4 @@ class MemberSchema(BaseModel):
     )
 
     class Config:
-        orm_mode = True
         from_attributes = True

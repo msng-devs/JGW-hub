@@ -1,17 +1,19 @@
-# TODO: Post CRUD endpoint 구현. Post 생성 시 content를 Markdown으로 저장할 수 있도록 구현.
+# TODO: RBAC 적용 - HEADER 정보를 바탕으로 권한 분기.
 # --------------------------------------------------------------------------
 # Post 기능의 API endpoint를 정의한 모듈입니다.
 #
 # @author bnbong bbbong9@gmail.com
 # --------------------------------------------------------------------------
 from logging import getLogger
+from typing import Optional
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, Query, Header
+from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import database
-from app.db.models import Post
+from app.db.models import Post, Member
 from app.helper.pagination import PaginatedResponse, paginate
 from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import post as schemas
@@ -30,15 +32,64 @@ post_router = APIRouter(prefix="/post")
     description="게시글 목록을 가져옵니다.",
 )
 async def read_posts(
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, description="몇번째 페이지를 가져올지 지정합니다."),
     page_size: int = Query(
         default=constant.POST_DEFAULT_PAGE_SIZE,
         ge=constant.POST_MIN_PAGE_SIZE,
         le=constant.POST_MAX_PAGE_SIZE,
+        description="한 페이지에 몇개의 데이터를 가져올지 지정합니다.",
+    ),
+    start_date: Optional[datetime] = Query(
+        None, description="게시글을 지정한 날짜부터 작성된 글을 가져옵니다.", example="2023-02-10T01:00:00"
+    ),
+    end_date: Optional[datetime] = Query(
+        None, description="게시글을 지정한 날짜까지 작성된 글을 가져옵니다.", example="2023-02-10T01:00:00"
+    ),
+    writer_uid: Optional[str] = Query(
+        None,
+        description="uid의 사용자가 작성한 글을 가져옵니다.",
+        example="SLDOqpd04867JDKVUqprod-203JI",
+    ),
+    writer_name: Optional[str] = Query(
+        None, description="지정한 이름을 가진 사용자가 작성한 글을 가져옵니다.", example="이준혁"
+    ),
+    board: Optional[int] = Query(None, description="지정한 게시판에 작성된 글을 가져옵니다.", example=1),
+    title: Optional[str] = Query(
+        None, description="지정한 단어가 제목에 포함된 글을 가져옵니다.", example="테스트"
+    ),
+    order: Optional[str] = Query(
+        None, description="지정한 필드를 기준으로 정렬하여 게시글을 가져옵니다.", example="id"
+    ),
+    desc: Optional[int] = Query(
+        None, description="order가 존재할 때, desc을 1로 지정하면 역순으로 정렬하여 게시글을 가져옵니다.", example=1
     ),
     db: AsyncSession = Depends(database.get_db),
 ):
-    return await paginate(db, select(Post), page, page_size)
+    conditions = []
+    query = select(Post)
+
+    if start_date:
+        conditions.append(Post.write_date >= start_date)
+    if end_date:
+        conditions.append(Post.write_date <= end_date)
+    if writer_uid:
+        conditions.append(Post.member_id == writer_uid)
+    if writer_name:
+        query = query.join(Post.member_relation).filter(Member.name == writer_name)
+    if board:
+        conditions.append(Post.board_id == board)
+    if title:
+        conditions.append(Post.title.contains(title))
+
+    query = query.where(and_(*conditions))
+
+    if order:
+        order_clause = getattr(Post, order)
+        if desc:
+            order_clause = order_clause.desc()
+        query = query.order_by(order_clause)
+
+    return await paginate(db, query, page, page_size)
 
 
 @post_router.get(
@@ -52,3 +103,60 @@ async def read_post(post_id: int, db: AsyncSession = Depends(database.get_db)):
     if db_post is None:
         raise InternalException("해당 게시글을 찾을 수 없습니다.", ErrorCode.NOT_FOUND)
     return db_post
+
+
+@post_router.post(
+    "/",
+    response_model=schemas.PostSchema,
+    status_code=201,
+    summary="게시글 생성",
+    description="새로운 게시글을 생성합니다.",
+)
+async def create_post(
+    post: schemas.PostCreateBase,
+    db: AsyncSession = Depends(database.get_db),
+    user_pk: Optional[str] = Header(None, alias="HTTP_USER_PK"),
+):
+    if user_pk is None:
+        raise InternalException("유저 정보를 찾을 수 없습니다.", ErrorCode.FORBIDDEN)
+
+    post_data = post.model_dump(by_alias=True)
+    post_data["member_member_pk"] = str(user_pk)
+    post_schema = schemas.PostCreateSchema(**post_data)
+
+    return await crud.create_post(db, post_schema)
+
+
+@post_router.put(
+    "/{post_id}",
+    response_model=schemas.PostSchema,
+    summary="게시글 수정 (전체 업데이트)",
+    description="지정한 게시글의 데이터를 전체적으로 수정합니다. (부분 업데이트도 지원합니다)",
+)
+@post_router.patch(
+    "/{post_id}",
+    response_model=schemas.PostSchema,
+    summary="게시글 수정 (부분 업데이트)",
+    description="지정한 게시글의 데이터를 부분적으로 수정합니다.",
+)
+async def update_post(
+    post_id: int,
+    post: schemas.PostUpdateSchema,
+    db: AsyncSession = Depends(database.get_db),
+):
+    db_post = await crud.update_post(db, post_id, post)
+    if db_post is None:
+        raise InternalException("해당 게시글을 찾을 수 없습니다.", ErrorCode.NOT_FOUND)
+    return db_post
+
+
+@post_router.delete(
+    "/{post_id}",
+    status_code=204,
+    summary="게시글 삭제",
+    description="지정한 게시글을 삭제합니다.",
+)
+async def delete_post(post_id: int, db: AsyncSession = Depends(database.get_db)):
+    deleted_id = await crud.delete_post(db, post_id)
+    if deleted_id is None:
+        raise InternalException("해당 게시글을 찾을 수 없습니다.", ErrorCode.NOT_FOUND)
