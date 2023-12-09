@@ -17,8 +17,8 @@ log = getLogger(__name__)
 
 
 async def check_user(
-    user_pk: str = Header(None, description="사용자의 고유 식별자입니다.", alias="HTTP_USER_PK"),
-    role_pk: int = Header(None, description="사용자의 이름입니다.", alias="HTTP_ROLE_PK"),
+    user_pk: str = Header(None, description="사용자의 고유 식별자입니다.", alias="http_user_pk"),
+    role_pk: int = Header(None, description="사용자의 이름입니다.", alias="http_role_pk"),
 ) -> Tuple[str, int]:
     if not user_pk or not role_pk:
         raise InternalException("사용자 정보가 없습니다.", ErrorCode.BAD_REQUEST)
