@@ -31,7 +31,7 @@ post_router = APIRouter(prefix="/post")
 
 
 @post_router.get(
-    "/",
+    "/list",
     response_model=PaginatedResponse[schemas.PostPreviewSchema],
     summary="모든 게시글 목록 가져오기",
     description="게시글 목록을 가져옵니다.\n\n결과로 가져오는 게시글은 content가 500자로 제한되어 리턴됩니다. \
