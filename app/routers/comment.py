@@ -10,7 +10,6 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from app.db import database
 from app.db.models import Comment
@@ -53,11 +52,9 @@ async def read_comments(
     ),
     db: AsyncSession = Depends(database.get_db),
 ):
-    query = select(Comment).where(Comment.post_id == post_id)
-    query = query.join(Comment.member_relation)
     return await paginate(
         db,
-        query,
+        select(Comment).where(Comment.post_id == post_id),
         page,
         page_size,
     )
