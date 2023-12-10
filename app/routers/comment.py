@@ -53,9 +53,11 @@ async def read_comments(
     ),
     db: AsyncSession = Depends(database.get_db),
 ):
+    query = select(Comment).where(Comment.post_id == post_id)
+    query = query.join(Comment.member_relation)
     return await paginate(
         db,
-        select(Comment).options(joinedload(Comment.member_relation)).where(Comment.post_id == post_id),
+        query,
         page,
         page_size,
     )
