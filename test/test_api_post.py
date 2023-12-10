@@ -93,7 +93,7 @@ class TestPostApi:
         print("Post Api GET all Running...")
 
         # given
-        await self._create_random_posts(20)
+        await self._create_random_posts(30)
 
         # when
         response = await app_client.get(f"{self.url}list", headers=self.__make_header())
@@ -101,12 +101,22 @@ class TestPostApi:
         # then
         response_data = response.json()
         assert response.status_code == 200
-        assert response_data.get("count") == 20
+        assert response_data.get("count") == 30
         assert response_data.get("next") == "http://test/hub/api/v2/post/list?page=2"
         assert response_data.get("previous") is None
         assert len(response_data.get("results")) == 10
         assert response_data.get("results")[0].get("post_id_pk") == 1
         assert len(response_data.get("results")[0].get("post_content")) == 500
+
+        # when
+        response = await app_client.get(
+            f"{self.url}list?page=2", headers=self.__make_header()
+        )
+
+        # then
+        response_data = response.json()
+        assert response.status_code == 200
+        assert response_data.get("count") == 10
 
     async def test_get_posts_by_desc(self, app_client: AsyncClient):
         print("Post Api GET desc Running...")

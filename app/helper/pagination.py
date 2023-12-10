@@ -40,7 +40,7 @@ class Paginator:
         self.query = query
         self.page = page
         self.page_size = per_page
-        self.limit = per_page * page
+        self.limit = per_page
         self.offset = (page - 1) * per_page
         self.request = request_object.get()
         # computed later
