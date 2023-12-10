@@ -76,9 +76,9 @@ async def read_posts(
     query = select(Post)
 
     if start_date:
-        conditions.append(Post.write_date >= start_date)
+        conditions.append(Post.write_time >= start_date)
     if end_date:
-        conditions.append(Post.write_date <= end_date)
+        conditions.append(Post.write_time <= end_date)
     if writer_uid:
         conditions.append(Post.member_id == writer_uid)
     if writer_name:
@@ -198,7 +198,9 @@ async def delete_post(
     db: AsyncSession = Depends(database.get_db),
     request_user: Tuple[str, int] = Depends(check_user),
 ):
-    await check_user_is_admin_or_self(db=db, user_info=request_user, post_id=post_id)
+    await check_user_is_admin_or_self(
+        db=db, user_info=request_user, model_id=post_id, model=Post
+    )
     deleted_id = await crud.delete_post(db, post_id)
     if deleted_id is None:
         raise InternalException("해당 게시글을 찾을 수 없습니다.", ErrorCode.NOT_FOUND)

@@ -38,10 +38,12 @@ class TestBoardApi:
     async def setup(self, app_client: AsyncClient):
         self.url = "/hub/api/v2/board/"
 
-    def __make_header(self):
+    def __make_header(
+        self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
+    ):
         header_data = {
-            "user_pk": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
-            "role_pk": "5",
+            "user_pk": user_pk,
+            "role_pk": str(role_pk),
         }
         return header_data
 

@@ -32,13 +32,13 @@ class PostCreateBase(BaseModel):
         description="게시글의 내용입니다.",
         alias="post_content",
     )
-    write_date: datetime = Field(
+    write_time: datetime = Field(
         ...,
         title="Post's Write Date",
         description="게시글의 작성일입니다.",
         alias="post_write_time",
     )
-    update_date: datetime = Field(
+    update_time: datetime = Field(
         ...,
         title="Post's Update Date",
         description="게시글의 수정일입니다.",
@@ -80,7 +80,7 @@ class PostUpdateSchema(BaseModel):
         description="게시글의 내용입니다.",
         alias="post_content",
     )
-    update_date: datetime = Field(
+    update_time: datetime = Field(
         None,
         title="Post's Update Date",
         description="게시글의 수정일입니다.",
@@ -113,17 +113,17 @@ class PostBase(BaseModel):
         description="게시글의 제목입니다.",
         serialization_alias="post_title",
     )
-    write_date: datetime = Field(
+    write_time: datetime = Field(
         ...,
         title="Post's Write Date",
         description="게시글의 작성일입니다.",
-        serialization_alias="post_write_date",
+        serialization_alias="post_write_time",
     )
-    update_date: datetime = Field(
+    update_time: datetime = Field(
         ...,
         title="Post's Update Date",
         description="게시글의 수정일입니다.",
-        serialization_alias="post_update_date",
+        serialization_alias="post_update_time",
     )
     thumbnail_id: Optional[int] = Field(
         None,

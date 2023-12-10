@@ -20,8 +20,8 @@ from .test_api_board import _create_test_board_at_db
 async def _create_test_post_at_db(
     post_title: str,
     post_content: str,
-    post_write_date: datetime,
-    post_update_date: datetime,
+    post_write_time: datetime,
+    post_update_time: datetime,
     board_board_id_pk: int,
     member_member_pk: str,
     thumbnail_id_pk: int = None,
@@ -30,8 +30,8 @@ async def _create_test_post_at_db(
         test_post = Post(
             title=post_title,
             content=post_content,
-            write_date=post_write_date,
-            update_date=post_update_date,
+            write_time=post_write_time,
+            update_time=post_update_time,
             board_id=board_board_id_pk,
             member_id=member_member_pk,
             thumbnail_id=thumbnail_id_pk,
@@ -55,16 +55,18 @@ class TestPostApi:
                 role_role_pk_comment_write_level=random.choice([1, 2, 3, 4, 5]),
             )
 
-    def __make_header(self):
+    def __make_header(
+        self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
+    ):
         header_data = {
-            "user_pk": "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
-            "role_pk": "5",
+            "user_pk": user_pk,
+            "role_pk": str(role_pk),
         }
         return header_data
 
     async def _create_random_posts(
         self,
-        iter_num: int,
+        iter_num: int = 1,
         member_member_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk",
         board_board_id_pk: int = 1,
         content: str = "".join(
@@ -80,8 +82,8 @@ class TestPostApi:
             await _create_test_post_at_db(
                 post_title="test_title" + str(i),
                 post_content=content,
-                post_write_date=write_date,
-                post_update_date=update_date,
+                post_write_time=write_date,
+                post_update_time=update_date,
                 board_board_id_pk=board_board_id_pk,
                 member_member_pk=member_member_pk,
                 thumbnail_id_pk=None,
@@ -151,7 +153,7 @@ class TestPostApi:
         response_data = response.json()
         if response_data.get("results"):
             response_datetime = datetime.strptime(
-                response_data.get("results")[0].get("post_write_date"),
+                response_data.get("results")[0].get("post_write_time"),
                 "%Y-%m-%dT%H:%M:%S",
             )
             assert response.status_code == 200
@@ -180,7 +182,7 @@ class TestPostApi:
         response_data = response.json()
         if response_data.get("results"):
             response_datetime = datetime.strptime(
-                response_data.get("results")[0].get("post_write_date"),
+                response_data.get("results")[0].get("post_write_time"),
                 "%Y-%m-%dT%H:%M:%S",
             )
             assert response.status_code == 200
@@ -310,8 +312,8 @@ class TestPostApi:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=datetime.now(),
-            post_update_date=datetime.now(),
+            post_write_time=datetime.now(),
+            post_update_time=datetime.now(),
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -370,8 +372,8 @@ class TestPostApi:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=previous_date,
-            post_update_date=previous_date,
+            post_write_time=previous_date,
+            post_update_time=previous_date,
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -391,8 +393,8 @@ class TestPostApi:
         response_data = response.json()
         assert response.status_code == 200
         assert response_data.get("post_title") == "test_title2"
-        assert response_data.get("post_update_date") != response_data.get(
-            "post_write_date"
+        assert response_data.get("post_update_time") != response_data.get(
+            "post_write_time"
         )
 
         assert response_data.get("post_content") == "<p>test_content</p>"
@@ -412,8 +414,8 @@ class TestPostApi:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=previous_date,
-            post_update_date=previous_date,
+            post_write_time=previous_date,
+            post_update_time=previous_date,
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -437,8 +439,8 @@ class TestPostApi:
         assert response.status_code == 200
         assert response_data.get("post_title") == "test_title2"
         assert response_data.get("post_content") == "<p>test_content2</p>"
-        assert response_data.get("post_update_date") != response_data.get(
-            "post_write_date"
+        assert response_data.get("post_update_time") != response_data.get(
+            "post_write_time"
         )
 
         assert response_data.get("board_board_id_pk").get("board_id_pk") == 2
@@ -457,8 +459,8 @@ class TestPostApi:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=previous_date,
-            post_update_date=previous_date,
+            post_write_time=previous_date,
+            post_update_time=previous_date,
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -503,8 +505,8 @@ class TestPostApiError:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=datetime.now(),
-            post_update_date=datetime.now(),
+            post_write_time=datetime.now(),
+            post_update_time=datetime.now(),
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -558,8 +560,8 @@ class TestPostApiError:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=datetime.now(),
-            post_update_date=datetime.now(),
+            post_write_time=datetime.now(),
+            post_update_time=datetime.now(),
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,
@@ -618,8 +620,8 @@ class TestPostApiError:
         await _create_test_post_at_db(
             post_title="test_title",
             post_content=content,
-            post_write_date=datetime.now(),
-            post_update_date=datetime.now(),
+            post_write_time=datetime.now(),
+            post_update_time=datetime.now(),
             board_board_id_pk=1,
             member_member_pk=self.member_id,
             thumbnail_id_pk=None,

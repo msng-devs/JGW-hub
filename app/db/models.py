@@ -45,13 +45,22 @@ class Board(Base):
     layout = Column(Integer, nullable=False, name="BOARD_LAYOUT")
 
     write_level = Column(
-        Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_WRITE_LEVEL"
+        Integer,
+        ForeignKey("ROLE.ROLE_PK"),
+        nullable=False,
+        name="ROLE_ROLE_PK_WRITE_LEVEL",
     )
     read_level = Column(
-        Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_READ_LEVEL"
+        Integer,
+        ForeignKey("ROLE.ROLE_PK"),
+        nullable=False,
+        name="ROLE_ROLE_PK_READ_LEVEL",
     )
     comment_write_level = Column(
-        Integer, ForeignKey("ROLE.ROLE_PK"), name="ROLE_ROLE_PK_COMMENT_WRITE_LEVEL"
+        Integer,
+        ForeignKey("ROLE.ROLE_PK"),
+        nullable=False,
+        name="ROLE_ROLE_PK_COMMENT_WRITE_LEVEL",
     )
 
     write_level_role = relationship("Role", foreign_keys=[write_level], lazy="selectin")
@@ -67,8 +76,8 @@ class Post(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, name="POST_ID_PK")
     title = Column(String(length=100), nullable=False, name="POST_TITLE")
     content = Column(Text, nullable=False, name="POST_CONTENT")
-    write_date = Column(DateTime, nullable=False, name="POST_WRITE_TIME")
-    update_date = Column(DateTime, nullable=False, name="POST_UPDATE_TIME")
+    write_time = Column(DateTime, nullable=False, name="POST_WRITE_TIME")
+    update_time = Column(DateTime, nullable=False, name="POST_UPDATE_TIME")
 
     thumbnail_id = Column(Integer, nullable=True, name="THUMBNAIL_ID_PK")
     board_id = Column(
@@ -116,8 +125,9 @@ class Comment(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, name="COMMENT_ID")
     depth = Column(Integer, nullable=False, name="COMMENT_DEPTH")
     content = Column(Text, nullable=False, name="COMMENT_CONTENT")
-    write_date = Column(DateTime, nullable=False, name="COMMENT_WRITE_TIME")
-    update_date = Column(DateTime, nullable=False, name="COMMENT_UPDATE_TIME")
+    write_time = Column(DateTime, nullable=False, name="COMMENT_WRITE_TIME")
+    update_time = Column(DateTime, nullable=False, name="COMMENT_UPDATE_TIME")
+    delete = Column(SmallInteger, nullable=False, default=0, name="COMMENT_DELETE")
 
     post_id = Column(
         Integer, ForeignKey("POST.POST_ID_PK"), nullable=False, name="POST_POST_ID_PK"
@@ -134,3 +144,5 @@ class Comment(Base):
         nullable=True,
         name="COMMENT_COMMENT_ID_REF",
     )
+
+    member_relation = relationship("Member", foreign_keys=[member_id], lazy="selectin")

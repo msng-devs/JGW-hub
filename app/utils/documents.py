@@ -11,6 +11,7 @@ def add_description_at_api_tags(app: FastAPI):
         # add application's description here
         "board": "게시판 카테고리 API 입니다. \n\n현재 자람 허브에서는 3개의 게시판만 운용하고 있으나, 추후 게시판 확장을 염두하여 API가 설계되었습니다.",
         "post": "게시글 API 입니다.",
+        "comment": "댓글 API 입니다.",
     }
 
     # OpenAPI 태그별 description 생성

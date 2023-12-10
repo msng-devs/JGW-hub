@@ -3,38 +3,10 @@
 #
 # @author bnbong bbbong9@gmail.com
 # --------------------------------------------------------------------------
-from typing import Any, Type, List, Optional
+from typing import Any, Type, Optional
 
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-
-async def get_object(
-    db: AsyncSession, model: Any, model_id: int, response_model: Type[BaseModel]
-) -> Optional[Any]:
-    query = select(model).filter(model.id == model_id)
-    result = (await db.execute(query)).scalar_one_or_none()
-    if result:
-        return response_model.model_validate(result.__dict__)
-    else:
-        return None
-
-
-async def get_objects(
-    db: AsyncSession,
-    model: Any,
-    response_model: Type[BaseModel],
-    condition: Optional[Any] = None,
-    skip: int = 0,
-    limit: int = 100,
-) -> List[Any]:
-    query = select(model).offset(skip).limit(limit)
-    if condition is not None:
-        query = query.where(condition)
-    result = await db.execute(query)
-    result_list = result.scalars().all()
-    return [response_model.model_validate(item.__dict__) for item in result_list]
 
 
 async def create_object(
@@ -59,7 +31,7 @@ async def update_object(
     db_obj = await db.get(model, model_id)
     if db_obj is None:
         return None
-    update_data = obj.model_dump(exclude_unset=True)
+    update_data = obj.model_dump(exclude_unset=True, exclude_none=True)
     for key, value in update_data.items():
         setattr(db_obj, key, value)
     db.add(db_obj)
