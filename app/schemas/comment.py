@@ -160,7 +160,7 @@ class CommentSchema(BaseModel):
     member_id: MemberSchema = Field(
         ...,
         title="Comment's Member ID",
-        description="댓글의 회원 ID입니다.",
+        description="댓글의 작성자 ID입니다.",
         validation_alias="member_relation",
         serialization_alias="member_member_pk",
     )

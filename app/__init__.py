@@ -85,7 +85,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         allow_headers=["*"],
     )
     app.add_middleware(PaginationMiddleware)
-    # app.add_middleware(ExceptionMiddleware, logger="hub_error_logger")
+    app.add_middleware(ExceptionMiddleware, logger="hub_error_logger")
 
     app.include_router(router)
 

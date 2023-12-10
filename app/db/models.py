@@ -133,7 +133,7 @@ class Comment(Base):
         Integer, ForeignKey("POST.POST_ID_PK"), nullable=False, name="POST_POST_ID_PK"
     )
     member_id = Column(
-        String(length=28),
+        String(length=45),
         ForeignKey("MEMBER.MEMBER_PK"),
         nullable=True,
         name="MEMBER_MEMBER_PK",
