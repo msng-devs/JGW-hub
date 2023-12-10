@@ -16,7 +16,7 @@ from app.helper.pagination import PaginatedResponse, paginate
 from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import board as schemas
 from app.crud import board as crud
-from app.utils import constant
+from app.utils import constant, documents
 from ._check import check_user, check_user_is_admin, auth
 
 log = getLogger(__name__)
@@ -27,7 +27,7 @@ board_router = APIRouter(prefix="/board")
     "/",
     response_model=PaginatedResponse[schemas.BoardSchema],
     summary="모든 게시판 목록 가져오기",
-    description="게시판 목록을 가져옵니다.",
+    description=documents.read_boards_description,
 )
 async def read_boards(
     page: int = Query(1, ge=1, description="몇번째 페이지를 가져올지 지정합니다."),
@@ -46,7 +46,7 @@ async def read_boards(
     "/{board_id}",
     response_model=schemas.BoardSchema,
     summary="특정 게시판 가져오기",
-    description="지정한 게시판의 데이터를 가져옵니다.",
+    description=documents.read_board_description,
 )
 async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db)):
     db_board = await crud.get_board(db, board_id)
@@ -60,7 +60,7 @@ async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db))
     response_model=schemas.BoardSchema,
     status_code=201,
     summary="게시판 생성",
-    description="새로운 게시판을 생성합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    description=documents.create_board_description,
     dependencies=[Depends(auth)],
 )
 async def create_board(
@@ -79,14 +79,14 @@ async def create_board(
     "/{board_id}",
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (전체 업데이트)",
-    description="지정한 게시판의 데이터를 전체적으로 수정합니다. (부분 업데이트도 지원합니다)\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    description=documents.update_board_description,
     dependencies=[Depends(auth)],
 )
 @board_router.patch(
     "/{board_id}",
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (부분 업데이트)",
-    description="지정한 게시판의 데이터를 부분적으로 수정합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    description=documents.update_board_description,
     dependencies=[Depends(auth)],
 )
 async def update_board(
@@ -108,7 +108,7 @@ async def update_board(
     "/{board_id}",
     status_code=204,
     summary="게시판 삭제",
-    description="지정한 게시판을 삭제합니다.\n\nAdmin(관리자) 이상의 권한이 필요합니다.",
+    description=documents.delete_board_description,
     dependencies=[Depends(auth)],
 )
 async def delete_board(

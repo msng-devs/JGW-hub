@@ -16,7 +16,7 @@ from app.db.models import Base
 from app.routers import router
 from app.core.settings import AppSettings
 from app.core.middlewares import PaginationMiddleware, ExceptionMiddleware
-from app.utils.documents import add_description_at_api_tags
+from app.utils.documents import add_description_at_api_tags, general_api_description
 from app.helper.logging import init_logger as _init_logger
 
 
@@ -26,7 +26,6 @@ try:
     )  # git version (dev version)
 except LookupError:
     __version__ = "2.0.0"  # production version
-
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +68,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
     )
     app = FastAPI(
         title="자람 허브 API v2",
-        description="FastAPI로 재작성된 자람 허브 API 입니다.",
+        description=general_api_description,
         version=__version__,
         lifespan=lifespan,
         docs_url="/hub/api/v2/docs",

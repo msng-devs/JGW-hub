@@ -116,7 +116,7 @@ class TestPostApi:
         # then
         response_data = response.json()
         assert response.status_code == 200
-        assert response_data.get("count") == 10
+        assert response_data.get("count") == 30
 
     async def test_get_posts_by_desc(self, app_client: AsyncClient):
         print("Post Api GET desc Running...")

@@ -18,7 +18,7 @@ from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import comment as schemas
 from app.crud import comment as crud
 from app.crud import post as post_crud
-from app.utils import constant
+from app.utils import constant, documents
 from ._check import (
     auth,
     check_user,
@@ -35,7 +35,7 @@ comment_router = APIRouter(prefix="/comment")
     "/",
     response_model=PaginatedResponse[schemas.CommentSchema],
     summary="특정 게시글의 모든 댓글 가져오기",
-    description="특정 게시글의 모든 댓글을 가져옵니다.",
+    description=documents.read_comments_description,
 )
 async def read_comments(
     post_id: int = Query(
@@ -65,9 +65,7 @@ async def read_comments(
     response_model=schemas.CommentSchema,
     status_code=201,
     summary="댓글 작성하기",
-    description="특정 게시글에 댓글을 작성합니다. 쓰기 요청한 유저의 권한이 작성하려는 게시판의 댓글 쓰기 레벨\
-    (Board.role_role_pk_comment_write_level)과 같거나 더 높아야 글 작성이 가능합니다.\
-    \n\nadmin은 게시판의 쓰기 권한과 상관 없이 댓글 작성이 가능합니다.",
+    description=documents.create_comment_description,
     dependencies=[Depends(auth)],
 )
 async def create_comment(
@@ -96,18 +94,14 @@ async def create_comment(
     "/{comment_id}",
     response_model=schemas.CommentSchema,
     summary="댓글 수정하기 (전체 업데이트)",
-    description="지정한 댓글의 데이터를 부분적으로 수정합니다 (전체 업데이트도 지원합니다). 요청한 유저가 댓글을 작성한 본인이면서 \
-    요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 댓글 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
-    \n\nadmin도 본인이 아니면 글 수정이 불가능합니다.",
+    description=documents.update_comment_description,
     dependencies=[Depends(auth)],
 )
 @comment_router.patch(
     "/{comment_id}",
     response_model=schemas.CommentSchema,
     summary="댓글 수정하기 (부분 업데이트)",
-    description="지정한 댓글의 데이터를 전체적으로 수정합니다 (부분 업데이트도 지원합니다). 요청한 유저가 댓글을 작성한 본인이면서 \
-    요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 댓글 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
-    \n\nadmin도 본인이 아니면 글 수정이 불가능합니다.",
+    description=documents.update_comment_description,
     dependencies=[Depends(auth)],
 )
 async def update_comment(
@@ -134,8 +128,7 @@ async def update_comment(
     "/{comment_id}",
     response_model=schemas.CommentSchema,
     summary="댓글 삭제하기",
-    description="지정한 댓글을 삭제합니다. 글을 쓴 본인 또는 관리자만 삭제가 가능합니다.\
-                \n\n데이터를 실제로 삭제하지 않고 comment_delete를 1로 변경합니다.",
+    description=documents.delete_comment_description,
     dependencies=[Depends(auth)],
 )
 async def delete_comment(

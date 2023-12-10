@@ -16,13 +16,13 @@ class RoleSchema(BaseModel):
         ...,
         title="Role's ID (pk)",
         description="권한의 고유 식별자입니다.",
-        serialization_alias="role_id_pk",
+        serialization_alias="role_pk",
     )
     name: str = Field(
         ...,
         title="Role's Name",
         description="권한의 이름입니다.",
-        serialization_alias="role_name",
+        serialization_alias="role_nm",
     )
 
     class Config:

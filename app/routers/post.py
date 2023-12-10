@@ -17,7 +17,7 @@ from app.helper.pagination import PaginatedResponse, paginate
 from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import post as schemas
 from app.crud import post as crud
-from app.utils import constant
+from app.utils import constant, documents
 from ._check import (
     auth,
     check_user,
@@ -35,8 +35,7 @@ post_router = APIRouter(prefix="/post")
     "/list",
     response_model=PaginatedResponse[schemas.PostPreviewSchema],
     summary="모든 게시글 목록 가져오기",
-    description="게시글 목록을 가져옵니다.\n\n결과로 가져오는 게시글은 content가 500자로 제한되어 리턴됩니다. \
-    \n\n모든 내용을 가져오려면 특정 게시글 가져오기 API를 사용해야합니다.",
+    description=documents.read_posts_description,
 )
 async def read_posts(
     page: int = Query(1, ge=1, description="몇번째 페이지를 가져올지 지정합니다."),
@@ -103,8 +102,7 @@ async def read_posts(
     "/{post_id}",
     response_model=schemas.PostSchema,
     summary="특정 게시글 가져오기",
-    description="지정한 게시글의 데이터를 가져옵니다. 요청한 유저의 권한이 가져오려는 게시글이 속한 게시판의 읽기 레벨과 같거나 \
-    더 높아야 글 읽기가 가능합니다.\n\n관리자는 게시판의 읽기 권한과 상관 없이 글 읽기가 가능합니다.",
+    description=documents.read_post_description,
     dependencies=[Depends(auth)],
 )
 async def read_post(
@@ -129,8 +127,7 @@ async def read_post(
     response_model=schemas.PostSchema,
     status_code=201,
     summary="게시글 생성",
-    description="새로운 게시글을 생성합니다. 쓰기 요청한 유저의 권한이 작성하려는 게시판의 쓰기 레벨과 같거나 더 높아야 글 작성이 가능합니다.\
-                \n\n관리자는 게시판의 쓰기 권한과 상관 없이 글 작성이 가능합니다.",
+    description=documents.create_post_description,
     dependencies=[Depends(auth)],
 )
 async def create_post(
@@ -154,18 +151,14 @@ async def create_post(
     "/{post_id}",
     response_model=schemas.PostSchema,
     summary="게시글 수정 (전체 업데이트)",
-    description="지정한 게시글의 데이터를 전체적으로 수정합니다. (부분 업데이트도 지원합니다) 요청한 유저가 글을 작성한 본인이면서 \
-    요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
-    \n\n관리자도 본인이 아니면 글 수정이 불가능합니다.",
+    description=documents.update_post_description,
     dependencies=[Depends(auth)],
 )
 @post_router.patch(
     "/{post_id}",
     response_model=schemas.PostSchema,
     summary="게시글 수정 (부분 업데이트)",
-    description="지정한 게시글의 데이터를 부분적으로 수정합니다. 요청한 유저가 글을 작성한 본인이면서 \
-    요청한 유저의 권한이 수정하려는 게시글이 속한 게시판의 쓰기 레벨과 같거나 더 높아야 글 수정이 가능합니다.\
-    \n\n관리자도 본인이 아니면 글 수정이 불가능합니다.",
+    description=documents.update_post_description,
     dependencies=[Depends(auth)],
 )
 async def update_post(
@@ -190,7 +183,7 @@ async def update_post(
     "/{post_id}",
     status_code=204,
     summary="게시글 삭제",
-    description="지정한 게시글을 삭제합니다.\n\n글을 쓴 본인 또는 관리자만 삭제가 가능합니다.",
+    description=documents.delete_post_description,
     dependencies=[Depends(auth)],
 )
 async def delete_post(

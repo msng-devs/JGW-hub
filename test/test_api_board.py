@@ -102,11 +102,11 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "공지사항1",
             "board_layout": 0,
-            "role_role_pk_write_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
-            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_write_level": {"role_pk": 1, "role_nm": "ROLE_GUEST"},
+            "role_role_pk_read_level": {"role_pk": 1, "role_nm": "ROLE_GUEST"},
             "role_role_pk_comment_write_level": {
-                "role_id_pk": 1,
-                "role_name": "ROLE_GUEST",
+                "role_pk": 1,
+                "role_nm": "ROLE_GUEST",
             },
         }
 
@@ -134,11 +134,11 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "test1",
             "board_layout": 0,
-            "role_role_pk_write_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
-            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_write_level": {"role_pk": 1, "role_nm": "ROLE_GUEST"},
+            "role_role_pk_read_level": {"role_pk": 1, "role_nm": "ROLE_GUEST"},
             "role_role_pk_comment_write_level": {
-                "role_id_pk": 1,
-                "role_name": "ROLE_GUEST",
+                "role_pk": 1,
+                "role_nm": "ROLE_GUEST",
             },
         }
 
@@ -174,11 +174,11 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "자유게시판",
             "board_layout": 0,
-            "role_role_pk_write_level": {"role_id_pk": 3, "role_name": "ROLE_USER1"},
-            "role_role_pk_read_level": {"role_id_pk": 1, "role_name": "ROLE_GUEST"},
+            "role_role_pk_write_level": {"role_pk": 3, "role_nm": "ROLE_USER1"},
+            "role_role_pk_read_level": {"role_pk": 1, "role_nm": "ROLE_GUEST"},
             "role_role_pk_comment_write_level": {
-                "role_id_pk": 1,
-                "role_name": "ROLE_GUEST",
+                "role_pk": 1,
+                "role_nm": "ROLE_GUEST",
             },
         }
 
@@ -220,11 +220,11 @@ class TestBoardApi:
             "board_id_pk": 1,
             "board_name": "자유게시판",
             "board_layout": 0,
-            "role_role_pk_write_level": {"role_id_pk": 3, "role_name": "ROLE_USER1"},
-            "role_role_pk_read_level": {"role_id_pk": 4, "role_name": "ROLE_ADMIN"},
+            "role_role_pk_write_level": {"role_pk": 3, "role_nm": "ROLE_USER1"},
+            "role_role_pk_read_level": {"role_pk": 4, "role_nm": "ROLE_ADMIN"},
             "role_role_pk_comment_write_level": {
-                "role_id_pk": 5,
-                "role_name": "ROLE_DEV",
+                "role_pk": 5,
+                "role_nm": "ROLE_DEV",
             },
         }
 
@@ -268,7 +268,6 @@ class TestBoardApiError:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
         self.url = "/hub/api/v2/board/"
-        # Config.objects.create(config_nm='admin_role_pk', config_val='500', config_pk=500)
 
     def __make_header(
         self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
@@ -441,7 +440,7 @@ class TestBoardApiError:
         ).json()
 
         assert data_check.get("board_name") == "공지사항1"
-        assert data_check.get("role_role_pk_write_level").get("role_id_pk") == 1
+        assert data_check.get("role_role_pk_write_level").get("role_pk") == 1
 
     async def test_user_forbidden_role_delete(self, app_client: AsyncClient):
         print("Post Api delete Forbidden Role Running...")
