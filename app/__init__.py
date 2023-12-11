@@ -67,6 +67,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         "FastAPI application running in DEBUG mode: %s", app_settings.DEBUG_MODE
     )
     app = FastAPI(
+        root_path="/hub/api/v2",
         title="자람 허브 API v2",
         description=general_api_description,
         version=__version__,
