@@ -19,6 +19,7 @@ from app.schemas import comment as schemas
 from app.crud import comment as crud
 from app.crud import post as post_crud
 from app.utils import constant, documents
+from app.utils.documents import response_403, response_500, comment_response_404
 from ._check import (
     auth,
     check_user,
@@ -33,6 +34,7 @@ comment_router = APIRouter(prefix="/comment")
 
 @comment_router.get(
     "",
+    responses={**response_500},
     response_model=PaginatedResponse[schemas.CommentSchema],
     summary="특정 게시글의 모든 댓글 가져오기",
     description=documents.read_comments_description,
@@ -62,6 +64,7 @@ async def read_comments(
 
 @comment_router.post(
     "",
+    responses={**response_403, **comment_response_404, **response_500},
     response_model=schemas.CommentSchema,
     status_code=201,
     summary="댓글 작성하기",
@@ -92,6 +95,7 @@ async def create_comment(
 
 @comment_router.put(
     "/{comment_id}",
+    responses={**response_403, **comment_response_404, **response_500},
     response_model=schemas.CommentSchema,
     summary="댓글 수정하기 (전체 업데이트)",
     description=documents.update_comment_description,
@@ -99,6 +103,7 @@ async def create_comment(
 )
 @comment_router.patch(
     "/{comment_id}",
+    responses={**response_403, **comment_response_404, **response_500},
     response_model=schemas.CommentSchema,
     summary="댓글 수정하기 (부분 업데이트)",
     description=documents.update_comment_description,
@@ -126,6 +131,7 @@ async def update_comment(
 
 @comment_router.delete(
     "/{comment_id}",
+    responses={**response_403, **comment_response_404, **response_500},
     response_model=schemas.CommentSchema,
     summary="댓글 삭제하기",
     description=documents.delete_comment_description,

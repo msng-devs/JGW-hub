@@ -96,7 +96,9 @@ class TestPostApi:
         await self._create_random_posts(30)
 
         # when
-        response = await app_client.get(f"{self.url}/list", headers=self.__make_header())
+        response = await app_client.get(
+            f"{self.url}/list", headers=self.__make_header()
+        )
 
         # then
         response_data = response.json()
@@ -477,7 +479,9 @@ class TestPostApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
+        response = await app_client.delete(
+            f"{self.url}/1", headers=self.__make_header()
+        )
 
         # then
         assert response.status_code == 204

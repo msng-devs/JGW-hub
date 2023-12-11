@@ -17,6 +17,7 @@ from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import board as schemas
 from app.crud import board as crud
 from app.utils import constant, documents
+from app.utils.documents import response_403, response_500, board_response_404
 from ._check import check_user, check_user_is_admin, auth
 
 log = getLogger(__name__)
@@ -25,6 +26,7 @@ board_router = APIRouter(prefix="/board")
 
 @board_router.get(
     "",
+    responses={**response_500},
     response_model=PaginatedResponse[schemas.BoardSchema],
     summary="모든 게시판 목록 가져오기",
     description=documents.read_boards_description,
@@ -44,6 +46,7 @@ async def read_boards(
 
 @board_router.get(
     "/{board_id}",
+    responses={**board_response_404, **response_500},
     response_model=schemas.BoardSchema,
     summary="특정 게시판 가져오기",
     description=documents.read_board_description,
@@ -57,6 +60,7 @@ async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db))
 
 @board_router.post(
     "",
+    responses={**response_403, **response_500},
     response_model=schemas.BoardSchema,
     status_code=201,
     summary="게시판 생성",
@@ -77,6 +81,7 @@ async def create_board(
 
 @board_router.put(
     "/{board_id}",
+    responses={**response_403, **board_response_404, **response_500},
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (전체 업데이트)",
     description=documents.update_board_description,
@@ -84,6 +89,7 @@ async def create_board(
 )
 @board_router.patch(
     "/{board_id}",
+    responses={**response_403, **board_response_404, **response_500},
     response_model=schemas.BoardSchema,
     summary="게시판 수정 (부분 업데이트)",
     description=documents.update_board_description,
@@ -106,6 +112,7 @@ async def update_board(
 
 @board_router.delete(
     "/{board_id}",
+    responses={**response_403, **board_response_404, **response_500},
     status_code=204,
     summary="게시판 삭제",
     description=documents.delete_board_description,

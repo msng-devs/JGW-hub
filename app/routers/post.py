@@ -18,6 +18,7 @@ from app.helper.exceptions import InternalException, ErrorCode
 from app.schemas import post as schemas
 from app.crud import post as crud
 from app.utils import constant, documents
+from app.utils.documents import response_403, response_500, post_response_404
 from ._check import (
     auth,
     check_user,
@@ -33,6 +34,7 @@ post_router = APIRouter(prefix="/post")
 
 @post_router.get(
     "/list",
+    responses={**response_500},
     response_model=PaginatedResponse[schemas.PostPreviewSchema],
     summary="모든 게시글 목록 가져오기",
     description=documents.read_posts_description,
@@ -100,6 +102,7 @@ async def read_posts(
 
 @post_router.get(
     "/{post_id}",
+    responses={**response_403, **post_response_404, **response_500},
     response_model=schemas.PostSchema,
     summary="특정 게시글 가져오기",
     description=documents.read_post_description,
@@ -124,6 +127,7 @@ async def read_post(
 
 @post_router.post(
     "",
+    responses={**response_403, **response_500},
     response_model=schemas.PostSchema,
     status_code=201,
     summary="게시글 생성",
@@ -149,6 +153,7 @@ async def create_post(
 
 @post_router.put(
     "/{post_id}",
+    responses={**response_403, **post_response_404, **response_500},
     response_model=schemas.PostSchema,
     summary="게시글 수정 (전체 업데이트)",
     description=documents.update_post_description,
@@ -156,6 +161,7 @@ async def create_post(
 )
 @post_router.patch(
     "/{post_id}",
+    responses={**response_403, **post_response_404, **response_500},
     response_model=schemas.PostSchema,
     summary="게시글 수정 (부분 업데이트)",
     description=documents.update_post_description,
@@ -181,6 +187,7 @@ async def update_post(
 
 @post_router.delete(
     "/{post_id}",
+    responses={**response_403, **post_response_404, **response_500},
     status_code=204,
     summary="게시글 삭제",
     description=documents.delete_post_description,

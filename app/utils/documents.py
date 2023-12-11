@@ -5,6 +5,8 @@
 # --------------------------------------------------------------------------
 from fastapi import FastAPI
 
+from app.helper.exceptions import ExceptionSchema
+
 
 def add_description_at_api_tags(app: FastAPI):
     tag_descriptions = {
@@ -322,3 +324,103 @@ RBAC - AUTH
 # Responses Schema documentations
 # --------------------------------------------------------------------------
 # TODO: 각 endpoint 문서에 렌더링할 400, 403, 404, 500 등의 에러 응답 JSON 스키마 작성
+response_403 = {
+    403: {
+        "model": ExceptionSchema,
+        "description": "Forbidden",
+        "content": {
+            "application/json": {
+                "example": {
+                    "timestamp": "2023-12-11T13:12:47.209076Z",
+                    "status": 403,
+                    "error": "FORBIDDEN",
+                    "message": "해당 유저의 권한으로는 불가능한 작업입니다.",
+                    "errorCode": "HB-AUTH-002",
+                    "path": "/hub/api/v2/<some/endpoint>",
+                }
+            }
+        },
+    },
+}
+database_err = {
+    400: {
+        "model": ExceptionSchema,
+        "description": "DATABASE ERROR",
+        "content": {
+            "application/json": {
+                "example": {
+                    "timestamp": "2023-12-11T13:12:47.209076Z",
+                    "status": "DATABASE_BAD_REQUEST",
+                    "error": "DATABASE_BAD_REQUEST",
+                    "message": "데이터베이스에 중복된 값이 존재합니다.",
+                    "errorCode": "HB-DATA-001",
+                    "path": "/hub/api/v2/<some/endpoint>",
+                }
+            }
+        },
+    },
+}
+
+response_500 = {
+    500: {
+        "model": ExceptionSchema,
+        "description": "UNKNOWN ERROR (서버 내부 로직 에러)",
+    },
+}
+
+board_response_404 = {
+    404: {
+        "model": ExceptionSchema,
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": {
+                    "timestamp": "2023-12-11T13:12:47.209076Z",
+                    "status": 404,
+                    "error": "NOT_FOUND",
+                    "message": "해당 게시판을 찾을 수 없습니다.",
+                    "errorCode": "HB-HTTP-002",
+                    "path": "/hub/api/v2/board/<invalid_board_id>",
+                }
+            }
+        },
+    },
+}
+
+post_response_404 = {
+    404: {
+        "model": ExceptionSchema,
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": {
+                    "timestamp": "2023-12-11T13:12:47.209076Z",
+                    "status": 404,
+                    "error": "NOT_FOUND",
+                    "message": "해당 게시글을 찾을 수 없습니다.",
+                    "errorCode": "HB-HTTP-002",
+                    "path": "/hub/api/v2/post/<invalid_post_id>",
+                }
+            }
+        },
+    },
+}
+
+comment_response_404 = {
+    404: {
+        "model": ExceptionSchema,
+        "description": "Not Found",
+        "content": {
+            "application/json": {
+                "example": {
+                    "timestamp": "2023-12-11T13:12:47.209076Z",
+                    "status": 404,
+                    "error": "NOT_FOUND",
+                    "message": "해당 댓글을 찾을 수 없습니다.",
+                    "errorCode": "HB-HTTP-002",
+                    "path": "/hub/api/v2/comment/<invalid_comment_id>",
+                }
+            }
+        },
+    },
+}

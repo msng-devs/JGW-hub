@@ -312,7 +312,9 @@ class TestCommentApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
+        response = await app_client.delete(
+            f"{self.url}/1", headers=self.__make_header()
+        )
 
         # then
         response_data = response.json()

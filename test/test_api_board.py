@@ -248,7 +248,9 @@ class TestBoardApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
+        response = await app_client.delete(
+            f"{self.url}/1", headers=self.__make_header()
+        )
 
         # then
         assert response.status_code == 204
@@ -312,7 +314,9 @@ class TestBoardApiError:
         )
 
         # when
-        response = await app_client.get(f"{self.url}/1000", headers=self.__make_header())
+        response = await app_client.get(
+            f"{self.url}/1000", headers=self.__make_header()
+        )
 
         # then
         response_data = response.json()
@@ -350,7 +354,7 @@ class TestBoardApiError:
         # then
         response_data = response.json()
         assert response.status_code == 400
-        assert response_data.get("status") == "DATABASE_BAD_REQUEST"
+        assert response_data.get("status") == 400
         assert response_data.get("message") == "데이터베이스에 중복된 값이 존재합니다."
         assert response_data.get("errorCode") == "HB-DATA-001"
 
