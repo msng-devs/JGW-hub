@@ -10,7 +10,10 @@ FastAPI로 새로 작성된 자람 허브
 
 url endpoint 태그 v2가 붙여져 있는 url로 호출 가능하며(/hub/api/v2/~~), Docker을 기반으로 새로운 포트 번호를 가진 컨테이너로 실행됩니다.
 
-API 문서 : [Link(Gitbook 문서 업로드 예정)]()
+API 문서 : [Link](https://jgw.gitbook.io/jgw-hub-v2/)
+
+단, 상단의 API 문서의 경우 response 스키마 일부 필드가 누락되거나 잘못 표기된 경우가 있으므로, 
+docs 폴더의 [/openapi.yaml](docs/openapi.yaml) 혹은 [/openapi.json](docs/openapi.json) 파일을 다운 받아 Swagger 뷰어로 확인하는 것을 권장드립니다.
 
 ## (v2) Directory 구조
 
@@ -53,6 +56,9 @@ API 문서 : [Link(Gitbook 문서 업로드 예정)]()
 │          ├── __init__.py
 │          ├── constant.py
 │          └── documents.py
+├── docs  # OpenAPI 규격의 API 문서 원본이 있는 폴더, 파일들을 다운 받아 Swagger 뷰어로 확인 가능
+│      ├── openapi.json
+│      └── openapi.yaml
 ├── logs  # 로그 파일 폴더, 실제 배포 시 hub.log, hub_errors.log 파일이 생성되어 로그가 저장됨
 │      ├── .logw
 │      ├── hub.log
