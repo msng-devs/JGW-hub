@@ -44,7 +44,7 @@ async def _create_test_post_at_db(
 class TestPostApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self):
-        self.url = "/hub/api/v2/post/"
+        self.url = "/hub/api/v2/post"
         self.member_id = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
         for i in range(5):
             await _create_test_board_at_db(
@@ -96,7 +96,7 @@ class TestPostApi:
         await self._create_random_posts(30)
 
         # when
-        response = await app_client.get(f"{self.url}list", headers=self.__make_header())
+        response = await app_client.get(f"{self.url}/list", headers=self.__make_header())
 
         # then
         response_data = response.json()
@@ -110,7 +110,7 @@ class TestPostApi:
 
         # when
         response = await app_client.get(
-            f"{self.url}list?page=2", headers=self.__make_header()
+            f"{self.url}/list?page=2", headers=self.__make_header()
         )
 
         # then
@@ -132,7 +132,7 @@ class TestPostApi:
             "desc": 1,
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -156,7 +156,7 @@ class TestPostApi:
             "start_date": formatted_date,
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then (start_date)
@@ -185,7 +185,7 @@ class TestPostApi:
             "end_date": formatted_date,
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then (end_date)
@@ -220,7 +220,7 @@ class TestPostApi:
             "writer_uid": self.member_id,
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -248,7 +248,7 @@ class TestPostApi:
             "writer_name": "Test Member",
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -274,7 +274,7 @@ class TestPostApi:
             "board": 2,
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -303,7 +303,7 @@ class TestPostApi:
             "title": "test_title1",
         }
         response = await app_client.get(
-            f"{self.url}list", params=query_params, headers=self.__make_header()
+            f"{self.url}/list", params=query_params, headers=self.__make_header()
         )
 
         # then
@@ -330,7 +330,7 @@ class TestPostApi:
         )
 
         # when
-        response = await app_client.get(f"{self.url}1", headers=self.__make_header())
+        response = await app_client.get(f"{self.url}/1", headers=self.__make_header())
 
         # then
         response_data = response.json()
@@ -396,7 +396,7 @@ class TestPostApi:
 
         # when
         response = await app_client.patch(
-            f"{self.url}1", json=data, headers=self.__make_header()
+            f"{self.url}/1", json=data, headers=self.__make_header()
         )
 
         # then
@@ -441,7 +441,7 @@ class TestPostApi:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=data, headers=self.__make_header()
+            f"{self.url}/1", json=data, headers=self.__make_header()
         )
 
         # then
@@ -477,7 +477,7 @@ class TestPostApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}1", headers=self.__make_header())
+        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
 
         # then
         assert response.status_code == 204
@@ -486,7 +486,7 @@ class TestPostApi:
 class TestPostApiError:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self):
-        self.url = "/hub/api/v2/post/"
+        self.url = "/hub/api/v2/post"
         self.member_id = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
         for i in range(5):
             await _create_test_board_at_db(
@@ -524,7 +524,7 @@ class TestPostApiError:
 
         # when
         response = await app_client.get(
-            f"{self.url}1", headers=self.__make_header(role_pk=1)
+            f"{self.url}/1", headers=self.__make_header(role_pk=1)
         )
 
         # then
@@ -583,7 +583,7 @@ class TestPostApiError:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=data, headers=self.__make_header(role_pk=1)
+            f"{self.url}/1", json=data, headers=self.__make_header(role_pk=1)
         )
 
         # then
@@ -595,12 +595,12 @@ class TestPostApiError:
         assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
 
         data_check_1 = (
-            await app_client.get(f"{self.url}1", headers=self.__make_header())
+            await app_client.get(f"{self.url}/1", headers=self.__make_header())
         ).json()
 
         # when
         response = await app_client.put(
-            f"{self.url}1",
+            f"{self.url}/1",
             json=data,
             headers=self.__make_header(
                 role_pk=3, user_pk="idididididididididididididid"
@@ -616,7 +616,7 @@ class TestPostApiError:
         assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
 
         data_check_2 = (
-            await app_client.get(f"{self.url}1", headers=self.__make_header())
+            await app_client.get(f"{self.url}/1", headers=self.__make_header())
         ).json()
 
         assert data_check_1 == data_check_2
@@ -639,7 +639,7 @@ class TestPostApiError:
 
         # when
         response = await app_client.delete(
-            f"{self.url}1",
+            f"{self.url}/1",
             headers=self.__make_header(
                 role_pk=3, user_pk="idididididididididididididid"
             ),
@@ -654,7 +654,7 @@ class TestPostApiError:
         assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
 
         data_check = (
-            await app_client.get(f"{self.url}1", headers=self.__make_header())
+            await app_client.get(f"{self.url}/1", headers=self.__make_header())
         ).json()
 
         assert data_check is not None

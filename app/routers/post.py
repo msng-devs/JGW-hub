@@ -123,7 +123,7 @@ async def read_post(
 
 
 @post_router.post(
-    "/",
+    "",
     response_model=schemas.PostSchema,
     status_code=201,
     summary="게시글 생성",

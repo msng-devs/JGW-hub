@@ -24,7 +24,7 @@ board_router = APIRouter(prefix="/board")
 
 
 @board_router.get(
-    "/",
+    "",
     response_model=PaginatedResponse[schemas.BoardSchema],
     summary="모든 게시판 목록 가져오기",
     description=documents.read_boards_description,
@@ -56,7 +56,7 @@ async def read_board(board_id: int, db: AsyncSession = Depends(database.get_db))
 
 
 @board_router.post(
-    "/",
+    "",
     response_model=schemas.BoardSchema,
     status_code=201,
     summary="게시판 생성",

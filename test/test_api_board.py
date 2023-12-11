@@ -36,7 +36,7 @@ async def _create_test_board_at_db(
 class TestBoardApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
-        self.url = "/hub/api/v2/board/"
+        self.url = "/hub/api/v2/board"
 
     def __make_header(
         self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
@@ -68,7 +68,7 @@ class TestBoardApi:
         response_data = response.json()
         assert response.status_code == 200
         assert response_data.get("count") == 20
-        assert response_data.get("next") == "http://test/hub/api/v2/board/?page=2"
+        assert response_data.get("next") == "http://test/hub/api/v2/board?page=2"
         assert response_data.get("previous") is None
         assert len(response_data.get("results")) == 10
         assert response_data.get("results")[0].get("board_name") == "공지사항0"
@@ -93,7 +93,7 @@ class TestBoardApi:
         )
 
         # when
-        response = await app_client.get(f"{self.url}1", headers=self.__make_header())
+        response = await app_client.get(f"{self.url}/1", headers=self.__make_header())
 
         # then
         response_data = response.json()
@@ -164,7 +164,7 @@ class TestBoardApi:
 
         # when
         response = await app_client.patch(
-            f"{self.url}1", json=patch_data, headers=self.__make_header()
+            f"{self.url}/1", json=patch_data, headers=self.__make_header()
         )
 
         # then
@@ -210,7 +210,7 @@ class TestBoardApi:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=put_data, headers=self.__make_header()
+            f"{self.url}/1", json=put_data, headers=self.__make_header()
         )
 
         # then
@@ -248,14 +248,14 @@ class TestBoardApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}1", headers=self.__make_header())
+        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
 
         # then
         assert response.status_code == 204
 
         # deletion check
         response_check = await app_client.get(
-            f"{self.url}1", headers=self.__make_header()
+            f"{self.url}/1", headers=self.__make_header()
         )
         response_data = response_check.json()
         assert response_check.status_code == 404
@@ -267,7 +267,7 @@ class TestBoardApi:
 class TestBoardApiError:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self, app_client: AsyncClient):
-        self.url = "/hub/api/v2/board/"
+        self.url = "/hub/api/v2/board"
 
     def __make_header(
         self, role_pk: int = 5, user_pk: str = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
@@ -295,7 +295,7 @@ class TestBoardApiError:
             "role_role_pk_comment_write_level": role_role_pk_comment_write_level,
         }
         response = await app_client.post(
-            "/hub/api/v2/board/", json=data, headers=self.__make_header()
+            self.url, json=data, headers=self.__make_header()
         )
         return response
 
@@ -312,7 +312,7 @@ class TestBoardApiError:
         )
 
         # when
-        response = await app_client.get(f"{self.url}1000", headers=self.__make_header())
+        response = await app_client.get(f"{self.url}/1000", headers=self.__make_header())
 
         # then
         response_data = response.json()
@@ -424,7 +424,7 @@ class TestBoardApiError:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=patch_data, headers=self.__make_header(role_pk=2)
+            f"{self.url}/1", json=patch_data, headers=self.__make_header(role_pk=2)
         )
 
         # then
@@ -436,7 +436,7 @@ class TestBoardApiError:
         assert response_data.get("message") == "해당 유저의 권한으로는 불가능한 작업입니다."
 
         data_check = (
-            await app_client.get(f"{self.url}1", headers=self.__make_header())
+            await app_client.get(f"{self.url}/1", headers=self.__make_header())
         ).json()
 
         assert data_check.get("board_name") == "공지사항1"
@@ -456,7 +456,7 @@ class TestBoardApiError:
 
         # when
         response = await app_client.delete(
-            f"{self.url}1", headers=self.__make_header(role_pk=2)
+            f"{self.url}/1", headers=self.__make_header(role_pk=2)
         )
 
         # then

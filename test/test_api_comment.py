@@ -47,7 +47,7 @@ async def _create_test_comment_at_db(
 class TestCommentApi:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self):
-        self.url = "/hub/api/v2/comment/"
+        self.url = "/hub/api/v2/comment"
         self.member_id = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
         for i in range(5):
             await _create_test_board_at_db(
@@ -135,7 +135,7 @@ class TestCommentApi:
         assert response_data.get("count") == 5
         assert (
             response_data.get("next")
-            == "http://test/hub/api/v2/comment/?post_id=1&page_size=3&page=2"
+            == "http://test/hub/api/v2/comment?post_id=1&page_size=3&page=2"
         )
         assert len(response_data.get("results")) == 3
         assert response_data.get("results")[0].get("comment_id") == 1
@@ -229,7 +229,7 @@ class TestCommentApi:
 
         # when
         response = await app_client.patch(
-            f"{self.url}1", json=data, headers=self.__make_header()
+            f"{self.url}/1", json=data, headers=self.__make_header()
         )
 
         # then
@@ -275,7 +275,7 @@ class TestCommentApi:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=data, headers=self.__make_header()
+            f"{self.url}/1", json=data, headers=self.__make_header()
         )
 
         # then
@@ -312,7 +312,7 @@ class TestCommentApi:
         )
 
         # when
-        response = await app_client.delete(f"{self.url}1", headers=self.__make_header())
+        response = await app_client.delete(f"{self.url}/1", headers=self.__make_header())
 
         # then
         response_data = response.json()
@@ -334,7 +334,7 @@ class TestCommentApi:
 class TestCommentApiError:
     @pytest_asyncio.fixture(autouse=True)
     async def setup(self):
-        self.url = "/hub/api/v2/comment/"
+        self.url = "/hub/api/v2/comment"
         self.member_id = "pkpkpkpkpkpkpkpkpkpkpkpkpkpk"
         for i in range(5):
             await _create_test_board_at_db(
@@ -457,7 +457,7 @@ class TestCommentApiError:
 
         # when
         response = await app_client.put(
-            f"{self.url}1", json=data, headers=self.__make_header(role_pk=1)
+            f"{self.url}/1", json=data, headers=self.__make_header(role_pk=1)
         )
 
         # then
@@ -469,7 +469,7 @@ class TestCommentApiError:
 
         # when
         response = await app_client.put(
-            f"{self.url}1",
+            f"{self.url}/1",
             json=data,
             headers=self.__make_header(
                 role_pk=5, user_pk="idididididididididididididid"

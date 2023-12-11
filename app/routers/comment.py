@@ -32,7 +32,7 @@ comment_router = APIRouter(prefix="/comment")
 
 
 @comment_router.get(
-    "/",
+    "",
     response_model=PaginatedResponse[schemas.CommentSchema],
     summary="특정 게시글의 모든 댓글 가져오기",
     description=documents.read_comments_description,
@@ -61,7 +61,7 @@ async def read_comments(
 
 
 @comment_router.post(
-    "/",
+    "",
     response_model=schemas.CommentSchema,
     status_code=201,
     summary="댓글 작성하기",

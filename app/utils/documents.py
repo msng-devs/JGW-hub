@@ -37,6 +37,111 @@ FastAPI로 재작성된 자람 허브 API v2 문서입니다.
 
 (예: /hub/api/v1/board/ -> /hub/api/v2/board/)
 
+
+## V2 변경 사항
+
+1. **Comment API에서 게시물의 모든 댓글을 불러오는 기능의 응답 데이터 변경 -> reply 필드 삭제.**
+
+    변경 내용된 response 예시는 다음과 같습니다.
+    
+    - 기존 응답 데이터
+    ```json
+        {
+          "count": 123,
+          "next": "https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4",
+          "previous": "https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2",
+          "results": [
+            {
+              "comment_id": 1,
+              "comment_depth": 0,
+              "comment_content": "댓글댓글~~~",
+              "comment_write_time": "2023-01-04T21:39:20.619843",
+              "comment_update_time": "2023-01-04T21:39:20.619843",
+              "comment_delete": 0,
+              "post_post_id_pk": 1,
+              "member_member_pk": {
+                "member_pk": "nfkOJDM8492KKMKndods9_@IiNJJjd",
+                "member_nm": "이름이름"
+              },
+              "reply": [
+                {
+                  "comment_id": 2,
+                  "comment_depth": 1,
+                  "comment_content": "답변댓글",
+                  "comment_write_time": "2023-01-04T21:39:20.619843",
+                  "comment_update_time": "2023-01-04T21:39:20.619843",
+                  "comment_delete": 0,
+                  "post_post_id_pk": 1,
+                  "member_member_pk": {
+                    "member_pk": "nfkOJDM8492KKMKndods9_@IiNJJjd",
+                    "member_nm": "이름이름"
+                  },
+                  "reply": {}
+                }
+              ]
+            }
+          ]
+        }
+    ```
+    - 변경된 응답 데이터
+    ```json
+        {
+          "count": 123,
+          "next": "https://api.jaramgroupware.cloud/hub/api/v1/post/?page=4",
+          "previous": "https://api.jaramgroupware.cloud/hub/api/v1/post/?page=2",
+          "results": [
+            {
+              "comment_id": 1,
+              "comment_depth": 0,
+              "comment_content": "댓글댓글~~~",
+              "comment_write_time": "2023-10-23T16:08:15",
+              "comment_update_time": "2023-10-23T16:08:15",
+              "comment_delete": 0,
+              "post_post_id_pk": 1,
+              "member_member_pk": {
+                "member_pk": "nfkOJDM8492KKMKndods9_@IiNJJjd",
+                "member_nm": "이름이름"
+              },
+              "comment_comment_id_ref": 0
+            },
+            {
+              "comment_id": 2,
+              "comment_depth": 1,
+              "comment_content": "답변댓글",
+              "comment_write_time": "2023-10-23T16:08:15",
+              "comment_update_time": "2023-10-23T16:08:15",
+              "comment_delete": 0,
+              "post_post_id_pk": 1,
+              "member_member_pk": {
+                "member_pk": "nfkOJDM8492KKMKndods9_@IiNJJjd",
+                "member_nm": "이름이름"
+              },
+              "comment_comment_id_ref": 1
+            }
+          ]
+        }
+    ```
+    
+    기존 v1 url : /hub/v1/comment/?page=<page_id>에서는 reply 필드에 특정 댓글의 답글 댓글까지 같이 출력을 하는 형태였으나, \
+    이는 답변 댓글이 중복으로 출력되어 같은 댓글이 두번이나 출력될 우려가 있었습니다.
+    
+    따라서 v2에서는 reply 필드를 삭제하고, comment_comment_id_ref 필드를 추가하여 답변 댓글의 부모 댓글의 id를 출력하도록 변경하였습니다.
+    
+    변경 사항에 맞춰서 답변 댓글을 출력하는 로직을 수정해주셔야 합니다. (예: 댓글에 답글 부분을 담을 리스트를 선언한 후, \
+    comment_comment_id_ref에 값이 있는 경우 해당 댓글을 리스트에 추가 -> 댓글 컨테이너에 render하는 방식으로 구현)
+    
+2. **url 끝부분에 슬래시 '/'를 붙이는 패턴을 RESTful하게 수정 -> (예: 기존 v1 url : /hub/v1/board/1/ -> v2 url : /hub/v2/board/1)**
+
+    RESTful API에서 '/'는 계층을 구분하기 위해 사용되는 문자입니다.
+    
+    따라서 후행 슬래시(/)는 의미가 전혀 없고 혼란을 야기할 수 있기 때문에 제거하였습니다.
+    
+    쿼리 파라미터를 넣을 때에도 기존 v1에서는 /hub/v1/board/?page=1과 같이 ? 앞에 슬래시를 붙여서 쿼리 파라미터를 넣었지만, \
+    v2에서는 /hub/v2/board?page=1과 같이 슬래시를 붙이지 않고 쿼리 파라미터를 넣어야 합니다.
+    
+    클라이언트 개발 시 서버로 url 요청을 보낼 때 슬래시에 유의하여 주시기 바랍니다.
+
+
 ## API 보안 규칙
 자람 허브 API를 포함한 Jaram Groupware의 모든 Back-end 서비스는 Gateway를 통해 요청을 보내는 유저의 정보를 검증합니다.
 
