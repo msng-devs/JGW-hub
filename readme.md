@@ -53,6 +53,9 @@ API 문서 : [Link(Gitbook 문서 업로드 예정)]()
 │          ├── __init__.py
 │          ├── constant.py
 │          └── documents.py
+├── docs  # OpenAPI 규격의 API 문서 원본이 있는 폴더, 파일들을 다운 받아 Swagger 뷰어로 확인 가능
+│      ├── openapi.json
+│      └── openapi.yaml
 ├── logs  # 로그 파일 폴더, 실제 배포 시 hub.log, hub_errors.log 파일이 생성되어 로그가 저장됨
 │      ├── .logw
 │      ├── hub.log
