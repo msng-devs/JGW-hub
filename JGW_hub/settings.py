@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
-    'corsheaders',
+    # 'corsheaders',
     'jgw_api'
 ]
 
