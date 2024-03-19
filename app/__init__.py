@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
-from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from app.db.database import engine
 from app.db.models import Base
@@ -86,8 +86,8 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_middleware(HTTPSRedirectMiddleware)
     app.add_middleware(PaginationMiddleware)
+    app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["https://jaramgroupware.cloud"])
     app.add_middleware(ExceptionMiddleware, logger="hub_error_logger")
 
     app.include_router(router)
