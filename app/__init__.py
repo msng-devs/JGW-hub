@@ -11,6 +11,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
+
 from app.db.database import engine
 from app.db.models import Base
 from app.routers import router
@@ -84,6 +86,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(HTTPSRedirectMiddleware)
     app.add_middleware(PaginationMiddleware)
     app.add_middleware(ExceptionMiddleware, logger="hub_error_logger")
 
