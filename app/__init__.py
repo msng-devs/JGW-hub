@@ -75,7 +75,7 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         redoc_url="/hub/api/v2/redoc",
     )
 
-    origins = ["*"]
+    origins = ["https://jaramgroupware.cloud"]
 
     app.add_middleware(
         CORSMiddleware,
