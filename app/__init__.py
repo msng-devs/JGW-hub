@@ -75,11 +75,11 @@ def create_app(app_settings: AppSettings) -> FastAPI:
         redoc_url="/hub/api/v2/redoc",
     )
 
-    origins = ["https://jaramgroupware.cloud"]
+    # Gateway에서 CORS를 설정하고, FastAPI에서 특정 origin을 설정하면 header에 중복으로 ORIGIN이 설정됨 -> origin 설정 제거
+    # origins = ["https://jaramgroupware.cloud"]
 
     app.add_middleware(
         CORSMiddleware,
-        # allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
